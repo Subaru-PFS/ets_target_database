@@ -7,7 +7,7 @@ import pandas as pd
 from .model import Base
 
 
-def generate_schema_markdown(dbinfo, schema_md=sys.stdout):
+def generate_schema_markdown(schema_md=sys.stdout):
 
     out_md = ""
 

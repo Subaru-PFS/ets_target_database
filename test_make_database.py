@@ -7,14 +7,11 @@ from targetdb import create_schema
 from targetdb import generate_schema_markdown
 
 
-def main(dbinfo, schema_md=sys.stdout, drop_all=False):
-
-    # print(dbinfo)
-    # print(drop_all)
+def main(dbinfo, schema_md=None, drop_all=False):
 
     create_schema(dbinfo, drop_all=drop_all)
 
-    generate_schema_markdown(dbinfo, schema_md)
+    generate_schema_markdown(schema_md=schema_md)
 
 
 if __name__ == "__main__":
@@ -33,7 +30,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--schema_md",
         type=str,
-        # action="store_true",
+        default=sys.stdout,
         help="Output markdown file to write tables in the database (Default: sys.stdout)",
     )
 
