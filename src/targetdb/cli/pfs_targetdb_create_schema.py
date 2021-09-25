@@ -3,13 +3,13 @@
 import argparse
 import sys
 
-from . import create_schema
+from .. import create_schema
 
 # from targetdb import generate_schema_markdown
 
 
 def get_arguments():
-    parser = argparse.ArgumentParser(description="Create targetDB on PostgreSQL.")
+    parser = argparse.ArgumentParser(description="Create the schema in targetDB.")
     parser.add_argument(
         "dbinfo",
         type=str,

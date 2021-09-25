@@ -171,10 +171,10 @@ setup(
     #
     # Similar to `install_requires` above, these must be valid existing
     # projects.
-    # extras_require={  # Optional
-    #     "dev": ["check-manifest"],
-    #     "test": ["coverage"],
-    # },
+    extras_require={  # Optional
+        "database_helpers": ["sqlalchemy_utils"],
+        # "test": ["coverage"],
+    },
     #
     #
     # If there are data files included in your packages that need to be
@@ -199,8 +199,10 @@ setup(
     # executes the function `main` from this package when invoked:
     entry_points={  # Optional
         "console_scripts": [
-            "pfs_targetdb_create_schema=targetdb.pfs_targetdb_create_schema:main",
-            "pfs_targetdb_generate_mdtable=targetdb.pfs_targetdb_generate_mdtable:main",
+            "pfs_targetdb_create_database=targetdb.cli.pfs_targetdb_database_helpers:main_create_database",
+            "pfs_targetdb_drop_database=targetdb.cli.pfs_targetdb_database_helpers:main_drop_database",
+            "pfs_targetdb_create_schema=targetdb.cli.pfs_targetdb_create_schema:main",
+            "pfs_targetdb_generate_mdtable=targetdb.cli.pfs_targetdb_generate_mdtable:main",
         ],
     },
     #

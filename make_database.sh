@@ -14,7 +14,7 @@
 
 hostname="localhost"
 port="15432"
-dbname="targetdb_test"
+dbname="targetdb"
 # dbname="postgres"
 username="admin"
 password="admin"
@@ -25,6 +25,11 @@ schema_md="--schema_md schema_targetdb_tables.md"
 ## make schema ##
 url="postgresql://${username}:${password}@${hostname}:${port}/${dbname}"
 
+# # CAUTION: drop database
+# pfs_targetdb_drop_database ${url}
+
+# create database if it does not exist
+pfs_targetdb_create_database ${url}
 pfs_targetdb_create_schema ${url} ${drop_all}
 pfs_targetdb_generate_mdtable ${schema_md}
 # python test_make_database.py ${url} ${drop_all} ${schema_md}
