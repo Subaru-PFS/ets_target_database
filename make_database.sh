@@ -25,7 +25,9 @@ schema_md="--schema_md schema_targetdb_tables.md"
 ## make schema ##
 url="postgresql://${username}:${password}@${hostname}:${port}/${dbname}"
 
-python test_make_database.py ${url} ${drop_all} ${schema_md}
+pfs_targetdb_create_schema ${url} ${drop_all}
+pfs_targetdb_generate_mdtable ${schema_md}
+# python test_make_database.py ${url} ${drop_all} ${schema_md}
 
 success=$?
 
@@ -37,6 +39,8 @@ if [ $success -ne 0 ]; then
     echo ""
     exit 1
 fi
+
+md-to-pdf schema_targetdb_tables.md
 
 # exit
 

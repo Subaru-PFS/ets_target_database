@@ -197,11 +197,14 @@ setup(
     #
     # For example, the following would provide a command called `sample` which
     # executes the function `main` from this package when invoked:
-    # entry_points={  # Optional
-    #     "console_scripts": [
-    #         "sample=sample:main",
-    #     ],
-    # },
+    entry_points={  # Optional
+        "console_scripts": [
+            # "pfs_targetdb_create_schema=pfs_targetdb_create_schema:main",
+            "pfs_targetdb_create_schema=targetdb.pfs_targetdb_create_schema:main",
+            "pfs_targetdb_generate_mdtable=targetdb.pfs_targetdb_generate_mdtable:main"
+            # "pfs_targetdb_mdtable=generate_database_schema_md:main",
+        ],
+    },
     #
     #
     # List additional URLs that are relevant to your project as a dict.
