@@ -1,16 +1,11 @@
 #!/usr/bin/env python
 
 import argparse
-import sys
 
 from sqlalchemy import create_engine
 from sqlalchemy_utils import create_database
 from sqlalchemy_utils import database_exists
 from sqlalchemy_utils import drop_database
-
-# from . import create_schema
-
-# from targetdb import generate_schema_markdown
 
 
 def get_arguments():
