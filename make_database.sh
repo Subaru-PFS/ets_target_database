@@ -52,11 +52,11 @@ SC_INFO_LEVEL="detailed"
 #        FINER, FINEST, ALL
 #      Optional, defaults to OFF
 # SC_LOG_LEVEL="CONFIG"
-SC_LOG_LEVEL="INFO"
+SC_LOG_LEVEL="SEVERE"
 
 SC_OUTPUT_FILE_PREFIX="schema_targetdb"
 
-rm -f ${SC_OUTPUT_FILE_PREFIX}.p*
+rm -f ${SC_OUTPUT_FILE_PREFIX}.pdf
 
 ./${SCHEMACRAWLERDIR}/_schemacrawler/schemacrawler.sh \
     --server=postgresql \
@@ -71,10 +71,6 @@ rm -f ${SC_OUTPUT_FILE_PREFIX}.p*
     --log-level=${SC_LOG_LEVEL} \
     --portable-names \
     --title='PFS Target Database (Prototype)' \
-    --output-format=ps2 \
-    --output-file=${SC_OUTPUT_FILE_PREFIX}.ps \
+    --output-format=pdf \
+    --output-file=${SC_OUTPUT_FILE_PREFIX}.pdf \
     --no-remarks
-
-ps2pdf ${SC_OUTPUT_FILE_PREFIX}.ps
-
-rm -f ${SC_OUTPUT_FILE_PREFIX}.ps

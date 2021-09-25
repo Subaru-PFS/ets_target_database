@@ -3,8 +3,8 @@
 import argparse
 import sys
 
-from targetdb import create_schema
-from targetdb import generate_schema_markdown
+from src.targetdb import create_schema
+from src.targetdb import generate_schema_markdown
 
 
 def main(dbinfo, schema_md=None, drop_all=False):
