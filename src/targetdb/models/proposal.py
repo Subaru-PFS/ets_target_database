@@ -36,7 +36,9 @@ class proposal(Base):
     rank = Column(Float, comment="TAC score")
     grade = Column(String, comment="TAC grade (A/B/C/F in the case of HSC queue)")
     allocated_time = Column(Float, comment="Total fiberhours allocated by TAC (hour)")
-    proposal_category_id = Column(Integer, ForeignKey("proposal_category"))
+    proposal_category_id = Column(
+        Integer, ForeignKey("proposal_category.proposal_category_id")
+    )
 
     created_at = Column(
         DateTime, comment="Creation time [YYYY-MM-DDThh:mm:ss] (UTC or HST?)"

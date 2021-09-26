@@ -8,10 +8,10 @@ from sqlalchemy import create_engine
 from sqlalchemy import update
 from sqlalchemy.orm import sessionmaker
 
-# from . import models
+from . import models
 
 
-class OpDB(object):
+class TargetDB(object):
     # url = "postgresql://pfs@db-ics:5432/opdb"
 
     def __init__(
@@ -36,6 +36,16 @@ class OpDB(object):
     def close(self):
         self.session.close()
         # print('connection to {0} closed'.format(self.dbinfo))
+
+    def reset(self, full=True):
+        self.session.query(models.input_catalog).delete()
+        self.session.query(models.object_type).delete()
+        self.session.query(models.proposal).delete()
+        self.session.query(models.proposal_category).delete()
+        self.session.query(models.target).delete()
+        self.session.query(models.unique_object).delete()
+
+        self.session.commit()
 
     def rollback(self):
         self.session.rollback()

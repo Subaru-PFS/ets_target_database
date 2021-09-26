@@ -3,7 +3,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from .model import Base
+from .models import Base
 
 
 def create_schema(dbinfo, drop_all=False):

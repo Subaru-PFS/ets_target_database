@@ -35,13 +35,13 @@ class object_type(Base):
 
     def __init__(
         self,
-        object_type_id,
+        # object_type_id,
         object_type_name,
         object_type_description,
         created_at,
         updated_at,
     ):
-        self.object_type_id = object_type_id
+        # self.object_type_id = object_type_id
         self.object_type_name = object_type_name
         self.object_type_description = object_type_description
         self.created_at = created_at

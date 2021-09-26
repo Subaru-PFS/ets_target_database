@@ -4,7 +4,7 @@ import sys
 
 import pandas as pd
 
-from .model import Base
+from .models import Base
 
 
 def generate_schema_markdown(schema_md=sys.stdout):

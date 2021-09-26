@@ -37,13 +37,13 @@ class input_catalog(Base):
 
     def __init__(
         self,
-        input_catalog_id,
+        # input_catalog_id,
         input_catalog_name,
         input_catalog_description,
         created_at,
         updated_at,
     ):
-        self.input_catalog_id = input_catalog_id
+        # self.input_catalog_id = input_catalog_id
         self.input_catalog_name = input_catalog_name
         self.input_catalog_description = input_catalog_description
         self.created_at = created_at
