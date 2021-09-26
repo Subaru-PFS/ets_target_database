@@ -18,12 +18,14 @@ dbname="targetdb"
 # dbname="postgres"
 username="admin"
 password="admin"
-drop_all="--drop_all"
-# drop_all=""
+# drop_all="--drop_all"
+drop_all=""
 schema_md="--schema_md schema_targetdb_tables.md"
 
 ## make schema ##
 url="postgresql://${username}:${password}@${hostname}:${port}/${dbname}"
+
+# postgresql://admin:admin@localhost:15432/targetdb
 
 # # CAUTION: drop database
 # pfs_targetdb_drop_database ${url}
