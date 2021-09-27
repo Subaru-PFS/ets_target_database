@@ -1,0 +1,9 @@
+input_catalog_name,input_catalog_description
+"gaia_dr1","Gaia Data Release 1"
+"gaia_dr2","Gaia Data Release 2"
+"gaia_edr3","Gaia Early Data Release 3"
+"gaia_dr3","Gaia Data Release 3"
+"hsc_pdr1","HSC-SSP Public Data Release 1"
+"hsc_pdr2","HSC-SSP Public Data Release 2"
+"hsc_pdr3","HSC-SSP Public Data Release 3"
+"hsc_pdr4","HSC-SSP Public Data Release 4"
