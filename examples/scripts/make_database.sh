@@ -20,7 +20,9 @@ username="admin"
 password="admin"
 drop_all="--drop_all"
 # drop_all=""
-schema_md="--schema_md schema_targetdb_tables.md"
+out_dir="../output"
+out_md="schema_targetdb_tables.md"
+schema_md="--schema_md ${out_dir}/${out_md}"
 
 ## make schema ##
 url="postgresql://${username}:${password}@${hostname}:${port}/${dbname}"
@@ -31,10 +33,19 @@ url="postgresql://${username}:${password}@${hostname}:${port}/${dbname}"
 # pfs_targetdb_drop_database ${url}
 
 # create database if it does not exist
+
+echo "Creating database:"
 pfs_targetdb_create_database ${url}
+echo ""
+
+echo "Creating schema:"
 pfs_targetdb_create_schema ${url} ${drop_all}
+echo ""
+
+echo "Writing Markdown tables for the schema"
 pfs_targetdb_generate_mdtable ${schema_md}
 # python test_make_database.py ${url} ${drop_all} ${schema_md}
+echo ""
 
 success=$?
 
@@ -47,12 +58,14 @@ if [ $success -ne 0 ]; then
     exit 1
 fi
 
-md-to-pdf schema_targetdb_tables.md
+# md-to-pdf schema_targetdb_tables.md
+md-to-pdf ${out_dir}/${out_md} --basedir ${out_dir}
 
 # exit
 
+echo "Generating ER diagram:"
 ## make schema diagram ##
-SCHEMACRAWLERDIR="../schemacrawler-16.15.4-distribution/"
+SCHEMACRAWLERDIR="../../../schemacrawler-16.15.4-distribution/"
 
 # SL_INFO_LEVEL="standard"
 SC_INFO_LEVEL="detailed"
@@ -65,6 +78,7 @@ SC_INFO_LEVEL="detailed"
 # SC_LOG_LEVEL="CONFIG"
 SC_LOG_LEVEL="SEVERE"
 
+SC_OUTPUT_DIR=${out_dir}
 SC_OUTPUT_FILE_PREFIX="schema_targetdb"
 
 rm -f ${SC_OUTPUT_FILE_PREFIX}.pdf
@@ -83,5 +97,5 @@ rm -f ${SC_OUTPUT_FILE_PREFIX}.pdf
     --portable-names \
     --title='PFS Target Database (Prototype)' \
     --output-format=pdf \
-    --output-file=${SC_OUTPUT_FILE_PREFIX}.pdf \
+    --output-file=${SC_OUTPUT_DIR}/${SC_OUTPUT_FILE_PREFIX}.pdf \
     --no-remarks

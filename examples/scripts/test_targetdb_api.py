@@ -3,7 +3,6 @@
 import datetime
 
 import pandas as pd
-
 from targetdb import targetdb
 
 
@@ -30,24 +29,24 @@ def main():
     # res = db.fetch_all("proposal_category")
     # print(res)
 
-    # utcnow = datetime.datetime.utcnow()
-    # df = pd.DataFrame(
-    #     {
-    #         "proposal_category_name": ["openuse", "keck", "gemini", "uh"],
-    #         "proposal_category_description": [
-    #             "Subaru openuse proposals",
-    #             "Subaru-Keck time exchange proposals",
-    #             "Subaru-Gemini time exchange proposals",
-    #             "University of Hawaii proposals",
-    #         ],
-    #         "created_at": [utcnow, utcnow, utcnow, utcnow],
-    #         "updated_at": [utcnow, utcnow, utcnow, utcnow],
-    #     }
-    # )
-
-    # db.insert("proposal_category", df)
-    # res = db.fetch_all("proposal_category")
-    # print(res)
+    if res.empty:
+        utcnow = datetime.datetime.utcnow()
+        df = pd.DataFrame(
+            {
+                "proposal_category_name": ["openuse", "keck", "gemini", "uh"],
+                "proposal_category_description": [
+                    "Subaru openuse proposals",
+                    "Subaru-Keck time exchange proposals",
+                    "Subaru-Gemini time exchange proposals",
+                    "University of Hawaii proposals",
+                ],
+                "created_at": [utcnow, utcnow, utcnow, utcnow],
+                "updated_at": [utcnow, utcnow, utcnow, utcnow],
+            }
+        )
+        db.insert("proposal_category", df)
+        res = db.fetch_all("proposal_category")
+        print(res)
 
     # # this should make error as 'proposal_category_name` must be unique.
     # db.insert("proposal_category", df)
