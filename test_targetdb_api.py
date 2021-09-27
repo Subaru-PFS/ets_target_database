@@ -27,7 +27,7 @@ def main():
 
     print(res)
 
-    db.reset()
+    # db.reset()
 
     utcnow = datetime.datetime.utcnow()
     df = pd.DataFrame(

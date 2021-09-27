@@ -27,7 +27,9 @@ class object_type(Base):
         comment="Unique identifier for target types",
     )
     object_type_name = Column(
-        String, comment="Name for the target type (e.g., star, galaxy, quasar, etc.)"
+        String,
+        unique=True,
+        comment="Name for the target type (e.g., star, galaxy, quasar, etc.)",
     )
     object_type_description = Column(String, comment="Description of the target type")
     created_at = Column(DateTime)

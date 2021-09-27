@@ -18,8 +18,8 @@ dbname="targetdb"
 # dbname="postgres"
 username="admin"
 password="admin"
-# drop_all="--drop_all"
-drop_all=""
+drop_all="--drop_all"
+# drop_all=""
 schema_md="--schema_md schema_targetdb_tables.md"
 
 ## make schema ##

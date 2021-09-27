@@ -28,6 +28,7 @@ class proposal_category(Base):
     )
     proposal_category_name = Column(
         String,
+        unique=True,
         comment="Proposal category name (e.g., Openuse, Keck, Gemini, and UH)",
     )
     proposal_category_description = Column(

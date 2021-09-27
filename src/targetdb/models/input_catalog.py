@@ -27,7 +27,9 @@ class input_catalog(Base):
         comment="Unique identifier for input catalogs",
     )
     input_catalog_name = Column(
-        String, comment="Name of the input catalog (e.g., Gaia DR2, HSC-SSP PDR3, etc.)"
+        String,
+        unique=True,
+        comment="Name of the input catalog (e.g., Gaia DR2, HSC-SSP PDR3, etc.)",
     )
     input_catalog_description = Column(
         String, comment="Description of the input catalog"
