@@ -9,16 +9,6 @@
 | created_at                | DATETIME | False         | False           |                                                                |
 | updated_at                | DATETIME | False         | False           |                                                                |
 
-## object_type
-
-| name                    | type     | primary_key   | autoincrement   | comment                                                     |
-|:------------------------|:---------|:--------------|:----------------|:------------------------------------------------------------|
-| object_type_id          | INTEGER  | True          | True            | Unique identifier for target types                          |
-| object_type_name        | VARCHAR  | False         | False           | Name for the target type (e.g., star, galaxy, quasar, etc.) |
-| object_type_description | VARCHAR  | False         | False           | Description of the target type                              |
-| created_at              | DATETIME | False         | False           |                                                             |
-| updated_at              | DATETIME | False         | False           |                                                             |
-
 ## proposal_category
 
 | name                          | type     | primary_key   | autoincrement   | comment                                                           |
@@ -28,6 +18,16 @@
 | proposal_category_description | VARCHAR  | False         | False           | Proposal category description (e.g., Openuse, Time exchange, etc. |
 | created_at                    | DATETIME | False         | False           | Creation time                                                     |
 | updated_at                    | DATETIME | False         | False           | Update time                                                       |
+
+## target_type
+
+| name                    | type     | primary_key   | autoincrement   | comment                            |
+|:------------------------|:---------|:--------------|:----------------|:-----------------------------------|
+| target_type_id          | INTEGER  | True          | False           | Unique identifier for target types |
+| target_type_name        | VARCHAR  | False         | False           | Name for the target type.          |
+| target_type_description | VARCHAR  | False         | False           | Description of the target type     |
+| created_at              | DATETIME | False         | False           |                                    |
+| updated_at              | DATETIME | False         | False           |                                    |
 
 ## unique_object
 
@@ -58,27 +58,32 @@
 
 ## target
 
-| name                 | type     | primary_key   | autoincrement   | comment                                                                                               |
-|:---------------------|:---------|:--------------|:----------------|:------------------------------------------------------------------------------------------------------|
-| target_id            | BIGINT   | True          | True            | Unique identifier for each target                                                                     |
-| unique_object_id     | BIGINT   | False         | False           |                                                                                                       |
-| proposal_id          | VARCHAR  | False         | False           |                                                                                                       |
-| obj_id               | BIGINT   | False         | False           | Object ID as specified by the observer at Phase 2 (can be same as the input_catalog_object_id)        |
-| user_ra              | FLOAT    | False         | False           | Original RA submitted by the observer at Phase 2 (ICRS, degree)                                       |
-| user_dec             | FLOAT    | False         | False           | Original Dec submitted by the observer at Phase 2 (ICRS, degree)                                      |
-| user_epoch           | VARCHAR  | False         | False           | Origina Epoch submitted by the observer at Phase 2                                                    |
-| match_distance       | FLOAT    | False         | False           | Distance between the matched unique_object and the original coordinate (arcsec)                       |
-| tract                | INTEGER  | False         | False           | same definition as HSC-SSP?; can be derived from the coordinate                                       |
-| patch                | INTEGER  | False         | False           | same definition as HSC-SSP?; can be derived from the coordinate; Note that it's defined as an integer |
-| object_type_id       | INTEGER  | False         | False           |                                                                                                       |
-| input_catalog_id     | INTEGER  | False         | False           | Input catalog ID from the input_catalog table                                                         |
-| input_catalog_obj_id | BIGINT   | False         | False           | Object ID in the specified input catalog                                                              |
-| fiber_mag_g          | FLOAT    | False         | False           | g-band magnitude within a fiber (AB mag)                                                              |
-| fiber_mag_r          | FLOAT    | False         | False           | r-band magnitude within a fiber (AB mag)                                                              |
-| fiber_mag_i          | FLOAT    | False         | False           | i-band magnitude within a fiber (AB mag)                                                              |
-| fiber_mag_z          | FLOAT    | False         | False           | z-band magnitude within a fiber (AB mag)                                                              |
-| fiber_mag_y          | FLOAT    | False         | False           | y-band magnitude within a fiber (AB mag)                                                              |
-| fiber_mag_j          | FLOAT    | False         | False           | J band magnitude within a fiber (AB mag)                                                              |
-| photoz               | FLOAT    | False         | False           | Photometric redshift for the object                                                                   |
-| created_at           | DATETIME | False         | False           |                                                                                                       |
-| updated_at           | DATETIME | False         | False           |                                                                                                       |
+| name                   | type     | primary_key   | autoincrement   | comment                                                                                               |
+|:-----------------------|:---------|:--------------|:----------------|:------------------------------------------------------------------------------------------------------|
+| target_id              | BIGINT   | True          | True            | Unique identifier for each target                                                                     |
+| unique_object_id       | BIGINT   | False         | False           |                                                                                                       |
+| proposal_id            | VARCHAR  | False         | False           |                                                                                                       |
+| obj_id                 | BIGINT   | False         | False           | Object ID as specified by the observer at Phase 2 (can be same as the input_catalog_object_id)        |
+| user_ra                | FLOAT    | False         | False           | Original RA submitted by the observer at Phase 2 (ICRS, degree)                                       |
+| user_dec               | FLOAT    | False         | False           | Original Dec submitted by the observer at Phase 2 (ICRS, degree)                                      |
+| user_epoch             | VARCHAR  | False         | False           | Origina Epoch submitted by the observer at Phase 2                                                    |
+| match_distance         | FLOAT    | False         | False           | Distance between the matched unique_object and the original coordinate (arcsec)                       |
+| tract                  | INTEGER  | False         | False           | same definition as HSC-SSP?; can be derived from the coordinate                                       |
+| patch                  | INTEGER  | False         | False           | same definition as HSC-SSP?; can be derived from the coordinate; Note that it's defined as an integer |
+| target_type_id         | INTEGER  | False         | False           |                                                                                                       |
+| input_catalog_id       | INTEGER  | False         | False           | Input catalog ID from the input_catalog table                                                         |
+| input_catalog_obj_id   | BIGINT   | False         | False           | Object ID in the specified input catalog                                                              |
+| fiber_mag_g            | FLOAT    | False         | False           | g-band magnitude within a fiber (AB mag)                                                              |
+| fiber_mag_r            | FLOAT    | False         | False           | r-band magnitude within a fiber (AB mag)                                                              |
+| fiber_mag_i            | FLOAT    | False         | False           | i-band magnitude within a fiber (AB mag)                                                              |
+| fiber_mag_z            | FLOAT    | False         | False           | z-band magnitude within a fiber (AB mag)                                                              |
+| fiber_mag_y            | FLOAT    | False         | False           | y-band magnitude within a fiber (AB mag)                                                              |
+| fiber_mag_j            | FLOAT    | False         | False           | J band magnitude within a fiber (AB mag)                                                              |
+| priority               | FLOAT    | False         | False           | Priority of the target specified by the observer within the proposal                                  |
+| effective_exptime      | FLOAT    | False         | False           | Requested effective exposure time (s)                                                                 |
+| is_medium_resolution   | BOOLEAN  | False         | False           | True if the medium resolution mode is requested                                                       |
+| qa_relative_throughput | FLOAT    | False         | False           | Relative throughput to the reference value requested by the observer                                  |
+| qa_relative_noise      | FLOAT    | False         | False           | Relative noise to the reference value requested by the observer                                       |
+| qa_reference_lambda    | FLOAT    | False         | False           | Reference wavelength to evaluate effective exposure time (angstrom or nm?)                            |
+| created_at             | DATETIME | False         | False           |                                                                                                       |
+| updated_at             | DATETIME | False         | False           |                                                                                                       |

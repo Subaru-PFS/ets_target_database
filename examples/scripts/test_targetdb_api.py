@@ -99,7 +99,7 @@ def main(conf=None, reset=False):
 
     db = insert_simple(db, table="input_catalog", csv="../data/input_catalog.csv")
 
-    db = insert_simple(db, table="object_type", csv="../data/object_type.csv")
+    db = insert_simple(db, table="target_type", csv="../data/target_type.csv")
 
     db.close()
 

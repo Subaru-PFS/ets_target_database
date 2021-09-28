@@ -15,8 +15,8 @@ from sqlalchemy.orm import relation
 
 from . import Base
 from . import input_catalog
-from . import object_type
 from . import proposal
+from . import target_type
 from . import unique_object
 
 
@@ -63,7 +63,7 @@ class target(Base):
         comment="same definition as HSC-SSP?; can be derived from the coordinate; Note that it's defined as an integer",
     )  # xxxx: needed?
 
-    object_type_id = Column(Integer, ForeignKey("object_type.object_type_id"))
+    target_type_id = Column(Integer, ForeignKey("target_type.target_type_id"))
 
     input_catalog_id = Column(
         Integer,
@@ -80,23 +80,39 @@ class target(Base):
     fiber_mag_z = Column(Float, comment="z-band magnitude within a fiber (AB mag)")
     fiber_mag_y = Column(Float, comment="y-band magnitude within a fiber (AB mag)")
     fiber_mag_j = Column(Float, comment="J band magnitude within a fiber (AB mag)")
-    photoz = Column(Float, comment="Photometric redshift for the object")
 
-    # priority = Column(
-    #     Float,
-    #     comment="Priority of the target specified by the observer within the proposal",
-    # )
-    # effective_exptime = Column(Float, comment="Requested effective exposure time (s)")
-    # is_medium_resolution = Column(
-    #     Boolean, comment="True if the medium resolution mode is requested"
-    # )
+    # photoz = Column(Float, comment="Photometric redshift for the object")
 
+    priority = Column(
+        Float,
+        comment="Priority of the target specified by the observer within the proposal",
+    )
+    effective_exptime = Column(Float, comment="Requested effective exposure time (s)")
+
+    is_medium_resolution = Column(
+        Boolean, comment="True if the medium resolution mode is requested"
+    )
+
+    # QA information
+    qa_relative_throughput = Column(
+        Float,
+        comment="Relative throughput to the reference value requested by the observer",
+    )
+    qa_relative_noise = Column(
+        Float, comment="Relative noise to the reference value requested by the observer"
+    )
+    qa_reference_lambda = Column(
+        Float,
+        comment="Reference wavelength to evaluate effective exposure time (angstrom or nm?)",
+    )
+
+    # timestamp
     created_at = Column(DateTime)
     updated_at = Column(DateTime)
 
     unique_objects = relation(unique_object, backref=backref("target"))
     proposals = relation(proposal, backref=backref("target"))
-    object_types = relation(object_type, backref=backref("target"))
+    target_types = relation(target_type, backref=backref("target"))
     input_catalogs = relation(input_catalog, backref=backref("target"))
 
     def __init__(
@@ -110,7 +126,7 @@ class target(Base):
         match_distance,
         tract,
         patch,
-        object_type_id,
+        target_type_id,
         input_catalog_id,
         input_catalog_obj_id,
         fiber_mag_g,
@@ -119,10 +135,16 @@ class target(Base):
         fiber_mag_z,
         fiber_mag_y,
         fiber_mag_j,
-        photoz,
-        # priority,
-        # effective_exptime,
-        # is_medium_resolution,
+        # photoz,
+        #
+        priority,
+        effective_exptime,
+        is_medium_resolution,
+        #
+        qa_relative_throughput,
+        qa_relative_noise,
+        qa_reference_lambda,
+        #
         created_at,
         updated_at,
     ):
@@ -135,7 +157,7 @@ class target(Base):
         self.match_distance = match_distance
         self.tract = tract
         self.patch = patch
-        self.object_type_id = object_type_id
+        self.target_type_id = target_type_id
         self.input_catalog_id = input_catalog_id
         self.input_catalog_obj_id = input_catalog_obj_id
         self.fiber_mag_g = fiber_mag_g
@@ -144,9 +166,15 @@ class target(Base):
         self.fiber_mag_z = fiber_mag_z
         self.fiber_mag_y = fiber_mag_y
         self.fiber_mag_j = fiber_mag_j
-        self.photoz = photoz
-        # self.priority = priority
-        # self.effective_exptime = effective_exptime
-        # self.is_medium_resolution = is_medium_resolution
+        # self.photoz = photoz
+        #
+        self.priority = priority
+        self.effective_exptime = effective_exptime
+        self.is_medium_resolution = is_medium_resolution
+        #
+        self.qa_relative_throughput = qa_relative_throughput
+        self.qa_relative_noise = qa_relative_noise
+        self.qa_reference_lambda = qa_reference_lambda
+        #
         self.created_at = created_at
         self.updated_at = updated_at
