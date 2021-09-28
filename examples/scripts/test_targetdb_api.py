@@ -24,20 +24,24 @@ def connect_db(conf=None):
     return db
 
 
-def insert_proposal_category(db):
-    df_proposal_category = pd.read_csv("../data/proposal_category.csv")
-    n_proposal_category = len(df_proposal_category.index)
+def insert_simple(db, table=None, csv=None):
+    df_input = pd.read_csv(csv)
+    # df_input = pd.read_csv("../data/proposal_category.csv")
+    n_input = len(df_input.index)
 
     try:
-        print("trying to insert data into proposal_category...")
+        print("trying to insert data into {:s}...".format(table))
 
         utcnow = datetime.datetime.utcnow()
-        df_proposal_category["created_at"] = [utcnow] * n_proposal_category
-        df_proposal_category["updated_at"] = [utcnow] * n_proposal_category
+        df_input["created_at"] = [utcnow] * n_input
+        df_input["updated_at"] = [utcnow] * n_input
 
-        db.insert("proposal_category", df_proposal_category)
+        db.insert(table, df_input)
     except:
-        print("no unique proposal_category_name is found. skip.")
+        print("no unique value in the input data is found. skip.")
+
+    res = db.fetch_all(table)
+    print(res)
 
     return db
 
@@ -72,19 +76,36 @@ def insert_proposal(db):
     return db
 
 
-def main(conf=None):
+def insert_target(db):
+    df = pd.read_csv("../data/target_s21b-en01.csv")
+
+    # extract_unique_objects_internally()
+
+    # extract_unique_objects_with_existing_unique_object()
+
+
+def main(conf=None, reset=False):
 
     db = connect_db(conf)
 
-    # db.reset()
+    if reset:
+        db.reset()
 
-    # db = insert_proposal_category(db)
+    db = insert_simple(
+        db, table="proposal_category", csv="../data/proposal_category.csv"
+    )
 
-    # db = insert_proposal(db)
+    db = insert_proposal(db)
+
+    db = insert_simple(db, table="input_catalog", csv="../data/input_catalog.csv")
+
+    db = insert_simple(db, table="object_type", csv="../data/object_type.csv")
 
     db.close()
 
 
 if __name__ == "__main__":
     conf = "targetdb_config.ini"
-    main(conf)
+    # reset = True
+    reset = False
+    main(conf, reset=reset)

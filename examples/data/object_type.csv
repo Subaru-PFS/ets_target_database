@@ -1,4 +1,4 @@
-object_type_name,object_name_description
+object_type_name,object_type_description
 "star","Stellar object"
 "galaxy","Galaxy"
-"quasar","QSO"
+"qso","QSO"
