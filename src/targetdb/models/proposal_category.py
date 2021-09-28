@@ -23,7 +23,7 @@ class proposal_category(Base):
         Integer,
         primary_key=True,
         unique=True,
-        autoincrement=True,
+        autoincrement=False,
         comment="Unique identifier of proposal category",
     )
     proposal_category_name = Column(
@@ -40,11 +40,13 @@ class proposal_category(Base):
 
     def __init__(
         self,
+        proposal_category_id,
         proposal_category_name,
         proposal_category_description,
         created_at,
         updated_at,
     ):
+        self.proposal_category_id = proposal_category_id
         self.proposal_category_name = proposal_category_name
         self.proposal_category_description = proposal_category_description
         self.created_at = created_at

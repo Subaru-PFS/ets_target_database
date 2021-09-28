@@ -3,7 +3,7 @@
 
 | name                      | type     | primary_key   | autoincrement   | comment                                                        |
 |:--------------------------|:---------|:--------------|:----------------|:---------------------------------------------------------------|
-| input_catalog_id          | INTEGER  | True          | True            | Unique identifier for input catalogs                           |
+| input_catalog_id          | INTEGER  | True          | False           | Unique identifier for input catalogs                           |
 | input_catalog_name        | VARCHAR  | False         | False           | Name of the input catalog (e.g., Gaia DR2, HSC-SSP PDR3, etc.) |
 | input_catalog_description | VARCHAR  | False         | False           | Description of the input catalog                               |
 | created_at                | DATETIME | False         | False           |                                                                |
@@ -13,7 +13,7 @@
 
 | name                          | type     | primary_key   | autoincrement   | comment                                                           |
 |:------------------------------|:---------|:--------------|:----------------|:------------------------------------------------------------------|
-| proposal_category_id          | INTEGER  | True          | True            | Unique identifier of proposal category                            |
+| proposal_category_id          | INTEGER  | True          | False           | Unique identifier of proposal category                            |
 | proposal_category_name        | VARCHAR  | False         | False           | Proposal category name (e.g., Openuse, Keck, Gemini, and UH)      |
 | proposal_category_description | VARCHAR  | False         | False           | Proposal category description (e.g., Openuse, Time exchange, etc. |
 | created_at                    | DATETIME | False         | False           | Creation time                                                     |

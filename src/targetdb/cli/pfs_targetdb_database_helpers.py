@@ -78,7 +78,7 @@ def main_drop_database():
 
     if database_exists(engine.url):
         print(
-            "WARNING: you are going to delete the database, {:s}.format(args.dbinfo)."
+            "WARNING: you are going to delete the database, {:s}.".format(args.dbinfo)
         )
         proceed = query_yes_no("Proceed? ", default="no")
         if proceed:
