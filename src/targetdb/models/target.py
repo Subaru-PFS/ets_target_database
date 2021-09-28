@@ -42,7 +42,7 @@ class target(Base):
     user_ra = Column(
         Float, comment="Original RA submitted by the observer at Phase 2 (ICRS, degree)"
     )
-    user_decl = Column(
+    user_dec = Column(
         Float,
         comment="Original Dec submitted by the observer at Phase 2 (ICRS, degree)",
     )
@@ -59,8 +59,8 @@ class target(Base):
         comment="same definition as HSC-SSP?; can be derived from the coordinate",
     )  # xxxx: needed?
     patch = Column(
-        String,
-        comment="same definition as HSC-SSP?; can be derived from the coordinate",
+        Integer,
+        comment="same definition as HSC-SSP?; can be derived from the coordinate; Note that it's defined as an integer",
     )  # xxxx: needed?
 
     object_type_id = Column(Integer, ForeignKey("object_type.object_type_id"))
@@ -105,7 +105,7 @@ class target(Base):
         proposal_id,
         obj_id,
         user_ra,
-        user_decl,
+        user_dec,
         user_epoch,
         match_distance,
         tract,
@@ -130,7 +130,7 @@ class target(Base):
         self.proposal_id = proposal_id
         self.obj_id = obj_id
         self.user_ra = user_ra
-        self.user_decl = user_decl
+        self.user_dec = user_dec
         self.user_epoch = user_epoch
         self.match_distance = match_distance
         self.tract = tract
