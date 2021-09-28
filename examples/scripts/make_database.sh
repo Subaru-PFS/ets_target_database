@@ -12,20 +12,47 @@
 # DROP SCHEMA PUBLIC CASCADE;
 # CREATE SCHEMA PUBLIC;
 
-hostname="localhost"
-port="15432"
-dbname="targetdb"
-# dbname="postgres"
-username="admin"
-password="admin"
+cfg.parser() {
+    #
+    # Ref: https://gist.github.com/splaspood/1473761
+    #
+    fixed_file=$(cat $1 | sed 's/ = /=/g') # fix ' = ' to be '='
+    IFS=$'\n' && ini=($fixed_file)         # convert to line-array
+    ini=(${ini[*]//;*/})                   # remove comments
+    ini=(${ini[*]/#[/\}$'\n'cfg.section.}) # set section prefix
+    ini=(${ini[*]/%]/ \(})                 # convert text2function (1)
+    ini=(${ini[*]/=/=\( })                 # convert item to array
+    ini=(${ini[*]/%/ \)})                  # close array parenthesis
+    ini=(${ini[*]/%\( \)/\(\) \{})         # convert text2function (2)
+    ini=(${ini[*]/%\} \)/\}})              # remove extra parenthesis
+    ini[0]=''                              # remove first element
+    ini[${#ini[*]} + 1]='}'                # add the last brace
+    eval "$(echo "${ini[*]}")"             # eval the result
+}
+
+cfg.parser "targetdb_config.ini"
+cfg.section.dbinfo
+cfg.section.schemacrawler
+
+# hostname="localhost"
+# port="15432"
+# dbname="targetdb"
+# # dbname="postgres"
+# username="admin"
+# password="admin"
+
 drop_all="--drop_all"
 # drop_all=""
 out_dir="../output"
 out_md="schema_targetdb_tables.md"
-schema_md="--schema_md ${out_dir}/${out_md}"
+schema_md="--schema_md=${out_dir}/${out_md}"
 
 ## make schema ##
-url="postgresql://${username}:${password}@${hostname}:${port}/${dbname}"
+url="postgresql://${username}:${passwd}@${hostname}:${port}/${dbname}"
+
+# echo $url
+
+# exit
 
 # postgresql://admin:admin@localhost:15432/targetdb
 
@@ -49,8 +76,6 @@ echo ""
 
 success=$?
 
-# exit
-
 if [ $success -ne 0 ]; then
     echo ""
     echo "Failed during running models_target_db.py. Exit."
@@ -58,14 +83,22 @@ if [ $success -ne 0 ]; then
     exit 1
 fi
 
-# md-to-pdf schema_targetdb_tables.md
-md-to-pdf ${out_dir}/${out_md} --basedir ${out_dir}
+{ # try
+    # md-to-pdf schema_targetdb_tables.md
+    md-to-pdf ${out_dir}/${out_md} --basedir ${out_dir}
+} || { # catch
+    echo "to convert md to pdf, you need to install some software such as md-to-pdf (https://github.com/simonhaenisch/md-to-pdf#readme)"
+}
 
 # exit
 
 echo "Generating ER diagram:"
 ## make schema diagram ##
-SCHEMACRAWLERDIR="../../../schemacrawler-16.15.4-distribution/"
+# SCHEMACRAWLERDIR="../../../schemacrawler-16.15.4-distribution/"
+
+# echo $SCHEMACRAWLERDIR
+
+# exit
 
 # SL_INFO_LEVEL="standard"
 SC_INFO_LEVEL="detailed"
@@ -90,7 +123,7 @@ rm -f ${SC_OUTPUT_FILE_PREFIX}.pdf
     --database=${dbname} \
     --schemas=public \
     --user=${username} \
-    --password=${password} \
+    --password=${passwd} \
     --info-level=${SC_INFO_LEVEL} \
     --command=schema \
     --log-level=${SC_LOG_LEVEL} \

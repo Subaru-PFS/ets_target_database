@@ -15,9 +15,9 @@ def connect_db(conf=None):
     config = configparser.ConfigParser()
     config.read(conf)
 
-    print(dict(config["database"]))
+    print(dict(config["dbinfo"]))
 
-    db = targetdb.TargetDB(**dict(config["database"]))
+    db = targetdb.TargetDB(**dict(config["dbinfo"]))
 
     db.connect()
 
