@@ -136,3 +136,8 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+
+# added by M. Onodera
+
+.DS_Store
