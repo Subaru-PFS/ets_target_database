@@ -165,22 +165,36 @@ In this example, the local port 15432 is mapped to the port 5432 inside the cont
 
 _For more examples, please refer to the [Documentation](https://example.com)_ -->
 
+### Create targetDB
 
-### Create a test database
+Following procedures in this section is summarized in `examples/scripts/make_database.bash`. You can create a test database and schema with associated outputs at once by the following commands.
+
+```sh
+cd examples/scripts
+bash ./make_database.bash
+```
+
+Note that the script must be execute as a Bash script.
+
+We recommend to check the content of `targetdb_config.ini` and change the configuration if necessary (e.g., `SCHEMACRAWLERDIR`).
+
+#### Create a test database
 
 Example database (called `targetdb` ) can be created with a command-line script `pfs_targetdb_create_database`.
 ```sh
 pfs_targetdb_create_database "postgresql://admin:admin@localhost:15432/targetdb"
 ```
 
-### Create tables in the test database
+#### Create tables in the database
+
 Then, you can create tables in `targetdb`.
 ```sh
 pfs_targetdb_create_schema "postgresql://admin:admin@localhost:15432/targetdb"
 ```
 `pfs_targetdb_create_schema` can accept an option `--drop_all`.  With `--drop_all`, all tables in the database schema will be dropped before creating them.
 
-### Generate an ER diagram of the database
+#### Generate an ER diagram of the database
+
 Using SchemaCrawler, you can make an Entity Relationship diagram (ERD) of the `targetdb`.
 ```sh
 ./PATH_TO_SCHEMACRAWLER/_schemacrawler/schemacrawler.sh \
@@ -202,7 +216,7 @@ Using SchemaCrawler, you can make an Entity Relationship diagram (ERD) of the `t
 ```
 The output ERD is saved in the `examples/output` directory.
 
-### Generate a markdown table of all tables in the database
+#### Generate a markdown table of all tables in the database
 
 The ER diagram generated above does not include detailed comments for each column. It is useful to make a table in the markdown format.
 
@@ -215,6 +229,18 @@ You can convert it to a PDF file.
 ```sh
 md-to-pdf schema_targetdb_tables.pdf
 ```
+
+### Insert test data into tables
+
+In the `examples/scripts` directory, there is a script named `test_targetdb_api.py` and currently it insert sample data into `proposal_category`, `proposal`, `input_catalog`, and `target_type` tables.
+
+The sample data are stored in the `examples/data` direcotry.
+
+```sh
+python ./test_targetdb_api.py
+```
+
+
 
 
 
