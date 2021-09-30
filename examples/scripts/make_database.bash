@@ -101,13 +101,15 @@ echo "Generating ER diagram:"
 # exit
 
 # SL_INFO_LEVEL="standard"
-SC_INFO_LEVEL="detailed"
+# SC_INFO_LEVEL="detailed"
+SC_INFO_LEVEL="maximum"
 
 #   Options:
 #   --log-level=<loglevel>
 #      Set log level using one of OFF, SEVERE, WARNING, INFO, CONFIG, FINE,
 #        FINER, FINEST, ALL
 #      Optional, defaults to OFF
+# SC_LOG_LEVEL="ALL"
 # SC_LOG_LEVEL="CONFIG"
 SC_LOG_LEVEL="SEVERE"
 
