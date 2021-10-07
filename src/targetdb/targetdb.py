@@ -38,12 +38,20 @@ class TargetDB(object):
         # print('connection to {0} closed'.format(self.dbinfo))
 
     def reset(self, full=True):
-        self.session.query(models.input_catalog).delete()
-        self.session.query(models.object_type).delete()
-        self.session.query(models.proposal).delete()
-        self.session.query(models.proposal_category).delete()
+        #
+        # Order of the resetting tables is important
+        #
         self.session.query(models.target).delete()
         self.session.query(models.unique_object).delete()
+        self.session.query(models.proposal).delete()
+        self.session.query(models.input_catalog).delete()
+        self.session.query(models.target_type).delete()
+        self.session.query(models.proposal_category).delete()
+
+        self.session.execute(
+            "ALTER SEQUENCE unique_object_unique_object_id_seq RESTART WITH 1"
+        )
+        self.session.execute("ALTER SEQUENCE target_target_id_seq RESTART WITH 1")
 
         self.session.commit()
 
@@ -56,7 +64,7 @@ class TargetDB(object):
         ############################################################
     """
 
-    def insert_mappings(self, tablename, mappings):
+    def insert_mappings(self, tablename, mappings, return_defaults=False):
         """
         Description
         -----------
@@ -71,13 +79,22 @@ class TargetDB(object):
         """
         model = getattr(models, tablename)
         try:
-            self.session.bulk_insert_mappings(model, mappings)
+            # print(mappings)
+            self.session.bulk_insert_mappings(
+                model, mappings, return_defaults=return_defaults
+            )
             self.session.commit()
+            if return_defaults:
+                df_ret = pd.DataFrame.from_records(mappings)
+                return df_ret
+            else:
+                return None
+            # print(mappings)
         except:
             self.session.rollback()
             raise
 
-    def insert(self, tablename, dataframe):
+    def insert(self, tablename, dataframe, return_defaults=False):
         """
         Description
         -----------
@@ -93,7 +110,14 @@ class TargetDB(object):
         ----
             Column labels of `dataframe` should be exactly the same as those of the table
         """
-        self.insert_mappings(tablename, dataframe.to_dict(orient="records"))
+        mappings_dict = dataframe.to_dict(orient="records")
+        df_ret = self.insert_mappings(
+            tablename, mappings_dict, return_defaults=return_defaults
+        )
+        if return_defaults:
+            return df_ret
+        else:
+            return None
 
     def insert_by_copy(self, tablename, data, colnames):
         """
