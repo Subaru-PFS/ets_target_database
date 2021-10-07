@@ -107,6 +107,8 @@ Additionally, the following packages and their dependencies are required to use 
 
 * [SQLAlchemy-Utils 0.37.8](https://sqlalchemy-utils.readthedocs.io/en/latest/)
 * [tabulate 0.8.9](https://pypi.org/project/tabulate/)
+* [Astropy 4.3.1](https://www.astropy.org/)
+* [logzero 1.7.0](https://logzero.readthedocs.io/en/latest/)
 * [SchemaCrawler 16.15.7](https://www.schemacrawler.com/)
 * [md-to-pdf 5.0.0](https://github.com/simonhaenisch/md-to-pdf)
 * [Docker 20.10.8](https://www.docker.com/)
