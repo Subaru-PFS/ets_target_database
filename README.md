@@ -237,8 +237,29 @@ In the `examples/scripts` directory, there is a script named `test_targetdb_api.
 The sample data are stored in the `examples/data` direcotry.
 
 ```sh
-python ./test_targetdb_api.py
+python ./test_targetdb_api.py -h
+
+usage: test_targetdb_api.py [-h] [--reset] [--skip_proposal_category] [--skip_proposal] [--skip_input_catalog] [--skip_target_type] [--skip_target] [--skip_unique_object] [--target TARGET] conf
+
+Test targetDB API
+
+positional arguments:
+  conf                  Config file for targetDB (default: './targetdb_config.ini')
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --reset               Reset all tables in targetdb before playing with it. (Default: False)
+  --skip_proposal_category
+                        Skip inserting test data into the proposal_category table (default: False)
+  --skip_proposal       Skip inserting test data into the proposal table (default: False)
+  --skip_input_catalog  Skip inserting test data into the input_catalog table (default: False)
+  --skip_target_type    Skip inserting test data into the target_type table (default: False)
+  --skip_target         Skip inserting test data into the target table (default: False)
+  --skip_unique_object  Skip inserting test data into the unique_object table (default: False)
+  --target TARGET       Sample csv file for targets (default: ../data/target_s21b-en01.csv)
 ```
+
+
 
 
 

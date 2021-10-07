@@ -62,7 +62,7 @@ def get_arguments():
     parser.add_argument(
         "--target",
         default="../data/target_s21b-en01.csv",
-        help="Skip inserting test data into the target table (default: False)",
+        help="Sample csv file for targets (default: ../data/target_s21b-en01.csv)",
     )
 
     args = parser.parse_args()
