@@ -42,15 +42,15 @@ class TargetDB(object):
         # Order of the resetting tables is important
         #
         self.session.query(models.target).delete()
-        self.session.query(models.unique_object).delete()
+        # self.session.query(models.unique_object).delete()
         self.session.query(models.proposal).delete()
         self.session.query(models.input_catalog).delete()
         self.session.query(models.target_type).delete()
         self.session.query(models.proposal_category).delete()
 
-        self.session.execute(
-            "ALTER SEQUENCE unique_object_unique_object_id_seq RESTART WITH 1"
-        )
+        # self.session.execute(
+        #     "ALTER SEQUENCE unique_object_unique_object_id_seq RESTART WITH 1"
+        # )
         self.session.execute("ALTER SEQUENCE target_target_id_seq RESTART WITH 1")
 
         self.session.commit()

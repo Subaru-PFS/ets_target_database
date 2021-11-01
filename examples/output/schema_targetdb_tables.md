@@ -29,17 +29,6 @@
 | created_at              | DATETIME | False         | False           |                                    |
 | updated_at              | DATETIME | False         | False           |                                    |
 
-## unique_object
-
-| name             | type     | primary_key   | autoincrement   | comment                                       |
-|:-----------------|:---------|:--------------|:----------------|:----------------------------------------------|
-| unique_object_id | BIGINT   | True          | True            | Unique unique_object identifier               |
-| ra               | FLOAT    | False         | False           | ICRS (degree)                                 |
-| dec              | FLOAT    | False         | False           | ICRS (degree)                                 |
-| epoch            | VARCHAR  | False         | False           | Reference epoch, e.g., J2000.0, J2015.5, etc. |
-| created_at       | DATETIME | False         | False           |                                               |
-| updated_at       | DATETIME | False         | False           |                                               |
-
 ## proposal
 
 | name                 | type     | primary_key   | autoincrement   | comment                                           |
@@ -61,18 +50,15 @@
 | name                   | type     | primary_key   | autoincrement   | comment                                                                                               |
 |:-----------------------|:---------|:--------------|:----------------|:------------------------------------------------------------------------------------------------------|
 | target_id              | BIGINT   | True          | True            | Unique identifier for each target                                                                     |
-| unique_object_id       | BIGINT   | False         | False           |                                                                                                       |
 | proposal_id            | VARCHAR  | False         | False           |                                                                                                       |
 | obj_id                 | BIGINT   | False         | False           | Object ID as specified by the observer at Phase 2 (can be same as the input_catalog_object_id)        |
-| user_ra                | FLOAT    | False         | False           | Original RA submitted by the observer at Phase 2 (ICRS, degree)                                       |
-| user_dec               | FLOAT    | False         | False           | Original Dec submitted by the observer at Phase 2 (ICRS, degree)                                      |
-| user_epoch             | VARCHAR  | False         | False           | Origina Epoch submitted by the observer at Phase 2                                                    |
-| match_distance         | FLOAT    | False         | False           | Distance between the matched unique_object and the original coordinate (arcsec)                       |
+| ra                     | FLOAT    | False         | False           | RA (ICRS, degree)                                                                                     |
+| dec                    | FLOAT    | False         | False           | Dec (ICRS, degree)                                                                                    |
+| epoch                  | VARCHAR  | False         | False           | Epoch                                                                                                 |
 | tract                  | INTEGER  | False         | False           | same definition as HSC-SSP?; can be derived from the coordinate                                       |
 | patch                  | INTEGER  | False         | False           | same definition as HSC-SSP?; can be derived from the coordinate; Note that it's defined as an integer |
 | target_type_id         | INTEGER  | False         | False           |                                                                                                       |
 | input_catalog_id       | INTEGER  | False         | False           | Input catalog ID from the input_catalog table                                                         |
-| input_catalog_obj_id   | BIGINT   | False         | False           | Object ID in the specified input catalog                                                              |
 | fiber_mag_g            | FLOAT    | False         | False           | g-band magnitude within a fiber (AB mag)                                                              |
 | fiber_mag_r            | FLOAT    | False         | False           | r-band magnitude within a fiber (AB mag)                                                              |
 | fiber_mag_i            | FLOAT    | False         | False           | i-band magnitude within a fiber (AB mag)                                                              |

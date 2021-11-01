@@ -34,13 +34,6 @@ cfg.parser "targetdb_config.ini"
 cfg.section.dbinfo
 cfg.section.schemacrawler
 
-# hostname="localhost"
-# port="15432"
-# dbname="targetdb"
-# # dbname="postgres"
-# username="admin"
-# password="admin"
-
 drop_all="--drop_all"
 # drop_all=""
 out_dir="../output"
@@ -54,10 +47,8 @@ url="postgresql://${username}:${passwd}@${hostname}:${port}/${dbname}"
 
 # exit
 
-# postgresql://admin:admin@localhost:15432/targetdb
-
 # # CAUTION: drop database
-# pfs_targetdb_drop_database ${url}
+pfs_targetdb_drop_database ${url}
 
 # create database if it does not exist
 

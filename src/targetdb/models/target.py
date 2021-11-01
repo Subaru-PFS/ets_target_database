@@ -17,7 +17,8 @@ from . import Base
 from . import input_catalog
 from . import proposal
 from . import target_type
-from . import unique_object
+
+# from . import unique_object
 
 
 class target(Base):
@@ -30,29 +31,37 @@ class target(Base):
         autoincrement=True,
         comment="Unique identifier for each target",
     )
-    unique_object_id = Column(BigInteger, ForeignKey("unique_object.unique_object_id"))
+    # unique_object_id = Column(BigInteger, ForeignKey("unique_object.unique_object_id"))
 
     proposal_id = Column(String, ForeignKey("proposal.proposal_id"))
+    # group_id = Column(String, ForeignKey("proposal.group_id"))
 
     obj_id = Column(
         BigInteger,
         comment="Object ID as specified by the observer at Phase 2 (can be same as the input_catalog_object_id)",
     )  # xxxx: need to understand more
 
-    user_ra = Column(
-        Float, comment="Original RA submitted by the observer at Phase 2 (ICRS, degree)"
-    )
-    user_dec = Column(
+    # user_ra = Column(
+    #     Float, comment="Original RA submitted by the observer at Phase 2 (ICRS, degree)"
+    # )
+    # user_dec = Column(
+    #     Float,
+    #     comment="Original Dec submitted by the observer at Phase 2 (ICRS, degree)",
+    # )
+    # user_epoch = Column(
+    #     String, comment="Original Epoch submitted by the observer at Phase 2"
+    # )
+    # match_distance = Column(
+    #     Float,
+    #     comment="Distance between the matched unique_object and the original coordinate (arcsec)",
+    # )
+
+    ra = Column(Float, comment="RA (ICRS, degree)")
+    dec = Column(
         Float,
-        comment="Original Dec submitted by the observer at Phase 2 (ICRS, degree)",
+        comment="Dec (ICRS, degree)",
     )
-    user_epoch = Column(
-        String, comment="Origina Epoch submitted by the observer at Phase 2"
-    )
-    match_distance = Column(
-        Float,
-        comment="Distance between the matched unique_object and the original coordinate (arcsec)",
-    )
+    epoch = Column(String, comment="Epoch")
 
     tract = Column(
         Integer,
@@ -70,9 +79,9 @@ class target(Base):
         ForeignKey("input_catalog.input_catalog_id"),
         comment="Input catalog ID from the input_catalog table",
     )
-    input_catalog_obj_id = Column(
-        BigInteger, comment="Object ID in the specified input catalog"
-    )
+    # input_catalog_obj_id = Column(
+    #     BigInteger, comment="Object ID in the specified input catalog"
+    # )
 
     fiber_mag_g = Column(Float, comment="g-band magnitude within a fiber (AB mag)")
     fiber_mag_r = Column(Float, comment="r-band magnitude within a fiber (AB mag)")
@@ -106,29 +115,37 @@ class target(Base):
         comment="Reference wavelength to evaluate effective exposure time (angstrom or nm?)",
     )
 
+    # NOTE: `probfstar` will be used for the Nov 2021 engineering, but not sure for the future releases
+    # Probability to be a F-star (Ishigaki-san)
+    prob_f_star = Column(Float, comment="Probability to be a F-star")
+
     # timestamp
     created_at = Column(DateTime)
     updated_at = Column(DateTime)
 
-    unique_objects = relation(unique_object, backref=backref("target"))
+    # unique_objects = relation(unique_object, backref=backref("target"))
     proposals = relation(proposal, backref=backref("target"))
     target_types = relation(target_type, backref=backref("target"))
     input_catalogs = relation(input_catalog, backref=backref("target"))
 
     def __init__(
         self,
-        unique_object_id,
+        # unique_object_id,
         proposal_id,
+        # group_id,
         obj_id,
-        user_ra,
-        user_dec,
-        user_epoch,
-        match_distance,
+        ra,
+        dec,
+        epoch,
+        # user_ra,
+        # user_dec,
+        # user_epoch,
+        # match_distance,
         tract,
         patch,
         target_type_id,
         input_catalog_id,
-        input_catalog_obj_id,
+        # input_catalog_obj_id,
         fiber_mag_g,
         fiber_mag_r,
         fiber_mag_i,
@@ -145,21 +162,27 @@ class target(Base):
         qa_relative_noise,
         qa_reference_lambda,
         #
+        prob_f_star,
+        #
         created_at,
         updated_at,
     ):
-        self.unique_object_id = unique_object_id
+        # self.unique_object_id = unique_object_id
         self.proposal_id = proposal_id
+        # self.group_id = group_id
         self.obj_id = obj_id
-        self.user_ra = user_ra
-        self.user_dec = user_dec
-        self.user_epoch = user_epoch
-        self.match_distance = match_distance
+        self.ra = ra
+        self.dec = dec
+        self.epoch = epoch
+        # self.user_ra = user_ra
+        # self.user_dec = user_dec
+        # self.user_epoch = user_epoch
+        # self.match_distance = match_distance
         self.tract = tract
         self.patch = patch
         self.target_type_id = target_type_id
         self.input_catalog_id = input_catalog_id
-        self.input_catalog_obj_id = input_catalog_obj_id
+        # self.input_catalog_obj_id = input_catalog_obj_id
         self.fiber_mag_g = fiber_mag_g
         self.fiber_mag_r = fiber_mag_r
         self.fiber_mag_i = fiber_mag_i
@@ -175,6 +198,8 @@ class target(Base):
         self.qa_relative_throughput = qa_relative_throughput
         self.qa_relative_noise = qa_relative_noise
         self.qa_reference_lambda = qa_reference_lambda
+        #
+        self.prob_f_star = prob_f_star
         #
         self.created_at = created_at
         self.updated_at = updated_at

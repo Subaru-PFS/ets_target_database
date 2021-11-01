@@ -7,7 +7,8 @@ Base = declarative_base()
 # Note: Order of import is important!
 from .proposal_category import proposal_category  # isort:skip
 from .input_catalog import input_catalog  # isort:skip
-from .unique_object import unique_object  # isort:skip
+
+# from .unique_object import unique_object  # isort:skip
 from .target_type import target_type  # isort:skip
 from .proposal import proposal  # isort:skip
 from .target import target  # isort:skip

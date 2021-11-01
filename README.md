@@ -178,20 +178,20 @@ bash ./make_database.bash
 
 Note that the script must be execute as a Bash script.
 
-We recommend to check the content of `targetdb_config.ini` and change the configuration if necessary (e.g., `SCHEMACRAWLERDIR`).
+We recommend to check the content of `targetdb_config.ini` (ask M. Onodera) and change the configuration if necessary (e.g., `SCHEMACRAWLERDIR`).
 
 #### Create a test database
 
 Example database (called `targetdb` ) can be created with a command-line script `pfs_targetdb_create_database`.
 ```sh
-pfs_targetdb_create_database "postgresql://admin:admin@localhost:15432/targetdb"
+pfs_targetdb_create_database "postgresql://<user>:<password>@<hostname>:<port>/targetdb"
 ```
 
 #### Create tables in the database
 
 Then, you can create tables in `targetdb`.
 ```sh
-pfs_targetdb_create_schema "postgresql://admin:admin@localhost:15432/targetdb"
+pfs_targetdb_create_schema "postgresql://<user>:<password>@<hostname>:<port>/targetdb"
 ```
 `pfs_targetdb_create_schema` can accept an option `--drop_all`.  With `--drop_all`, all tables in the database schema will be dropped before creating them.
 
@@ -201,12 +201,12 @@ Using SchemaCrawler, you can make an Entity Relationship diagram (ERD) of the `t
 ```sh
 ./PATH_TO_SCHEMACRAWLER/_schemacrawler/schemacrawler.sh \
     --server=postgresql \
-    --host=localhost \
-    --port=15432 \
+    --host=<hostname> \
+    --port=<port> \
     --database=targetdb \
     --schemas=public \
-    --user=admin \
-    --password=admin \
+    --user=<user> \
+    --password=<password> \
     --info-level=standard \
     --command=schema \
     --log-level=INFO \
