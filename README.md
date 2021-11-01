@@ -84,7 +84,8 @@
 </details> -->
 
 
-
+## Note
+- `commissioning_2021nov` branch will be used for the preparation of the November 2021 commissioning.
 
 
 <!-- ABOUT THE PROJECT -->
