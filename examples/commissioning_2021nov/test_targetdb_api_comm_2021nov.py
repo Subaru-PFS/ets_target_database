@@ -3,6 +3,7 @@
 import argparse
 import configparser
 import datetime
+import os
 import sys
 
 import astropy.units as u
@@ -61,7 +62,7 @@ def get_arguments():
     parser.add_argument(
         "--target",
         default=None,
-        help="Sample csv file for targets (default: ../data/target_s21b-en01.csv)",
+        help="Sample file for targets (default: ../data/target_s21b-en01.csv)",
     )
 
     args = parser.parse_args()
@@ -156,10 +157,18 @@ def insert_proposal(db, csv=None):
     return db
 
 
-def insert_target(db, csv=None, fetch_table=False):
+def insert_target(db, infile=None, fetch_table=False):
 
-    logger.info("Loading data from {:s}".format(csv))
-    df = pd.read_csv(csv)
+    _, ext = os.path.splitext(infile)
+
+    logger.info("Loading data from {:s}".format(infile))
+
+    if ext == ".csv":
+        df = pd.read_csv(infile)
+    elif ext == ".feather":
+        df = pd.read_feather(infile)
+    else:
+        logger.error("Filetype {:s} is not supported. Abort.".format(ext))
 
     # copy dataframe (may not be needed)
     df_target_tmp = df.copy()
@@ -215,7 +224,7 @@ def main():
 
     if not args.skip_target:
         logger.info("Inserting sample data into the target table")
-        db = insert_target(db, csv=args.target, fetch_table=False)
+        db = insert_target(db, infile=args.target, fetch_table=False)
 
     db.close()
 

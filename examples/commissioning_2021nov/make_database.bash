@@ -30,7 +30,8 @@ cfg.parser() {
     eval "$(echo "${ini[*]}")"             # eval the result
 }
 
-cfg.parser "targetdb_config.ini"
+# cfg.parser "targetdb_config.ini"
+cfg.parser "targetdb_config_pfsa-db01-gb.ini"
 cfg.section.dbinfo
 cfg.section.schemacrawler
 
@@ -60,6 +61,8 @@ echo "Creating schema:"
 pfs_targetdb_create_schema ${url} ${drop_all}
 echo ""
 
+exit
+
 echo "Writing Markdown tables for the schema"
 pfs_targetdb_generate_mdtable ${schema_md}
 # python test_make_database.py ${url} ${drop_all} ${schema_md}
@@ -73,6 +76,8 @@ if [ $success -ne 0 ]; then
     echo ""
     exit 1
 fi
+
+# exit
 
 { # try
     # md-to-pdf schema_targetdb_tables.md
