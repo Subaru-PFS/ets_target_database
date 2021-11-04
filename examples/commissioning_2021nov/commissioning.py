@@ -177,6 +177,7 @@ def gen_target_list_from_targetdb(args):
     import configparser
 
     import pandas as pd
+    from astropy import units as u
     from astropy.table import Table
     from ets_shuffle import query_utils
     from targetdb import models
@@ -216,22 +217,26 @@ def gen_target_list_from_targetdb(args):
 
     dw = fp_rad_deg * fp_fudge_factor
 
+    cos_term = 1.0 / np.cos(args.dec * u.deg)
+
+    dw_ra = dw * cos_term
+
     dec1, dec2 = args.dec - dw, args.dec + dw
 
-    if args.ra - dw < 0.0:
-        ra1, ra2 = 0.0, args.ra + dw
+    if args.ra - dw_ra < 0.0:
+        ra1, ra2 = 0.0, args.ra + dw_ra
         q1 = generate_query_simple_boxsearch(ra1, ra2, dec1, dec2)
-        ra1, ra2 = args.ra - dw + 360.0, 360.0
+        ra1, ra2 = args.ra - dw_ra + 360.0, 360.0
         q2 = generate_query_simple_boxsearch(ra1, ra2, dec1, dec2)
         qlist = [q1, q2]
-    elif args.ra + dw >= 360.0:
-        ra1, ra2 = 0.0, args.ra + dw - 360.0
+    elif args.ra + dw_ra >= 360.0:
+        ra1, ra2 = 0.0, args.ra + dw_ra - 360.0
         q1 = generate_query_simple_boxsearch(ra1, ra2, dec1, dec2)
-        ra1, ra2 = args.ra - dw, 360.0
+        ra1, ra2 = args.ra - dw_ra, 360.0
         q2 = generate_query_simple_boxsearch(ra1, ra2, dec1, dec2)
         qlist = [q1, q2]
     else:
-        ra1, ra2 = args.ra - dw, args.ra + dw
+        ra1, ra2 = args.ra - dw_ra, args.ra + dw_ra
         q1 = generate_query_simple_boxsearch(ra1, ra2, dec1, dec2)
         qlist = [q1]
 
