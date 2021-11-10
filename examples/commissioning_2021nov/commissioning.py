@@ -164,8 +164,15 @@ def get_arguments():
     parser.add_argument(
         "--targetdb_conf",
         type=str,
-        default="targetdb_config.ini",
+        default="../../../database_configs/targetdb_config.ini",
         help="Config file for targetDB",
+    )
+
+    parser.add_argument(
+        "--gaiadb_conf",
+        type=str,
+        default="../../../database_configs/gaiadb_config_hilo.ini",
+        help="Config file for Subaru's Gaia DB",
     )
 
     args = parser.parse_args()
@@ -179,9 +186,10 @@ def gen_target_list_from_targetdb(args):
     import pandas as pd
     from astropy import units as u
     from astropy.table import Table
-    from ets_shuffle import query_utils
-    from targetdb import models
     from targetdb import targetdb
+
+    # from ets_shuffle import query_utils
+    # from targetdb import models
 
     def connect_db(conf=None):
 
@@ -439,6 +447,239 @@ def gen_assignment(args):
     )
 
 
+def add_guidestars_from_gaiadb(args):
+    import configparser
+
+    import matplotlib.path as mppath
+    import pandas as pd
+    import pfs.datamodel
+    import psycopg2
+    import psycopg2.extras
+    from astropy import units as u
+    from astropy.table import Table
+    from astropy.time import Time
+    from ets_shuffle import query_utils
+    from ets_shuffle.convenience import flag_close_pairs
+    from ets_shuffle.convenience import guidecam_geometry
+    from ets_shuffle.convenience import plot_focal_plane
+    from ets_shuffle.convenience import update_coords_for_proper_motion
+    from pfs.utils.coordinates.CoordTransp import CoordinateTransform as ctrans
+    from pfs.utils.coordinates.CoordTransp import ag_pfimm_to_pixel
+    from targetdb import targetdb
+
+    # from ets_shuffle import query_utils
+    # from targetdb import models
+
+    def connect_gaiadb(conf=None):
+
+        config = configparser.ConfigParser()
+        config.read(conf)
+        # print(dict(config["dbinfo"]))
+
+        conn = psycopg2.connect(**dict(config["dbinfo"]))
+        # db = targetdb.TargetDB(**dict(config["dbinfo"]))
+        # db.connect()
+        return conn
+
+    input_design = pfs.datamodel.PfsDesign.read(args.run_id, args.design_dir)
+    raTel_deg, decTel_deg, pa_deg = (
+        input_design.raBoresight,
+        input_design.decBoresight,
+        input_design.posAng,
+    )
+
+    # this should come from the pfsDesign as well, but is not yet in there
+    # (DAMD-101)
+    obs_time = args.observation_time
+
+    guidestar_mag_max = args.guidestar_mag_max
+    guidestar_neighbor_mag_min = args.guidestar_neighbor_mag_min
+    guidestar_minsep_deg = args.guidestar_minsep_deg
+
+    # guide star cam geometries
+    agcoord = guidecam_geometry()
+
+    # internal, technical parameters
+    # set focal plane radius
+    fp_rad_deg = 260.0 * 10.2 / 3600
+    fp_fudge_factor = 1.2
+
+    # Find guide star candidates
+
+    conn = connect_gaiadb(args.gaiadb_conf)
+    # cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    cur = conn.cursor()
+
+    coldict = {
+        "ra": "ra",
+        "dec": "dec",
+        "pmra": "pmra",
+        "pmdec": "pmdec",
+        "id": "source_id",
+    }
+    racol, deccol = coldict["ra"], coldict["dec"]
+    req_columns = [
+        coldict["id"],
+        racol,
+        deccol,
+        coldict["pmra"],
+        coldict["pmdec"],
+        "phot_g_mean_mag",
+    ]
+
+    query_string = """SELECT source_id,ra,dec,pmra,pmdec,phot_g_mean_mag
+    FROM gaia
+    WHERE q3c_radial_query(ra, dec, {:}, {:}, {:})
+    AND {:s} IS NOT NULL AND {:s} IS NOT NULL
+    AND {:s} BETWEEN {:} AND {:}
+    ;
+    """.format(
+        raTel_deg,
+        decTel_deg,
+        fp_rad_deg * fp_fudge_factor,
+        coldict["pmra"],
+        coldict["pmdec"],
+        "phot_g_mean_mag",
+        0.0,
+        guidestar_neighbor_mag_min,
+    )
+
+    # print(query_string)
+
+    cur.execute(query_string)
+    df_res = pd.DataFrame(
+        cur.fetchall(),
+        columns=["source_id", "ra", "dec", "pmra", "pmdec", "phot_g_mean_mag"],
+    )
+
+    # print(df_res)
+
+    res = {}
+    for col in df_res.columns:
+        res[col] = df_res[col].to_numpy()
+
+    # print(res)
+
+    cur.close()
+    conn.close()
+
+    # # FIXME: run similar query, but without the PM requirement, to get a list of
+    # # potentially too-bright neighbours
+
+    # adjust for proper motion
+    epoch = Time(args.observation_time).jyear
+    res[racol], res[deccol] = update_coords_for_proper_motion(
+        res[racol],
+        res[deccol],
+        res[coldict["pmra"]],
+        res[coldict["pmdec"]],
+        2015.5,
+        epoch,
+    )
+
+    # compute PFI coordinates
+    tmp = np.array([res[racol], res[deccol]])
+    tmp = ctrans(
+        xyin=tmp,
+        za=0.0,
+        mode="sky_pfi",
+        inr=0.0,
+        pa=pa_deg,
+        cent=np.array([raTel_deg, decTel_deg]),
+        time=obs_time,
+    )
+
+    res["xypos"] = np.array([tmp[0, :], tmp[1, :]]).T
+
+    # determine the subset of sources falling within the guide cam FOVs
+    # For the moment I'm using matplotlib's path functionality for this task
+    # Once the "pfi_sky" transformation direction is available in
+    # pfs_utils.coordinates, we can do a direct polygon query for every camera,
+    # which should be more efficient.
+    targets = {}
+    tgtcam = []
+
+    for i in range(agcoord.shape[0]):
+
+        p = mppath.Path(agcoord[i])
+
+        # find all targets in the slighty enlarged FOV
+        tmp = p.contains_points(res["xypos"], radius=1.0)  # 1mm more
+        tdict = {}
+
+        for key, val in res.items():
+            tdict[key] = val[tmp]
+
+        # eliminate close neighbors
+        flags = flag_close_pairs(tdict[racol], tdict[deccol], guidestar_minsep_deg)
+
+        for key, val in tdict.items():
+            tdict[key] = val[np.invert(flags)]
+
+        # eliminate all targets which are not bright enough to be guide stars
+        flags = tdict["phot_g_mean_mag"] < guidestar_mag_max
+
+        for key, val in tdict.items():
+            tdict[key] = val[flags]
+
+        # eliminate all targets which are not really in the camera's FOV
+        flags = p.contains_points(tdict["xypos"])  # 1mm more
+
+        for key, val in tdict.items():
+            tdict[key] = val[flags]
+
+        # add AG camera ID
+        tdict["agid"] = [i] * len(tdict[coldict["id"]])
+
+        # compute and add pixel coordinates
+        tmp = []
+        for pos in tdict["xypos"]:
+            tmp.append(ag_pfimm_to_pixel(i, pos[0], pos[1]))
+        tdict["agpix_x"] = np.array([x[0] for x in tmp])
+        tdict["agpix_y"] = np.array([x[1] for x in tmp])
+
+        # append the results for this camera to the full list
+        tgtcam.append(tdict)
+        for key, val in tdict.items():
+            if key not in targets:
+                targets[key] = val
+            else:
+                targets[key] = np.concatenate((targets[key], val))
+
+    # Write the results to a new pfsDesign file. Data fields are according to
+    # DAMD-101.
+    # required data:
+    # ra/dec of guide star candidates: in racol, deccol
+    # PM information: in pmra, pmdec
+    # parallax: currently N/A
+    # flux: currently N/A
+    # AgId: trivial to obtain from data structure
+    # AgX, AgY (pixel coordinates): only computable with access to the full
+    #   AG camera geometry
+    output_design = input_design
+
+    ntgt = len(targets[coldict["id"]])
+    guidestars = pfs.datamodel.guideStars.GuideStars(
+        targets[coldict["id"]],
+        np.array([epoch] * ntgt),  # epoch
+        targets[coldict["ra"]],
+        targets[coldict["dec"]],
+        targets[coldict["pmra"]],
+        targets[coldict["pmdec"]],
+        np.array([0.0] * ntgt),  # parallax
+        targets["phot_g_mean_mag"],
+        np.array(["??"] * ntgt),  # passband
+        np.array([0.0] * ntgt),  # color
+        targets["agid"],  # AG camera ID
+        targets["agpix_x"],  # AG x pixel coordinate
+        targets["agpix_y"],  # AG y pixel coordinate
+        -42.0,  # telescope elevation, don't know how to obtain,
+        0,  # numerical ID assigned to the GAIA catalogue
+    )
+    output_design.guideStars = guidestars
+    output_design.write(dirName=args.design_dir)
+
+
 def add_guidestars(args):
     import matplotlib.path as mppath
     import pfs.datamodel
@@ -601,10 +842,13 @@ def add_guidestars(args):
 
 def main():
     args = get_arguments()
+
     # gen_target_list(args)
+
     gen_target_list_from_targetdb(args)
     gen_assignment(args)
     add_guidestars(args)
+    # add_guidestars_from_gaiadb(args)
 
 
 if __name__ == "__main__":
