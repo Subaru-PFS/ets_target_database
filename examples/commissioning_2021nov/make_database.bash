@@ -31,7 +31,7 @@ cfg.parser() {
 }
 
 # cfg.parser "targetdb_config.ini"
-cfg.parser "targetdb_config_pfsa-db01-gb.ini"
+cfg.parser "../../../database_configs/targetdb_config_pfsa-db01-gb.ini"
 cfg.section.dbinfo
 cfg.section.schemacrawler
 
@@ -61,7 +61,7 @@ echo "Creating schema:"
 pfs_targetdb_create_schema ${url} ${drop_all}
 echo ""
 
-exit
+# exit
 
 echo "Writing Markdown tables for the schema"
 pfs_targetdb_generate_mdtable ${schema_md}
