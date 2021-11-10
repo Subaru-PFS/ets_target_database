@@ -90,6 +90,20 @@ class target(Base):
     fiber_mag_y = Column(Float, comment="y-band magnitude within a fiber (AB mag)")
     fiber_mag_j = Column(Float, comment="J band magnitude within a fiber (AB mag)")
 
+    psf_mag_g = Column(Float, comment="g-band PSF magnitude (AB mag)")
+    psf_mag_r = Column(Float, comment="r-band PSF magnitude (AB mag)")
+    psf_mag_i = Column(Float, comment="i-band PSF magnitude (AB mag)")
+    psf_mag_z = Column(Float, comment="z-band PSF magnitude (AB mag)")
+    psf_mag_y = Column(Float, comment="y-band PSF magnitude (AB mag)")
+    psf_mag_j = Column(Float, comment="J band PSF magnitude (AB mag)")
+
+    psf_flux_g = Column(Float, comment="g-band PSF flux (nJy)")
+    psf_flux_r = Column(Float, comment="r-band PSF flux (nJy)")
+    psf_flux_i = Column(Float, comment="i-band PSF flux (nJy)")
+    psf_flux_z = Column(Float, comment="z-band PSF flux (nJy)")
+    psf_flux_y = Column(Float, comment="y-band PSF flux (nJy)")
+    psf_flux_j = Column(Float, comment="J band PSF flux (nJy)")
+
     # photoz = Column(Float, comment="Photometric redshift for the object")
 
     priority = Column(
@@ -152,6 +166,21 @@ class target(Base):
         fiber_mag_z,
         fiber_mag_y,
         fiber_mag_j,
+        #
+        psf_mag_g,
+        psf_mag_r,
+        psf_mag_i,
+        psf_mag_z,
+        psf_mag_y,
+        psf_mag_j,
+        #
+        psf_flux_g,
+        psf_flux_r,
+        psf_flux_i,
+        psf_flux_z,
+        psf_flux_y,
+        psf_flux_j,
+        #
         # photoz,
         #
         priority,
@@ -183,12 +212,28 @@ class target(Base):
         self.target_type_id = target_type_id
         self.input_catalog_id = input_catalog_id
         # self.input_catalog_obj_id = input_catalog_obj_id
+        #
         self.fiber_mag_g = fiber_mag_g
         self.fiber_mag_r = fiber_mag_r
         self.fiber_mag_i = fiber_mag_i
         self.fiber_mag_z = fiber_mag_z
         self.fiber_mag_y = fiber_mag_y
         self.fiber_mag_j = fiber_mag_j
+        #
+        self.psf_mag_g = psf_mag_g
+        self.psf_mag_r = psf_mag_r
+        self.psf_mag_i = psf_mag_i
+        self.psf_mag_z = psf_mag_z
+        self.psf_mag_y = psf_mag_y
+        self.psf_mag_j = psf_mag_j
+        #
+        self.psf_flux_g = psf_flux_g
+        self.psf_flux_r = psf_flux_r
+        self.psf_flux_i = psf_flux_i
+        self.psf_flux_z = psf_flux_z
+        self.psf_flux_y = psf_flux_y
+        self.psf_flux_j = psf_flux_j
+        #
         # self.photoz = photoz
         #
         self.priority = priority
