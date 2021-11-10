@@ -58,4 +58,4 @@ if __name__ == "__main__":
     out_prefix = "target_fstars_s21b-en16"
     nline = 1000000
 
-    main(csv, out_prefix, outdir="data", nline=nline)
+    # main(csv, out_prefix, outdir="data", nline=nline)
