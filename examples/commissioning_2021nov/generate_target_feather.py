@@ -22,7 +22,6 @@ def main(csv, out_prefix, outdir=".", nline=None):
             "obj_id": df["objid"],
             "ra": df["ra"],
             "dec": df["decl"],
-            # "epoch": ["J2000.0"] * n_target,
             "epoch": df["epoch"],
             # "tract": df["tract"],
             # "patch": df["patch"],
@@ -30,6 +29,16 @@ def main(csv, out_prefix, outdir=".", nline=None):
             "input_catalog_name": ["ps1_dr2"] * n_target,
             "priority": [1] * n_target,
             "effective_exptime": df["exptime"],
+            "psf_mag_g": df["gPS1"],
+            "psf_mag_r": df["rPS1"],
+            "psf_mag_i": df["iPS1"],
+            "psf_mag_z": df["zPS1"],
+            "psf_mag_y": df["yPS1"],
+            "psf_flux_g": df["gFluxJy"],
+            "psf_flux_r": df["rFluxJy"],
+            "psf_flux_i": df["iFluxJy"],
+            "psf_flux_z": df["zFluxJy"],
+            "psf_flux_y": df["yFluxJy"],
             "prob_f_star": df["probfstar"],
         }
     )
@@ -56,8 +65,10 @@ def main(csv, out_prefix, outdir=".", nline=None):
 
 if __name__ == "__main__":
 
-    csv = "data/Fstar_v0.1.csv"
-    out_prefix = "target_fstars_s21b-en16"
+    csv = "../../../../star_catalogs_ishigaki/Fstar_v0.3.csv"
+    out_prefix = "target_fstars_v0.3_s21b-en16"
+    out_dir = "../../../../star_catalogs_ishigaki"
+
     nline = 1000000
 
-    main(csv, out_prefix, outdir="data", nline=nline)
+    main(csv, out_prefix, outdir=out_dir, nline=nline)
