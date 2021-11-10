@@ -65,6 +65,18 @@
 | fiber_mag_z            | FLOAT    | False         | False           | z-band magnitude within a fiber (AB mag)                                                              |
 | fiber_mag_y            | FLOAT    | False         | False           | y-band magnitude within a fiber (AB mag)                                                              |
 | fiber_mag_j            | FLOAT    | False         | False           | J band magnitude within a fiber (AB mag)                                                              |
+| psf_mag_g              | FLOAT    | False         | False           | g-band PSF magnitude (AB mag)                                                                         |
+| psf_mag_r              | FLOAT    | False         | False           | r-band PSF magnitude (AB mag)                                                                         |
+| psf_mag_i              | FLOAT    | False         | False           | i-band PSF magnitude (AB mag)                                                                         |
+| psf_mag_z              | FLOAT    | False         | False           | z-band PSF magnitude (AB mag)                                                                         |
+| psf_mag_y              | FLOAT    | False         | False           | y-band PSF magnitude (AB mag)                                                                         |
+| psf_mag_j              | FLOAT    | False         | False           | J band PSF magnitude (AB mag)                                                                         |
+| psf_flux_g             | FLOAT    | False         | False           | g-band PSF flux (nJy)                                                                                 |
+| psf_flux_r             | FLOAT    | False         | False           | r-band PSF flux (nJy)                                                                                 |
+| psf_flux_i             | FLOAT    | False         | False           | i-band PSF flux (nJy)                                                                                 |
+| psf_flux_z             | FLOAT    | False         | False           | z-band PSF flux (nJy)                                                                                 |
+| psf_flux_y             | FLOAT    | False         | False           | y-band PSF flux (nJy)                                                                                 |
+| psf_flux_j             | FLOAT    | False         | False           | J band PSF flux (nJy)                                                                                 |
 | priority               | FLOAT    | False         | False           | Priority of the target specified by the observer within the proposal                                  |
 | effective_exptime      | FLOAT    | False         | False           | Requested effective exposure time (s)                                                                 |
 | is_medium_resolution   | BOOLEAN  | False         | False           | True if the medium resolution mode is requested                                                       |
