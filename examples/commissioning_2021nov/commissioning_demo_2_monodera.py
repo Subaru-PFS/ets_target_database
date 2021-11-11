@@ -6,14 +6,12 @@
 # All of them were at the HEAD of the respective master branches, with the
 # exception of "ets_fiber_assigner" (must be on branch "commissioning_demo").
 #
-# Also the "pulp" Python package (version 1.6!) is required to solve the fiber assignment
+# Also the "pulp" Python package (vrsion 1.6!) is required to solve the fiber assignment
 # problem.
 #
 # Also, the environment variable PFS_INSTDATA_DIR must be set correctly.
 
-# import argparse
-
-import time
+import argparse
 
 import numpy as np
 
@@ -34,6 +32,7 @@ def getBench(args):
     cobraCoach = CobraCoach(
         "fpga", loadModel=False, trajectoryMode=True, rootDir=args.cobra_coach_dir
     )
+
     cobraCoach.loadModel(version="ALL", moduleVersion=args.cobra_coach_module_version)
 
     # Get the calibration product
@@ -107,10 +106,6 @@ def get_arguments():
         help="planned time of observation",
     )
     parser.add_argument(
-        "--run_id", type=int, default=42, help="numerical identifier for this run"
-    )
-
-    parser.add_argument(
         "--lim_target_mag",
         type=float,
         default="19.",
@@ -167,12 +162,35 @@ def get_arguments():
         default="../../../database_configs/targetdb_config.ini",
         help="Config file for targetDB",
     )
-
     parser.add_argument(
         "--gaiadb_conf",
         type=str,
         default="../../../database_configs/gaiadb_config_hilo.ini",
         help="Config file for Subaru's Gaia DB",
+    )
+    parser.add_argument(
+        "--target_mag_max",
+        type=float,
+        default=30.0,
+        help="Maximum (faintest) magnitude for stars in fibers (default: 30)",
+    )
+    parser.add_argument(
+        "--target_mag_min",
+        type=float,
+        default=0.0,
+        help="Minimum (brightest) magnitude for stars in fibers (default: 0)",
+    )
+    parser.add_argument(
+        "--target_mag_filter",
+        type=str,
+        default="g",
+        help="Photometric band (grizyj) to apply magnitude cuts (default: g)",
+    )
+    parser.add_argument(
+        "--fluxstd_min_prob_f_star",
+        type=float,
+        default=0.0,
+        help="Minimum acceptable prob_f_star (default: 0)",
     )
 
     args = parser.parse_args()
@@ -182,6 +200,8 @@ def get_arguments():
 def gen_target_list_from_targetdb(args):
 
     import configparser
+    import tempfile
+    import time
 
     import pandas as pd
     from astropy import units as u
@@ -200,7 +220,9 @@ def gen_target_list_from_targetdb(args):
         db.connect()
         return db
 
-    def generate_query_simple_boxsearch(ra1, ra2, dec1, dec2):
+    def generate_query_simple_boxsearch(
+        ra1, ra2, dec1, dec2, mag_min, mag_max, mag_filter, min_prob_f_star
+    ):
         # FIXME: I know this is too simple and stupid,
         #        but should be enough for the November 2021 commissioning run.
         query_target = """SELECT
@@ -212,9 +234,10 @@ def gen_target_list_from_targetdb(args):
     FROM target
     WHERE ra >= {:f} AND ra < {:f}
     AND dec >= {:f} AND dec < {:f}
-    AND prob_f_star > 0.;
+    AND psf_mag_{:s} BETWEEN {:f} AND {:f}
+    AND prob_f_star > {:f};
     """.format(
-            ra1, ra2, dec1, dec2
+            ra1, ra2, dec1, dec2, mag_filter, mag_min, mag_max, min_prob_f_star
         )
         return query_target
 
@@ -233,19 +256,64 @@ def gen_target_list_from_targetdb(args):
 
     if args.ra - dw_ra < 0.0:
         ra1, ra2 = 0.0, args.ra + dw_ra
-        q1 = generate_query_simple_boxsearch(ra1, ra2, dec1, dec2)
+        q1 = generate_query_simple_boxsearch(
+            ra1,
+            ra2,
+            dec1,
+            dec2,
+            args.target_mag_min,
+            args.target_mag_max,
+            args.target_mag_filter,
+            args.args.fluxstd_min_prob_f_star,
+        )
         ra1, ra2 = args.ra - dw_ra + 360.0, 360.0
-        q2 = generate_query_simple_boxsearch(ra1, ra2, dec1, dec2)
+        q2 = generate_query_simple_boxsearch(
+            ra1,
+            ra2,
+            dec1,
+            dec2,
+            args.target_mag_min,
+            args.target_mag_max,
+            args.target_mag_filter,
+            args.fluxstd_min_prob_f_star,
+        )
         qlist = [q1, q2]
     elif args.ra + dw_ra >= 360.0:
         ra1, ra2 = 0.0, args.ra + dw_ra - 360.0
-        q1 = generate_query_simple_boxsearch(ra1, ra2, dec1, dec2)
+        q1 = generate_query_simple_boxsearch(
+            ra1,
+            ra2,
+            dec1,
+            dec2,
+            args.target_mag_min,
+            args.target_mag_max,
+            args.target_mag_filter,
+            args.fluxstd_min_prob_f_star,
+        )
         ra1, ra2 = args.ra - dw_ra, 360.0
-        q2 = generate_query_simple_boxsearch(ra1, ra2, dec1, dec2)
+        q2 = generate_query_simple_boxsearch(
+            ra1,
+            ra2,
+            dec1,
+            dec2,
+            args.target_mag_min,
+            args.target_mag_max,
+            args.target_mag_filter,
+            args.fluxstd_min_prob_f_star,
+        )
         qlist = [q1, q2]
     else:
         ra1, ra2 = args.ra - dw_ra, args.ra + dw_ra
-        q1 = generate_query_simple_boxsearch(ra1, ra2, dec1, dec2)
+        q1 = generate_query_simple_boxsearch(
+            ra1,
+            ra2,
+            dec1,
+            dec2,
+            args.target_mag_min,
+            args.target_mag_max,
+            args.target_mag_filter,
+            args.fluxstd_min_prob_f_star,
+        )
         qlist = [q1]
 
     # print(qlist)
@@ -253,6 +321,7 @@ def gen_target_list_from_targetdb(args):
     df = pd.DataFrame(columns=["obj_id", "ra", "dec", "priority", "effective_exptime"])
 
     for q in qlist:
+        print(q)
         t_begin = time.time()
         df_tmp = db.fetch_query(q)
         t_end = time.time()
@@ -270,16 +339,23 @@ def gen_target_list_from_targetdb(args):
     tbl["Dec."] = tbl_tmp["dec"]
     tbl["Exposure Time"] = tbl_tmp["effective_exptime"]
     tbl["Priority"] = np.array(tbl_tmp["priority"], dtype=int)
-    tbl.write(
-        "{:s}_targets.txt".format(str(args.run_id)),
-        format="ascii.ecsv",
-        overwrite=True,
-    )
+    with tempfile.NamedTemporaryFile(dir="/tmp", delete=False) as tmpfile:
+        outfile = tmpfile.name
+    tbl.write(outfile, format="ascii.ecsv", overwrite=True)
+    # tbl.write(
+    #     "{:s}_targets.txt".format(str(args.run_id)),
+    #     format="ascii.ecsv",
+    #     overwrite=True,
+    # )
 
     db.close()
 
+    return outfile
+
 
 def gen_target_list(args):
+    import tempfile
+
     from astropy.table import Table
     from ets_shuffle import query_utils
 
@@ -298,18 +374,20 @@ def gen_target_list(args):
     tbl["Dec."] = res[deccol]
     tbl["Exposure Time"] = np.full(res[deccol].shape, 900.0, dtype=np.float64)
     tbl["Priority"] = np.full(res[deccol].shape, 1, dtype=np.int64)
-    tbl.write(str(args.run_id) + "_targets.txt", format="ascii.ecsv", overwrite=True)
-    # tbl.write(str(args.run_id) + "_targets.fits", overwrite=True)
+    with tempfile.NamedTemporaryFile(dir="/tmp", delete=False) as tmpfile:
+        outfile = tmpfile.name
+    tbl.write(outfile, format="ascii.ecsv", overwrite=True)
+    return outfile
 
 
-def gen_assignment(args):
+def gen_assignment(args, listname):
     import ets_fiber_assigner.netflow as nf
     from ics.cobraOps.cobraConstants import NULL_TARGET_ID
     from ics.cobraOps.cobraConstants import NULL_TARGET_POSITION
     from ics.cobraOps.CollisionSimulator2 import CollisionSimulator2
     from ics.cobraOps.TargetGroup import TargetGroup
 
-    tgt = nf.readScientificFromFile(str(args.run_id) + "_targets.txt", "sci")
+    tgt = nf.readScientificFromFile(listname, "sci")
     cobraCoach, bench = getBench(args)
     telescopes = [nf.Telescope(args.ra, args.dec, args.pa, args.observation_time)]
 
@@ -436,18 +514,13 @@ def gen_assignment(args):
     # assignment done; write pfsDesign.
     import ets_fiber_assigner.io_helpers
 
-    ets_fiber_assigner.io_helpers.writePfsDesign(
-        pfsDesignId=args.run_id,
-        pfsDesignDirectory=args.design_dir,
-        vis=res[0],
-        tp=tpos[0],
-        tel=telescopes[0],
-        tgt=tgt,
-        classdict=tclassdict,
+    return ets_fiber_assigner.io_helpers.generatePfsDesign(
+        vis=res[0], tp=tpos[0], tel=telescopes[0], tgt=tgt, classdict=tclassdict
     )
 
 
-def add_guidestars_from_gaiadb(args):
+def create_guidestars_from_gaiadb(args):
+
     import configparser
 
     import matplotlib.path as mppath
@@ -481,12 +554,8 @@ def add_guidestars_from_gaiadb(args):
         # db.connect()
         return conn
 
-    input_design = pfs.datamodel.PfsDesign.read(args.run_id, args.design_dir)
-    raTel_deg, decTel_deg, pa_deg = (
-        input_design.raBoresight,
-        input_design.decBoresight,
-        input_design.posAng,
-    )
+    # Get ra, dec and position angle from input arguments
+    raTel_deg, decTel_deg, pa_deg = args.ra, args.dec, args.pa
 
     # this should come from the pfsDesign as well, but is not yet in there
     # (DAMD-101)
@@ -511,11 +580,11 @@ def add_guidestars_from_gaiadb(args):
     cur = conn.cursor()
 
     coldict = {
+        "id": "source_id",
         "ra": "ra",
         "dec": "dec",
         "pmra": "pmra",
         "pmdec": "pmdec",
-        "id": "source_id",
     }
     racol, deccol = coldict["ra"], coldict["dec"]
     req_columns = [
@@ -656,7 +725,7 @@ def add_guidestars_from_gaiadb(args):
     # AgId: trivial to obtain from data structure
     # AgX, AgY (pixel coordinates): only computable with access to the full
     #   AG camera geometry
-    output_design = input_design
+    # output_design = input_design
 
     ntgt = len(targets[coldict["id"]])
     guidestars = pfs.datamodel.guideStars.GuideStars(
@@ -676,11 +745,13 @@ def add_guidestars_from_gaiadb(args):
         -42.0,  # telescope elevation, don't know how to obtain,
         0,  # numerical ID assigned to the GAIA catalogue
     )
-    output_design.guideStars = guidestars
-    output_design.write(dirName=args.design_dir)
+    # output_design.guideStars = guidestars
+    # output_design.write(dirName=args.design_dir)
+
+    return guidestars
 
 
-def add_guidestars(args):
+def create_guidestars(args):
     import matplotlib.path as mppath
     import pfs.datamodel
     from astropy.time import Time
@@ -692,12 +763,8 @@ def add_guidestars(args):
     from pfs.utils.coordinates.CoordTransp import CoordinateTransform as ctrans
     from pfs.utils.coordinates.CoordTransp import ag_pfimm_to_pixel
 
-    input_design = pfs.datamodel.PfsDesign.read(args.run_id, args.design_dir)
-    raTel_deg, decTel_deg, pa_deg = (
-        input_design.raBoresight,
-        input_design.decBoresight,
-        input_design.posAng,
-    )
+    # Get ra, dec and position angle from input arguments
+    raTel_deg, decTel_deg, pa_deg = args.ra, args.dec, args.pa
 
     # this should come from the pfsDesign as well, but is not yet in there
     # (DAMD-101)
@@ -806,8 +873,7 @@ def add_guidestars(args):
             else:
                 targets[key] = np.concatenate((targets[key], val))
 
-    # Write the results to a new pfsDesign file. Data fields are according to
-    # DAMD-101.
+    # Return guide star data in a type according to DAMD-101.
     # required data:
     # ra/dec of guide star candidates: in racol, deccol
     # PM information: in pmra, pmdec
@@ -815,8 +881,7 @@ def add_guidestars(args):
     # flux: currently N/A
     # AgId: trivial to obtain from data structure
     # AgX, AgY (pixel coordinates): only computable with access to the full
-    #   AG camera geometry
-    output_design = input_design
+    # AG camera geometry
 
     ntgt = len(targets[coldict["id"]])
     guidestars = pfs.datamodel.guideStars.GuideStars(
@@ -836,19 +901,22 @@ def add_guidestars(args):
         -42.0,  # telescope elevation, don't know how to obtain,
         0,  # numerical ID assigned to the GAIA catalogue
     )
-    output_design.guideStars = guidestars
-    output_design.write(dirName=args.design_dir)
+    return guidestars
 
 
 def main():
+    import pfs.datamodel
+
     args = get_arguments()
+    # listname = gen_target_list(args)
+    listname = gen_target_list_from_targetdb(args)
+    design = gen_assignment(args, listname)
+    # guidestars = create_guidestars(args)
+    guidestars = create_guidestars_from_gaiadb(args)
+    design.guideStars = guidestars
 
-    # gen_target_list(args)
-
-    gen_target_list_from_targetdb(args)
-    gen_assignment(args)
-    add_guidestars(args)
-    # add_guidestars_from_gaiadb(args)
+    filename = pfs.datamodel.PfsDesign.fileNameFormat % (design.pfsDesignId)
+    design.write(dirName=args.design_dir, fileName=filename)
 
 
 if __name__ == "__main__":
