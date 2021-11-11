@@ -16,15 +16,15 @@ class TargetDB(object):
 
     def __init__(
         self,
-        hostname="localhost",
+        host="localhost",
         port="5432",
         dbname="testdb",
-        username="admin",
-        passwd="ask someone",
+        user="admin",
+        password="ask someone",
         dialect="postgresql",
     ):
         self.dbinfo = "{0}://{1}:{2}@{3}:{4}/{5}".format(
-            dialect, username, passwd, hostname, port, dbname
+            dialect, user, password, host, port, dbname
         )
 
     def connect(self):

@@ -921,3 +921,14 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+# Example:
+# python ./commissioning_demo_2_monodera.py
+# --use_gurobi
+# --design_dir="design"
+# --cobra_coach_dir="cobracoach"
+# --ra=150
+# --dec=2
+# --targetdb_conf ../../../database_configs/targetdb_config_pfsa-db01-gb.ini
+# --gaiadb_conf ../../../database_configs/gaiadb_config_hilo.ini
