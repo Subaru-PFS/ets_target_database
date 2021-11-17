@@ -12,18 +12,42 @@
 # Also, the environment variable PFS_INSTDATA_DIR must be set correctly.
 
 import argparse
+import configparser
+import os
+import tempfile
+import time
 
+import ets_fiber_assigner.io_helpers
+import ets_fiber_assigner.netflow as nf
+import matplotlib.path as mppath
 import numpy as np
+import pandas as pd
+import pfs.datamodel
+import psycopg2
+import psycopg2.extras
+from astropy import units as u
+from astropy.table import Table
+from astropy.time import Time
+from ets_shuffle import query_utils
+from ets_shuffle.convenience import flag_close_pairs
+from ets_shuffle.convenience import guidecam_geometry
+from ets_shuffle.convenience import plot_focal_plane
+from ets_shuffle.convenience import update_coords_for_proper_motion
+from ics.cobraOps.Bench import Bench
+from ics.cobraOps.BlackDotsCalibrationProduct import BlackDotsCalibrationProduct
+from ics.cobraOps.cobraConstants import NULL_TARGET_ID
+from ics.cobraOps.cobraConstants import NULL_TARGET_POSITION
+from ics.cobraOps.CollisionSimulator2 import CollisionSimulator2
+from ics.cobraOps.TargetGroup import TargetGroup
+from pfs.utils.coordinates.CoordTransp import CoordinateTransform as ctrans
+from pfs.utils.coordinates.CoordTransp import ag_pfimm_to_pixel
+from procedures.moduleTest.cobraCoach import CobraCoach
+from targetdb import targetdb
 
 
 # This was needed for fixing some issues with the XML files.
 # Can probably be simplified. Javier?
 def getBench(args):
-    import os
-
-    from ics.cobraOps.Bench import Bench
-    from ics.cobraOps.BlackDotsCalibrationProduct import BlackDotsCalibrationProduct
-    from procedures.moduleTest.cobraCoach import CobraCoach
 
     # os.environ["PFS_INSTDATA_DIR"] = "/home/martin/codes/pfs_instdata"
     os.environ[
@@ -87,7 +111,6 @@ def getBench(args):
 
 
 def get_arguments():
-    import argparse
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -103,13 +126,13 @@ def get_arguments():
         "--observation_time",
         type=str,
         default="2020-01-01 15:00:00",
-        help="planned time of observation",
+        help="planned time of observation (default: 2020-01-01 15:00:00)",
     )
     parser.add_argument(
         "--lim_target_mag",
         type=float,
         default="19.",
-        help="magnitude of the faintest targets",
+        help="magnitude of the faintest targets (obsolete)",
     )
 
     parser.add_argument(
@@ -171,7 +194,7 @@ def get_arguments():
     parser.add_argument(
         "--target_mag_max",
         type=float,
-        default=30.0,
+        default=19.0,
         help="Maximum (faintest) magnitude for stars in fibers (default: 30)",
     )
     parser.add_argument(
@@ -197,20 +220,19 @@ def get_arguments():
     return args
 
 
+def connect_subaru_gaiadb(conf=None):
+
+    config = configparser.ConfigParser()
+    config.read(conf)
+    # print(dict(config["dbinfo"]))
+
+    conn = psycopg2.connect(**dict(config["dbinfo"]))
+    # db = targetdb.TargetDB(**dict(config["dbinfo"]))
+    # db.connect()
+    return conn
+
+
 def gen_target_list_from_targetdb(args):
-
-    import configparser
-    import tempfile
-    import time
-
-    import pandas as pd
-    from astropy import units as u
-    from astropy.table import Table
-    from targetdb import targetdb
-
-    # from ets_shuffle import query_utils
-    # from targetdb import models
-
     def connect_db(conf=None):
 
         config = configparser.ConfigParser()
@@ -229,15 +251,27 @@ def gen_target_list_from_targetdb(args):
     obj_id,
     ra,
     dec,
+    epoch,
     priority,
-    effective_exptime
+    effective_exptime,
+    psf_flux_{:s},
+    target_type_id,
+    input_catalog_id
     FROM target
     WHERE ra >= {:f} AND ra < {:f}
     AND dec >= {:f} AND dec < {:f}
     AND psf_mag_{:s} BETWEEN {:f} AND {:f}
     AND prob_f_star > {:f};
     """.format(
-            ra1, ra2, dec1, dec2, mag_filter, mag_min, mag_max, min_prob_f_star
+            mag_filter,
+            ra1,
+            ra2,
+            dec1,
+            dec2,
+            mag_filter,
+            mag_min,
+            mag_max,
+            min_prob_f_star,
         )
         return query_target
 
@@ -318,7 +352,21 @@ def gen_target_list_from_targetdb(args):
 
     # print(qlist)
 
-    df = pd.DataFrame(columns=["obj_id", "ra", "dec", "priority", "effective_exptime"])
+    df = pd.DataFrame(
+        columns=[
+            "obj_id",
+            "ra",
+            "dec",
+            "epoch",
+            "priority",
+            "effective_exptime",
+            "psf_flux_{:s}".format(
+                args.target_mag_filter,
+            ),
+            "target_type_id",
+            "input_catalog_id",
+        ]
+    )
 
     for q in qlist:
         print(q)
@@ -337,8 +385,19 @@ def gen_target_list_from_targetdb(args):
     tbl["ID"] = tbl_tmp["obj_id"]
     tbl["R.A."] = tbl_tmp["ra"]
     tbl["Dec."] = tbl_tmp["dec"]
+    tbl["Epoch"] = tbl_tmp["epoch"]
     tbl["Exposure Time"] = tbl_tmp["effective_exptime"]
     tbl["Priority"] = np.array(tbl_tmp["priority"], dtype=int)
+
+    tbl["psfFlux"] = tbl_tmp[
+        "psf_flux_{:s}".format(
+            args.target_mag_filter,
+        )
+    ]
+    tbl["filterNames"] = ["g"] * len(tbl["ID"])
+    tbl["target_type_id"] = tbl_tmp["target_type_id"]
+    tbl["input_catalog_id"] = tbl_tmp["input_catalog_id"]
+
     with tempfile.NamedTemporaryFile(dir="/tmp", delete=False) as tmpfile:
         outfile = tmpfile.name
     tbl.write(outfile, format="ascii.ecsv", overwrite=True)
@@ -350,14 +409,112 @@ def gen_target_list_from_targetdb(args):
 
     db.close()
 
-    return outfile
+    return outfile, tbl
+
+
+def gen_target_list_from_gaiadb(args):
+
+    fp_rad_deg = 260.0 * 10.2 / 3600
+    fp_fudge_factor = 1.2
+
+    conn = connect_subaru_gaiadb(args.gaiadb_conf)
+    cur = conn.cursor()
+
+    query_string = """SELECT source_id,ref_epoch,ra,dec,pmra,pmdec,phot_g_mean_mag,phot_bp_mean_mag,phot_rp_mean_mag
+    FROM gaia
+    WHERE q3c_radial_query(ra, dec, {:}, {:}, {:})
+    AND {:s} BETWEEN {:} AND {:}
+    ;
+    """.format(
+        args.ra,
+        args.dec,
+        fp_rad_deg * fp_fudge_factor,
+        "phot_g_mean_mag",
+        args.target_mag_min,
+        args.target_mag_max,
+    )
+
+    # print(query_string)
+
+    cur.execute(query_string)
+
+    df_res = pd.DataFrame(
+        cur.fetchall(),
+        columns=[
+            "source_id",
+            "ref_epoch",
+            "ra",
+            "dec",
+            "pmra",
+            "pmdec",
+            "phot_g_mean_mag",
+            "phot_bp_mean_mag",
+            "phot_rp_mean_mag",
+        ],
+    )
+
+    cur.close()
+    conn.close()
+
+    tbl_tmp = Table.from_pandas(df_res)
+
+    # ZPs are taken from Weiler (2018, A&A, 617, A138)
+    tbl_tmp["g_mag_ab"] = (tbl_tmp["phot_g_mean_mag"] + (25.7455 - 25.6409)) * u.ABmag
+    tbl_tmp["bp_mag_ab"] = (tbl_tmp["phot_bp_mean_mag"] + (25.3603 - 25.3423)) * u.ABmag
+    tbl_tmp["rp_mag_ab"] = (tbl_tmp["phot_rp_mean_mag"] + (25.1185 - 24.7600)) * u.ABmag
+
+    tbl_tmp["g_flux_njy"] = tbl_tmp["g_mag_ab"].to("nJy")
+    tbl_tmp["bp_flux_njy"] = tbl_tmp["bp_mag_ab"].to("nJy")
+    tbl_tmp["rp_flux_njy"] = tbl_tmp["rp_mag_ab"].to("nJy")
+
+    n_target = tbl_tmp["source_id"].size
+
+    tbl = Table()
+    tbl["ID"] = tbl_tmp["source_id"]
+    tbl["R.A."] = tbl_tmp["ra"]
+    tbl["Dec."] = tbl_tmp["dec"]
+    tbl["Epoch"] = tbl_tmp["ref_epoch"]
+    tbl["Exposure Time"] = np.full(n_target, 900.0)
+    tbl["Priority"] = np.full(n_target, 1, dtype=int)
+
+    filternames = [["gaia_g", "gaia_bp", "gaia_rp"]] * n_target
+
+    totalfluxes = np.empty(n_target, dtype=object)
+
+    for i in range(n_target):
+        totalfluxes[i] = [
+            tbl_tmp["g_flux_njy"][i],
+            tbl_tmp["bp_flux_njy"][i],
+            tbl_tmp["rp_flux_njy"][i],
+        ]
+
+    tbl["totalFlux"] = totalfluxes
+    tbl["filterNames"] = filternames
+
+    # tbl["psfFlux"] = tbl_tmp[
+    #     "psf_flux_{:s}".format(
+    #         args.target_mag_filter,
+    #     )
+    # ]
+    # tbl["filterNames"] = ["g"] * len(tbl["ID"])
+
+    tbl["target_type_id"] = np.full(n_target, 1)  # 1: SCIENCE
+    tbl["input_catalog_id"] = np.full(n_target, 2)  # 2: gaia_dr2
+
+    with tempfile.NamedTemporaryFile(dir="/tmp", delete=False) as tmpfile:
+        outfile = tmpfile.name
+    tbl.write(outfile, format="ascii.ecsv", overwrite=True)
+    print(outfile)
+    # tbl.write(
+    #     "{:s}_targets.txt".format(str(args.run_id)),
+    #     format="ascii.ecsv",
+    #     overwrite=True,
+    # )
+
+    return outfile, tbl
 
 
 def gen_target_list(args):
-    import tempfile
-
-    from astropy.table import Table
-    from ets_shuffle import query_utils
 
     fp_rad_deg = 260.0 * 10.2 / 3600
     conn, table, coldict = query_utils.openGAIA2connection()
@@ -381,12 +538,6 @@ def gen_target_list(args):
 
 
 def gen_assignment(args, listname):
-    import ets_fiber_assigner.netflow as nf
-    from ics.cobraOps.cobraConstants import NULL_TARGET_ID
-    from ics.cobraOps.cobraConstants import NULL_TARGET_POSITION
-    from ics.cobraOps.CollisionSimulator2 import CollisionSimulator2
-    from ics.cobraOps.TargetGroup import TargetGroup
-
     tgt = nf.readScientificFromFile(listname, "sci")
     cobraCoach, bench = getBench(args)
     telescopes = [nf.Telescope(args.ra, args.dec, args.pa, args.observation_time)]
@@ -512,7 +663,6 @@ def gen_assignment(args, listname):
         done = ncoll == 0
 
     # assignment done; write pfsDesign.
-    import ets_fiber_assigner.io_helpers
 
     return ets_fiber_assigner.io_helpers.generatePfsDesign(
         vis=res[0], tp=tpos[0], tel=telescopes[0], tgt=tgt, classdict=tclassdict
@@ -520,40 +670,6 @@ def gen_assignment(args, listname):
 
 
 def create_guidestars_from_gaiadb(args):
-
-    import configparser
-
-    import matplotlib.path as mppath
-    import pandas as pd
-    import pfs.datamodel
-    import psycopg2
-    import psycopg2.extras
-    from astropy import units as u
-    from astropy.table import Table
-    from astropy.time import Time
-    from ets_shuffle import query_utils
-    from ets_shuffle.convenience import flag_close_pairs
-    from ets_shuffle.convenience import guidecam_geometry
-    from ets_shuffle.convenience import plot_focal_plane
-    from ets_shuffle.convenience import update_coords_for_proper_motion
-    from pfs.utils.coordinates.CoordTransp import CoordinateTransform as ctrans
-    from pfs.utils.coordinates.CoordTransp import ag_pfimm_to_pixel
-    from targetdb import targetdb
-
-    # from ets_shuffle import query_utils
-    # from targetdb import models
-
-    def connect_gaiadb(conf=None):
-
-        config = configparser.ConfigParser()
-        config.read(conf)
-        # print(dict(config["dbinfo"]))
-
-        conn = psycopg2.connect(**dict(config["dbinfo"]))
-        # db = targetdb.TargetDB(**dict(config["dbinfo"]))
-        # db.connect()
-        return conn
-
     # Get ra, dec and position angle from input arguments
     raTel_deg, decTel_deg, pa_deg = args.ra, args.dec, args.pa
 
@@ -575,7 +691,7 @@ def create_guidestars_from_gaiadb(args):
 
     # Find guide star candidates
 
-    conn = connect_gaiadb(args.gaiadb_conf)
+    conn = connect_subaru_gaiadb(args.gaiadb_conf)
     # cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
     cur = conn.cursor()
 
@@ -752,16 +868,6 @@ def create_guidestars_from_gaiadb(args):
 
 
 def create_guidestars(args):
-    import matplotlib.path as mppath
-    import pfs.datamodel
-    from astropy.time import Time
-    from ets_shuffle import query_utils
-    from ets_shuffle.convenience import flag_close_pairs
-    from ets_shuffle.convenience import guidecam_geometry
-    from ets_shuffle.convenience import plot_focal_plane
-    from ets_shuffle.convenience import update_coords_for_proper_motion
-    from pfs.utils.coordinates.CoordTransp import CoordinateTransform as ctrans
-    from pfs.utils.coordinates.CoordTransp import ag_pfimm_to_pixel
 
     # Get ra, dec and position angle from input arguments
     raTel_deg, decTel_deg, pa_deg = args.ra, args.dec, args.pa
@@ -893,7 +999,8 @@ def create_guidestars(args):
         targets[coldict["pmdec"]],
         np.array([0.0] * ntgt),  # parallax
         targets["phot_g_mean_mag"],
-        np.array(["??"] * ntgt),  # passband
+        # np.array(["??"] * ntgt),  # passband
+        np.array(["g"] * ntgt),  # passband
         np.array([0.0] * ntgt),  # color
         targets["agid"],  # AG camera ID
         targets["agpix_x"],  # AG x pixel coordinate
@@ -905,13 +1012,17 @@ def create_guidestars(args):
 
 
 def main():
-    import pfs.datamodel
 
     args = get_arguments()
-    # listname = gen_target_list(args)
-    listname = gen_target_list_from_targetdb(args)
+    # # listname = gen_target_list(args)
+    # listname, tbl = gen_target_list_from_targetdb(args)
+    listname, tbl = gen_target_list_from_gaiadb(args)
     design = gen_assignment(args, listname)
-    # guidestars = create_guidestars(args)
+    # # guidestars = create_guidestars(args)
+
+    # # design.psfFlux = [np.array([f]) for f in tbl["psfFlux"].data]
+    # # design.filterNames = [[f] for f in tbl["filterNames"].data]
+
     guidestars = create_guidestars_from_gaiadb(args)
     design.guideStars = guidestars
 
