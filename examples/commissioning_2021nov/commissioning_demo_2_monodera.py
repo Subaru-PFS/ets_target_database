@@ -537,8 +537,9 @@ def gen_target_list(args):
     return outfile
 
 
-def gen_assignment(args, listname):
-    tgt = nf.readScientificFromFile(listname, "sci")
+def gen_assignment(args, listname_targets, listname_fluxstds):
+    tgt = nf.readScientificFromFile(listname_targets, "sci")
+    tgt += nf.readCalibrationFromFile(listname_fluxstds, "cal")
     cobraCoach, bench = getBench(args)
     telescopes = [nf.Telescope(args.ra, args.dec, args.pa, args.observation_time)]
 
@@ -555,7 +556,13 @@ def gen_assignment(args, listname):
         "partialObservationCost": 1000,
         "calib": False,
     }
-    tclassdict = {"sci_P1": 1}
+    classdict["cal"] = {
+        "numRequired": 50,
+        "nonObservationCost": 10000,
+        "calib": True,
+    }
+
+    tclassdict = {"sci_P1": 1, "cal": 3}
 
     t_obs = 900.0
 
@@ -1015,9 +1022,9 @@ def main():
 
     args = get_arguments()
     # # listname = gen_target_list(args)
-    # listname, tbl = gen_target_list_from_targetdb(args)
-    listname, tbl = gen_target_list_from_gaiadb(args)
-    design = gen_assignment(args, listname)
+    listname_fluxstds, tbl_fluxstds = gen_target_list_from_targetdb(args)
+    listname_targets, tbl_targets = gen_target_list_from_gaiadb(args)
+    design = gen_assignment(args, listname_targets, listname_fluxstds)
     # # guidestars = create_guidestars(args)
 
     # # design.psfFlux = [np.array([f]) for f in tbl["psfFlux"].data]
