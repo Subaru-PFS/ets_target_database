@@ -107,8 +107,8 @@ def getBench(args):
 
 
 def get_arguments():
-
     parser = argparse.ArgumentParser()
+
     parser.add_argument(
         "--ra",
         type=float,
@@ -127,8 +127,6 @@ def get_arguments():
         default=0.0,
         help="Telescope position angle [degrees] (default: 0.0)",
     )
-
-    # NOTE: is this UTC or HST?
     parser.add_argument(
         "--observation_time",
         type=str,
@@ -243,6 +241,13 @@ def get_arguments():
     )
 
     args = parser.parse_args()
+
+    if args.observation_time.lower() == "now":
+        print("converting to the current time")
+        args.observation_time = (
+            Time.now().iso
+        )  # astropy.time.Time.now() uses datetime.utcnow()
+
     return args
 
 
@@ -933,6 +938,9 @@ def create_guidestars_from_gaiadb(args):
 def main():
 
     args = get_arguments()
+
+    print(args)
+    # exit()
 
     for d in [args.design_dir, args.cobra_coach_dir]:
         try:
