@@ -16,9 +16,7 @@ import configparser
 import os
 import tempfile
 import time
-from collections import defaultdict
 
-import ets_fiber_assigner.io_helpers
 import ets_fiber_assigner.netflow as nf
 import matplotlib.path as mppath
 import numpy as np
@@ -29,11 +27,9 @@ import psycopg2.extras
 from astropy import units as u
 from astropy.table import Table
 from astropy.time import Time
-from astropy.units.cgs import C
 from ets_shuffle import query_utils
 from ets_shuffle.convenience import flag_close_pairs
 from ets_shuffle.convenience import guidecam_geometry
-from ets_shuffle.convenience import plot_focal_plane
 from ets_shuffle.convenience import update_coords_for_proper_motion
 from ics.cobraOps.Bench import Bench
 from ics.cobraOps.BlackDotsCalibrationProduct import BlackDotsCalibrationProduct
@@ -41,13 +37,9 @@ from ics.cobraOps.cobraConstants import NULL_TARGET_ID
 from ics.cobraOps.cobraConstants import NULL_TARGET_POSITION
 from ics.cobraOps.CollisionSimulator2 import CollisionSimulator2
 from ics.cobraOps.TargetGroup import TargetGroup
-from pfs.datamodel import FiberStatus
-from pfs.datamodel import PfsDesign
-from pfs.datamodel import TargetType
 from pfs.utils.coordinates.CoordTransp import CoordinateTransform as ctrans
 from pfs.utils.coordinates.CoordTransp import ag_pfimm_to_pixel
 from pfs.utils.pfsDesignUtils import makePfsDesign
-from pfs.utils.pfsDesignUtils import showPfsDesign
 from procedures.moduleTest.cobraCoach import CobraCoach
 from targetdb import targetdb
 
@@ -56,10 +48,7 @@ from targetdb import targetdb
 # Can probably be simplified. Javier?
 def getBench(args):
 
-    # os.environ["PFS_INSTDATA_DIR"] = "/home/martin/codes/pfs_instdata"
-    os.environ[
-        "PFS_INSTDATA_DIR"
-    ] = "/Users/monodera/Dropbox/NAOJ/PFS/Subaru-PFS/pfs_instdata/"
+    os.environ["PFS_INSTDATA_DIR"] = args.pfs_instdata_dir
     cobraCoach = CobraCoach(
         "fpga", loadModel=False, trajectoryMode=True, rootDir=args.cobra_coach_dir
     )
@@ -124,97 +113,97 @@ def get_arguments():
         "--ra",
         type=float,
         default=0.0,
-        help="Telescope center RA [degrees]",
+        help="Telescope center RA [degrees] (default: 0.0)",
     )
     parser.add_argument(
         "--dec",
         type=float,
         default=0.0,
-        help="Telescope center Dec [degrees]",
+        help="Telescope center Dec [degrees] (default: 0.0)",
     )
     parser.add_argument(
         "--pa",
         type=float,
         default=0.0,
-        help="Telescope position angle [degrees]",
+        help="Telescope position angle [degrees] (default: 0.0)",
     )
+
+    # NOTE: is this UTC or HST?
     parser.add_argument(
         "--observation_time",
         type=str,
-        default="2020-01-01 15:00:00",
-        help="planned time of observation (default: 2020-01-01 15:00:00)",
+        default="2021-11-20 15:00:00",
+        help="planned time of observation (default: 2021-11-20 15:00:00)",
     )
     parser.add_argument(
         "--lim_target_mag",
         type=float,
         default="19.",
-        help="magnitude of the faintest targets (obsolete)",
+        help="magnitude of the faintest targets (obsolete) (default:19)",
     )
 
     parser.add_argument(
         "--design_dir",
         type=str,
         default=".",
-        help="directory for storing PFS designs",
+        help="directory for storing PFS designs (default: .)",
     )
 
     parser.add_argument(
         "--guidestar_mag_max",
         type=float,
         default=19.0,
-        help="maximum magnitude for guide star candidates",
+        help="maximum magnitude for guide star candidates (default: 19.)",
     )
     parser.add_argument(
         "--guidestar_neighbor_mag_min",
         type=float,
         default=21.0,
-        help="minimum magnitude for objects in the vicinity of guide star candidates",
+        help="minimum magnitude for objects in the vicinity of guide star candidates (default: 21.)",
     )
     parser.add_argument(
         "--guidestar_minsep_deg",
         type=float,
         default=1.0 / 3600,
-        help="radius of guide star candidate vicinity",
+        help="radius of guide star candidate vicinity (default: 1/3600)",
     )
 
     parser.add_argument(
         "--use_gurobi",
-        # type=bool,
-        # default=False,
         action="store_true",
-        help="use Gurobi solver instead of PuLP",
+        help="use Gurobi",
     )
     parser.add_argument(
         "--cobra_coach_dir",
         type=str,
         default=".",
-        help="path for temporary cobraCoach files",
+        help="path for temporary cobraCoach files (default: .)",
     )
 
     parser.add_argument(
         "--cobra_coach_module_version",
         type=str,
         default="final_20210920_mm",
-        help="version of the bench decription file",
+        help="version of the bench decription file (default: final_20210920_mm)",
     )
 
     parser.add_argument(
         "--targetdb_conf",
         type=str,
-        default="../../../database_configs/targetdb_config.ini",
-        help="Config file for targetDB",
+        default="targetdb_config.ini",
+        help="Config file for targetDB (default: targetdb_config.ini)",
     )
     parser.add_argument(
         "--gaiadb_conf",
         type=str,
-        default="../../../database_configs/gaiadb_config_hilo.ini",
-        help="Config file for Subaru's Gaia DB",
+        default="gaiadb_config_hilo.ini",
+        help="Config file for Subaru's Gaia DB (default: gaiadb_config_hilo.ini",
     )
     parser.add_argument(
         "--target_mag_max",
         type=float,
         default=19.0,
-        help="Maximum (faintest) magnitude for stars in fibers (default: 30)",
+        help="Maximum (faintest) magnitude for stars in fibers (default: 19.)",
     )
     parser.add_argument(
         "--target_mag_min",
@@ -226,7 +215,7 @@ def get_arguments():
         "--target_mag_filter",
         type=str,
         default="g",
-        help="Photometric band (grizyj) to apply magnitude cuts (default: g)",
+        help="Photometric band (grizyj of PS1) to apply magnitude cuts (default: g)",
     )
     parser.add_argument(
         "--fluxstd_min_prob_f_star",
@@ -244,7 +233,13 @@ def get_arguments():
         "--n_fluxstd",
         type=int,
         default=50,
-        help="Number of FLUXSTD stars to be allocated.",
+        help="Number of FLUXSTD stars to be allocated. (default: 50)",
+    )
+    parser.add_argument(
+        "--pfs_instdata_dir",
+        type=str,
+        default="/Users/monodera/Dropbox/NAOJ/PFS/Subaru-PFS/pfs_instdata/",
+        help="Location of pfs_instdata (default: /Users/monodera/Dropbox/NAOJ/PFS/Subaru-PFS/pfs_instdata/)",
     )
 
     args = parser.parse_args()
@@ -252,23 +247,16 @@ def get_arguments():
 
 
 def connect_subaru_gaiadb(conf=None):
-
     config = configparser.ConfigParser()
     config.read(conf)
-    # print(dict(config["dbinfo"]))
-
     conn = psycopg2.connect(**dict(config["dbinfo"]))
-    # db = targetdb.TargetDB(**dict(config["dbinfo"]))
-    # db.connect()
     return conn
 
 
 def gen_target_list_from_targetdb(args):
     def connect_db(conf=None):
-
         config = configparser.ConfigParser()
         config.read(conf)
-        # print(dict(config["dbinfo"]))
         db = targetdb.TargetDB(**dict(config["dbinfo"]))
         db.connect()
         return db
@@ -384,8 +372,6 @@ def gen_target_list_from_targetdb(args):
         )
         qlist = [q1]
 
-    # print(qlist)
-
     df = pd.DataFrame(
         columns=[
             "obj_id",
@@ -404,15 +390,12 @@ def gen_target_list_from_targetdb(args):
         ]
     )
 
-    # print(df.dtypes)
-
     for q in qlist:
         print(q)
         t_begin = time.time()
         df_tmp = db.fetch_query(q)
         t_end = time.time()
         print("Time spent for querying: {:f}".format(t_end - t_begin))
-        # print(df_tmp)
         df = df.append(df_tmp, ignore_index=True)
 
     print(df)
@@ -442,6 +425,7 @@ def gen_target_list_from_targetdb(args):
     tbl["target_type_id"] = tbl_tmp["target_type_id"]
     tbl["input_catalog_id"] = tbl_tmp["input_catalog_id"]
 
+    # FIXME: I think it is worth putting the table file in a non-tmp directory
     with tempfile.NamedTemporaryFile(dir="/tmp", delete=False) as tmpfile:
         outfile = tmpfile.name
     tbl.write(outfile, format="ascii.ecsv", overwrite=True)
@@ -515,7 +499,6 @@ def gen_target_list_from_gaiadb(args):
     tbl["Priority"] = np.full(n_target, 1, dtype=int)
 
     filternames = [["g_gaia", "bp_gaia", "rp_gaia"]] * n_target
-
     totalfluxes = np.empty(n_target, dtype=object)
 
     for i in range(n_target):
@@ -529,46 +512,16 @@ def gen_target_list_from_gaiadb(args):
 
     tbl["totalFlux"] = totalfluxes
     tbl["filterNames"] = filternames
-
-    # tbl["psfFlux"] = tbl_tmp[
-    #     "psf_flux_{:s}".format(
-    #         args.target_mag_filter,
-    #     )
-    # ]
-    # tbl["filterNames"] = ["g"] * len(tbl["ID"])
-
     tbl["target_type_id"] = np.full(n_target, 1)  # 1: SCIENCE
     tbl["input_catalog_id"] = np.full(n_target, 2)  # 2: gaia_dr2
 
+    # FIXME: I think it is worth putting the table file in a non-tmp directory
     with tempfile.NamedTemporaryFile(dir="/tmp", delete=False) as tmpfile:
         outfile = tmpfile.name
     tbl.write(outfile, format="ascii.ecsv", overwrite=True)
     print(outfile)
 
     return outfile, tbl
-
-
-def gen_target_list(args):
-
-    fp_rad_deg = 260.0 * 10.2 / 3600
-    conn, table, coldict = query_utils.openGAIA2connection()
-    racol, deccol = coldict["ra"], coldict["dec"]
-    req_columns = [coldict["id"], racol, deccol, "phot_g_mean_mag"]
-    constraints = [
-        query_utils.build_circle_query(args.ra, args.dec, fp_rad_deg * 1.2, coldict),
-        query_utils.build_mag_query(args.lim_target_mag, 0, "phot_g_mean_mag"),
-    ]
-    res = query_utils.run_query(conn, table, req_columns, constraints)
-    tbl = Table()
-    tbl["ID"] = res[coldict["id"]]
-    tbl["R.A."] = res[racol]
-    tbl["Dec."] = res[deccol]
-    tbl["Exposure Time"] = np.full(res[deccol].shape, 900.0, dtype=np.float64)
-    tbl["Priority"] = np.full(res[deccol].shape, 1, dtype=np.int64)
-    with tempfile.NamedTemporaryFile(dir="/tmp", delete=False) as tmpfile:
-        outfile = tmpfile.name
-    tbl.write(outfile, format="ascii.ecsv", overwrite=True)
-    return outfile
 
 
 def gen_assignment(args, listname_targets, listname_fluxstds):
@@ -688,7 +641,7 @@ def gen_assignment(args, listname_targets, listname_fluxstds):
             #            from ics.cobraOps import plotUtils
             #            simulator.plotResults(paintFootprints=False)
             #            plotUtils.pauseExecution()
-
+            #
             #            if np.any(simulator.endPointCollisions):
             #                print("ERROR: detected end point collision, which should be impossible")
             #                raise RuntimeError()
@@ -710,19 +663,12 @@ def gen_assignment(args, listname_targets, listname_fluxstds):
         done = ncoll == 0
 
     return res[0], tpos[0], telescopes[0], tgt, tclassdict
-    # assignment done; write pfsDesign.
-
-    # return ets_fiber_assigner.io_helpers.generatePfsDesign(
-    #     vis=res[0], tp=tpos[0], tel=telescopes[0], tgt=tgt, classdict=tclassdict
-    # )
 
 
 def generate_pfs_design(vis, tp, tel, tgt, classdict, tbl_targets, tbl_fluxstds):
 
     n_fiber = 2394
     fiber_id = np.arange(n_fiber, dtype=int) + 1  # fiberID starts with 0 or 1?
-
-    n_tgt = len(vis.items())
 
     idx_array = np.arange(n_fiber)
 
@@ -753,7 +699,6 @@ def generate_pfs_design(vis, tp, tel, tgt, classdict, tbl_targets, tbl_fluxstds)
             tbl_targets["ID"] == np.int64(tgt[tidx].ID),
             tbl_targets["target_type_id"] == classdict[tgt[tidx].targetclass],
         )
-
         idx_fluxstd = np.logical_and(
             tbl_fluxstds["ID"] == np.int64(tgt[tidx].ID),
             tbl_fluxstds["target_type_id"] == classdict[tgt[tidx].targetclass],
@@ -763,14 +708,10 @@ def generate_pfs_design(vis, tp, tel, tgt, classdict, tbl_targets, tbl_fluxstds)
             catId[i_fiber] = tbl_targets["input_catalog_id"][idx_target][0]
             totalFlux[i_fiber] = tbl_targets["totalFlux"][idx_target][0]
             filterNames[i_fiber] = tbl_targets["filterNames"][idx_target][0].tolist()
-
         if np.any(idx_fluxstd):
             catId[i_fiber] = tbl_fluxstds["input_catalog_id"][idx_fluxstd][0]
             psfFlux[i_fiber] = tbl_fluxstds["psfFlux"][idx_fluxstd][0]
             filterNames[i_fiber] = tbl_fluxstds["filterNames"][idx_fluxstd][0].tolist()
-
-    # print(filterNames)
-    # print(totalFlux)
 
     design = makePfsDesign(
         pfiNominal,
@@ -796,9 +737,7 @@ def generate_pfs_design(vis, tp, tel, tgt, classdict, tbl_targets, tbl_fluxstds)
         # guideStars=None,
         # designName=None,
     )
-    # design = ets_fiber_assigner.io_helpers.generatePfsDesign(
-    #     vis=vis, tp=tp, tel=tel, tgt=tgt, classdict=classdict
-    # )
+
     return design
 
 
@@ -823,11 +762,9 @@ def create_guidestars_from_gaiadb(args):
     fp_fudge_factor = 1.2
 
     # Find guide star candidates
-
     conn = connect_subaru_gaiadb(args.gaiadb_conf)
     # cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
     cur = conn.cursor()
-
     coldict = {
         "id": "source_id",
         "ra": "ra",
@@ -862,21 +799,16 @@ def create_guidestars_from_gaiadb(args):
         guidestar_neighbor_mag_min,
     )
 
-    # print(query_string)
-
     cur.execute(query_string)
+
     df_res = pd.DataFrame(
         cur.fetchall(),
         columns=["source_id", "ra", "dec", "pmra", "pmdec", "phot_g_mean_mag"],
     )
 
-    # print(df_res)
-
     res = {}
     for col in df_res.columns:
         res[col] = df_res[col].to_numpy()
-
-    # print(res)
 
     cur.close()
     conn.close()
@@ -891,7 +823,7 @@ def create_guidestars_from_gaiadb(args):
         res[deccol],
         res[coldict["pmra"]],
         res[coldict["pmdec"]],
-        2015.5,
+        2015.5,  # Gaia DR2 use 2015.5
         epoch,
     )
 
@@ -994,153 +926,7 @@ def create_guidestars_from_gaiadb(args):
         args.telescope_elevation,  # telescope elevation, don't know how to obtain,
         2,  # numerical ID assigned to the GAIA catalogue
     )
-    # output_design.guideStars = guidestars
-    # output_design.write(dirName=args.design_dir)
 
-    return guidestars
-
-
-def create_guidestars(args):
-
-    # Get ra, dec and position angle from input arguments
-    raTel_deg, decTel_deg, pa_deg = args.ra, args.dec, args.pa
-
-    # this should come from the pfsDesign as well, but is not yet in there
-    # (DAMD-101)
-    obs_time = args.observation_time
-
-    guidestar_mag_max = args.guidestar_mag_max
-    guidestar_neighbor_mag_min = args.guidestar_neighbor_mag_min
-    guidestar_minsep_deg = args.guidestar_minsep_deg
-
-    # guide star cam geometries
-    agcoord = guidecam_geometry()
-
-    # internal, technical parameters
-    # set focal plane radius
-    fp_rad_deg = 260.0 * 10.2 / 3600
-
-    # Find guide star candidates
-
-    # Query GAIA2 for a circular region containing all guide cam FOVs
-    # Obtain all targets with g_mean_mag<=guidestar_neighbor_mag_min that have
-    # proper motion information
-    conn, table, coldict = query_utils.openGAIA2connection()
-    racol, deccol = coldict["ra"], coldict["dec"]
-    req_columns = [
-        coldict["id"],
-        racol,
-        deccol,
-        coldict["pmra"],
-        coldict["pmdec"],
-        "phot_g_mean_mag",
-    ]
-    constraints = [
-        query_utils.build_circle_query(
-            raTel_deg, decTel_deg, fp_rad_deg * 1.2, coldict
-        ),
-        query_utils.build_pm_query(coldict),
-        query_utils.build_mag_query(guidestar_neighbor_mag_min, 0, "phot_g_mean_mag"),
-    ]
-    res = query_utils.run_query(conn, table, req_columns, constraints)
-    # FIXME: run similar query, but without the PM requirement, to get a list of
-    # potentially too-bright neighbours
-
-    # adjust for proper motion
-    epoch = Time(args.observation_time).jyear
-    res[racol], res[deccol] = update_coords_for_proper_motion(
-        res[racol],
-        res[deccol],
-        res[coldict["pmra"]],
-        res[coldict["pmdec"]],
-        2015.5,
-        epoch,
-    )
-
-    # compute PFI coordinates
-    tmp = np.array([res[racol], res[deccol]])
-    tmp = ctrans(
-        xyin=tmp,
-        za=0.0,
-        mode="sky_pfi",
-        inr=0.0,
-        pa=pa_deg,
-        cent=np.array([raTel_deg, decTel_deg]),
-        time=obs_time,
-    )
-    res["xypos"] = np.array([tmp[0, :], tmp[1, :]]).T
-
-    # determine the subset of sources falling within the guide cam FOVs
-    # For the moment I'm using matplotlib's path functionality for this task
-    # Once the "pfi_sky" transformation direction is available in
-    # pfs_utils.coordinates, we can do a direct polygon query for every camera,
-    # which should be more efficient.
-    targets = {}
-    tgtcam = []
-    for i in range(agcoord.shape[0]):
-        p = mppath.Path(agcoord[i])
-        # find all targets in the slighty enlarged FOV
-        tmp = p.contains_points(res["xypos"], radius=1.0)  # 1mm more
-        tdict = {}
-        for key, val in res.items():
-            tdict[key] = val[tmp]
-        # eliminate close neighbors
-        flags = flag_close_pairs(tdict[racol], tdict[deccol], guidestar_minsep_deg)
-        for key, val in tdict.items():
-            tdict[key] = val[np.invert(flags)]
-        # eliminate all targets which are not bright enough to be guide stars
-        flags = tdict["phot_g_mean_mag"] < guidestar_mag_max
-        for key, val in tdict.items():
-            tdict[key] = val[flags]
-        # eliminate all targets which are not really in the camera's FOV
-        flags = p.contains_points(tdict["xypos"])  # 1mm more
-        for key, val in tdict.items():
-            tdict[key] = val[flags]
-        # add AG camera ID
-        tdict["agid"] = [i] * len(tdict[coldict["id"]])
-        # compute and add pixel coordinates
-        tmp = []
-        for pos in tdict["xypos"]:
-            tmp.append(ag_pfimm_to_pixel(i, pos[0], pos[1]))
-        tdict["agpix_x"] = np.array([x[0] for x in tmp])
-        tdict["agpix_y"] = np.array([x[1] for x in tmp])
-        # append the results for this camera to the full list
-        tgtcam.append(tdict)
-        for key, val in tdict.items():
-            if key not in targets:
-                targets[key] = val
-            else:
-                targets[key] = np.concatenate((targets[key], val))
-
-    # Return guide star data in a type according to DAMD-101.
-    # required data:
-    # ra/dec of guide star candidates: in racol, deccol
-    # PM information: in pmra, pmdec
-    # parallax: currently N/A
-    # flux: currently N/A
-    # AgId: trivial to obtain from data structure
-    # AgX, AgY (pixel coordinates): only computable with access to the full
-    # AG camera geometry
-
-    ntgt = len(targets[coldict["id"]])
-    guidestars = pfs.datamodel.guideStars.GuideStars(
-        targets[coldict["id"]],
-        np.array([epoch] * ntgt),  # epoch
-        targets[coldict["ra"]],
-        targets[coldict["dec"]],
-        targets[coldict["pmra"]],
-        targets[coldict["pmdec"]],
-        np.array([0.0] * ntgt),  # parallax
-        targets["phot_g_mean_mag"],
-        # np.array(["??"] * ntgt),  # passband
-        np.full(ntgt, "g"),  # passband
-        np.array([0.0] * ntgt),  # color
-        targets["agid"],  # AG camera ID
-        targets["agpix_x"],  # AG x pixel coordinate
-        targets["agpix_y"],  # AG y pixel coordinate
-        -42.0,  # telescope elevation, don't know how to obtain,
-        0,  # numerical ID assigned to the GAIA catalogue
-    )
     return guidestars
 
 
@@ -1166,21 +952,11 @@ def main():
     guidestars = create_guidestars_from_gaiadb(args)
     design.guideStars = guidestars
 
-    # filename = pfs.datamodel.PfsDesign.fileNameFormat % (design.pfsDesignId)
-    filename = design.filename
-    design.write(dirName=args.design_dir, fileName=filename)
+    design.write(dirName=args.design_dir, fileName=design.filename)
 
 
 if __name__ == "__main__":
     main()
 
-
 # Example:
-# python ./commissioning_demo_2_monodera.py
-# --use_gurobi
-# --design_dir="design"
-# --cobra_coach_dir="cobracoach"
-# --ra=150
-# --dec=2
-# --targetdb_conf ../../../database_configs/targetdb_config_pfsa-db01-gb.ini
-# --gaiadb_conf ../../../database_configs/gaiadb_config_hilo.ini
+# python ./commissioning_demo_2_monodera.py --use_gurobi --design_dir="design2" --cobra_coach_dir="cobracoach" --ra=150 --dec=2 --targetdb_conf ../../../database_configs/targetdb_config_pfsa-db01-gb.ini --gaiadb_conf ../../../database_configs/gaiadb_config_hilo.ini
