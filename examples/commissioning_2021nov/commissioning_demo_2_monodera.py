@@ -16,6 +16,7 @@ import configparser
 import os
 import tempfile
 import time
+from collections import defaultdict
 
 import ets_fiber_assigner.io_helpers
 import ets_fiber_assigner.netflow as nf
@@ -28,6 +29,7 @@ import psycopg2.extras
 from astropy import units as u
 from astropy.table import Table
 from astropy.time import Time
+from astropy.units.cgs import C
 from ets_shuffle import query_utils
 from ets_shuffle.convenience import flag_close_pairs
 from ets_shuffle.convenience import guidecam_geometry
@@ -39,8 +41,13 @@ from ics.cobraOps.cobraConstants import NULL_TARGET_ID
 from ics.cobraOps.cobraConstants import NULL_TARGET_POSITION
 from ics.cobraOps.CollisionSimulator2 import CollisionSimulator2
 from ics.cobraOps.TargetGroup import TargetGroup
+from pfs.datamodel import FiberStatus
+from pfs.datamodel import PfsDesign
+from pfs.datamodel import TargetType
 from pfs.utils.coordinates.CoordTransp import CoordinateTransform as ctrans
 from pfs.utils.coordinates.CoordTransp import ag_pfimm_to_pixel
+from pfs.utils.pfsDesignUtils import makePfsDesign
+from pfs.utils.pfsDesignUtils import showPfsDesign
 from procedures.moduleTest.cobraCoach import CobraCoach
 from targetdb import targetdb
 
@@ -114,13 +121,22 @@ def get_arguments():
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--ra", type=float, default=0.0, help="Telescope center RA [degrees]"
+        "--ra",
+        type=float,
+        default=0.0,
+        help="Telescope center RA [degrees]",
     )
     parser.add_argument(
-        "--dec", type=float, default=0.0, help="Telescope center Dec [degrees]"
+        "--dec",
+        type=float,
+        default=0.0,
+        help="Telescope center Dec [degrees]",
     )
     parser.add_argument(
-        "--pa", type=float, default=0.0, help="Telescope position angle [degrees]"
+        "--pa",
+        type=float,
+        default=0.0,
+        help="Telescope position angle [degrees]",
     )
     parser.add_argument(
         "--observation_time",
@@ -136,7 +152,10 @@ def get_arguments():
     )
 
     parser.add_argument(
-        "--design_dir", type=str, default=".", help="directory for storing PFS designs"
+        "--design_dir",
+        type=str,
+        default=".",
+        help="directory for storing PFS designs",
     )
 
     parser.add_argument(
@@ -215,6 +234,18 @@ def get_arguments():
         default=0.0,
         help="Minimum acceptable prob_f_star (default: 0)",
     )
+    parser.add_argument(
+        "--telescope_elevation",
+        type=float,
+        default=60.0,
+        help="Telescope elevation in degree (default: 60)",
+    )
+    parser.add_argument(
+        "--n_fluxstd",
+        type=int,
+        default=50,
+        help="Number of FLUXSTD stars to be allocated.",
+    )
 
     args = parser.parse_args()
     return args
@@ -254,7 +285,11 @@ def gen_target_list_from_targetdb(args):
     epoch,
     priority,
     effective_exptime,
-    psf_flux_{:s},
+    psf_flux_g,
+    psf_flux_r,
+    psf_flux_i,
+    psf_flux_z,
+    psf_flux_y,
     target_type_id,
     input_catalog_id
     FROM target
@@ -263,7 +298,6 @@ def gen_target_list_from_targetdb(args):
     AND psf_mag_{:s} BETWEEN {:f} AND {:f}
     AND prob_f_star > {:f};
     """.format(
-            mag_filter,
             ra1,
             ra2,
             dec1,
@@ -360,13 +394,17 @@ def gen_target_list_from_targetdb(args):
             "epoch",
             "priority",
             "effective_exptime",
-            "psf_flux_{:s}".format(
-                args.target_mag_filter,
-            ),
+            "psf_flux_g",
+            "psf_flux_r",
+            "psf_flux_i",
+            "psf_flux_z",
+            "psf_flux_y",
             "target_type_id",
             "input_catalog_id",
         ]
     )
+
+    # print(df.dtypes)
 
     for q in qlist:
         print(q)
@@ -382,30 +420,31 @@ def gen_target_list_from_targetdb(args):
     tbl_tmp = Table.from_pandas(df)
 
     tbl = Table()
-    tbl["ID"] = tbl_tmp["obj_id"]
+    tbl["ID"] = np.array(tbl_tmp["obj_id"], dtype=np.int64)
     tbl["R.A."] = tbl_tmp["ra"]
     tbl["Dec."] = tbl_tmp["dec"]
     tbl["Epoch"] = tbl_tmp["epoch"]
     tbl["Exposure Time"] = tbl_tmp["effective_exptime"]
     tbl["Priority"] = np.array(tbl_tmp["priority"], dtype=int)
 
-    tbl["psfFlux"] = tbl_tmp[
-        "psf_flux_{:s}".format(
-            args.target_mag_filter,
+    tbl["psfFlux"] = [
+        np.array(
+            [
+                tbl_tmp["psf_flux_g"][i],
+                tbl_tmp["psf_flux_r"][i],
+                tbl_tmp["psf_flux_i"][i],
+            ]
         )
+        for i in range(len(tbl["ID"]))
     ]
-    tbl["filterNames"] = ["g"] * len(tbl["ID"])
+
+    tbl["filterNames"] = [["g_ps1", "r_ps1", "i_ps1"]] * len(tbl["ID"])
     tbl["target_type_id"] = tbl_tmp["target_type_id"]
     tbl["input_catalog_id"] = tbl_tmp["input_catalog_id"]
 
     with tempfile.NamedTemporaryFile(dir="/tmp", delete=False) as tmpfile:
         outfile = tmpfile.name
     tbl.write(outfile, format="ascii.ecsv", overwrite=True)
-    # tbl.write(
-    #     "{:s}_targets.txt".format(str(args.run_id)),
-    #     format="ascii.ecsv",
-    #     overwrite=True,
-    # )
 
     db.close()
 
@@ -433,8 +472,6 @@ def gen_target_list_from_gaiadb(args):
         args.target_mag_min,
         args.target_mag_max,
     )
-
-    # print(query_string)
 
     cur.execute(query_string)
 
@@ -477,16 +514,18 @@ def gen_target_list_from_gaiadb(args):
     tbl["Exposure Time"] = np.full(n_target, 900.0)
     tbl["Priority"] = np.full(n_target, 1, dtype=int)
 
-    filternames = [["gaia_g", "gaia_bp", "gaia_rp"]] * n_target
+    filternames = [["g_gaia", "bp_gaia", "rp_gaia"]] * n_target
 
     totalfluxes = np.empty(n_target, dtype=object)
 
     for i in range(n_target):
-        totalfluxes[i] = [
-            tbl_tmp["g_flux_njy"][i],
-            tbl_tmp["bp_flux_njy"][i],
-            tbl_tmp["rp_flux_njy"][i],
-        ]
+        totalfluxes[i] = np.array(
+            [
+                tbl_tmp["g_flux_njy"][i],
+                tbl_tmp["bp_flux_njy"][i],
+                tbl_tmp["rp_flux_njy"][i],
+            ]
+        )
 
     tbl["totalFlux"] = totalfluxes
     tbl["filterNames"] = filternames
@@ -505,11 +544,6 @@ def gen_target_list_from_gaiadb(args):
         outfile = tmpfile.name
     tbl.write(outfile, format="ascii.ecsv", overwrite=True)
     print(outfile)
-    # tbl.write(
-    #     "{:s}_targets.txt".format(str(args.run_id)),
-    #     format="ascii.ecsv",
-    #     overwrite=True,
-    # )
 
     return outfile, tbl
 
@@ -540,6 +574,7 @@ def gen_target_list(args):
 def gen_assignment(args, listname_targets, listname_fluxstds):
     tgt = nf.readScientificFromFile(listname_targets, "sci")
     tgt += nf.readCalibrationFromFile(listname_fluxstds, "cal")
+    # tgt += nf.readCalibrationFromFile(listname_sky, "sky")  # need a list of sky positions, which looks very hard.
     cobraCoach, bench = getBench(args)
     telescopes = [nf.Telescope(args.ra, args.dec, args.pa, args.observation_time)]
 
@@ -550,19 +585,24 @@ def gen_assignment(args, listname_targets, listname_fluxstds):
     # of targets
     # For the purpose of this demonstration we assume that all targets are
     # scientific targets with priority 1.
-    classdict = {}
-    classdict["sci_P1"] = {
-        "nonObservationCost": 100,
-        "partialObservationCost": 1000,
-        "calib": False,
+    classdict = {
+        "sci_P1": {
+            "nonObservationCost": 100,
+            "partialObservationCost": 1000,
+            "calib": False,
+        },
+        "cal": {
+            "numRequired": args.n_fluxstd,
+            "nonObservationCost": 1e5,
+            "calib": True,
+        },
+        "sky": {
+            "numRequired": 100,
+            "nonObservationCost": 1e6,
+            "calib": True,
+        },
     }
-    classdict["cal"] = {
-        "numRequired": 50,
-        "nonObservationCost": 10000,
-        "calib": True,
-    }
-
-    tclassdict = {"sci_P1": 1, "cal": 3}
+    tclassdict = {"sci_P1": 1, "sky": 2, "cal": 3}
 
     t_obs = 900.0
 
@@ -669,11 +709,97 @@ def gen_assignment(args, listname_targets, listname_fluxstds):
         print("trajectory collisions found:", ncoll)
         done = ncoll == 0
 
+    return res[0], tpos[0], telescopes[0], tgt, tclassdict
     # assignment done; write pfsDesign.
 
-    return ets_fiber_assigner.io_helpers.generatePfsDesign(
-        vis=res[0], tp=tpos[0], tel=telescopes[0], tgt=tgt, classdict=tclassdict
+    # return ets_fiber_assigner.io_helpers.generatePfsDesign(
+    #     vis=res[0], tp=tpos[0], tel=telescopes[0], tgt=tgt, classdict=tclassdict
+    # )
+
+
+def generate_pfs_design(vis, tp, tel, tgt, classdict, tbl_targets, tbl_fluxstds):
+
+    n_fiber = 2394
+    fiber_id = np.arange(n_fiber, dtype=int) + 1  # fiberID starts with 0 or 1?
+
+    n_tgt = len(vis.items())
+
+    idx_array = np.arange(n_fiber)
+
+    ra = np.full(n_fiber, np.nan)
+    dec = np.full(n_fiber, np.nan)
+    pfiNominal = np.full((n_fiber, 2), [np.nan, np.nan])
+    catId = np.full(n_fiber, -1, dtype=int)
+    objId = np.full(n_fiber, -1, dtype=np.int64)
+    targetType = np.full(n_fiber, 4, dtype=int)  # filled as unassigned number
+
+    totalFlux = [np.array([np.nan, np.nan, np.nan])] * n_fiber
+    psfFlux = [np.array([np.nan, np.nan, np.nan])] * n_fiber
+    filterNames = [["none", "none", "none"]] * n_fiber
+
+    for tidx, cidx in vis.items():
+
+        idx_fiber = fiber_id == (cidx + 1)
+        i_fiber = idx_array[idx_fiber][0]
+
+        ra[idx_fiber] = tgt[tidx].ra
+        dec[idx_fiber] = tgt[tidx].dec
+        # netflow's Target class convert object IDs to string.
+        objId[idx_fiber] = np.int64(tgt[tidx].ID)
+        pfiNominal[idx_fiber] = [tp[tidx].real, tp[tidx].imag]
+        targetType[idx_fiber] = classdict[tgt[tidx].targetclass]
+
+        idx_target = np.logical_and(
+            tbl_targets["ID"] == np.int64(tgt[tidx].ID),
+            tbl_targets["target_type_id"] == classdict[tgt[tidx].targetclass],
+        )
+
+        idx_fluxstd = np.logical_and(
+            tbl_fluxstds["ID"] == np.int64(tgt[tidx].ID),
+            tbl_fluxstds["target_type_id"] == classdict[tgt[tidx].targetclass],
+        )
+
+        if np.any(idx_target):
+            catId[i_fiber] = tbl_targets["input_catalog_id"][idx_target][0]
+            totalFlux[i_fiber] = tbl_targets["totalFlux"][idx_target][0]
+            filterNames[i_fiber] = tbl_targets["filterNames"][idx_target][0].tolist()
+
+        if np.any(idx_fluxstd):
+            catId[i_fiber] = tbl_fluxstds["input_catalog_id"][idx_fluxstd][0]
+            psfFlux[i_fiber] = tbl_fluxstds["psfFlux"][idx_fluxstd][0]
+            filterNames[i_fiber] = tbl_fluxstds["filterNames"][idx_fluxstd][0].tolist()
+
+    # print(filterNames)
+    # print(totalFlux)
+
+    design = makePfsDesign(
+        pfiNominal,
+        ra,
+        dec,
+        raBoresight=tel._ra,
+        decBoresight=tel._dec,
+        posAng=tel._posang,
+        # arms="br",
+        # tract=1,
+        # patch="1,1",
+        catId=catId,
+        objId=objId,
+        targetType=targetType,
+        # fiberStatus=FiberStatus.GOOD,
+        # fiberFlux=np.NaN,
+        psfFlux=psfFlux,
+        totalFlux=totalFlux,
+        # fiberFluxErr=np.NaN,
+        # psfFluxErr=np.NaN,
+        # totalFluxErr=np.NaN,
+        filterNames=filterNames,
+        # guideStars=None,
+        # designName=None,
     )
+    # design = ets_fiber_assigner.io_helpers.generatePfsDesign(
+    #     vis=vis, tp=tp, tel=tel, tgt=tgt, classdict=classdict
+    # )
+    return design
 
 
 def create_guidestars_from_gaiadb(args):
@@ -853,20 +979,20 @@ def create_guidestars_from_gaiadb(args):
     ntgt = len(targets[coldict["id"]])
     guidestars = pfs.datamodel.guideStars.GuideStars(
         targets[coldict["id"]],
-        np.array([epoch] * ntgt),  # epoch
+        np.full(ntgt, "J{:.1f}".format(epoch)),  # convert float epoch to string
         targets[coldict["ra"]],
         targets[coldict["dec"]],
         targets[coldict["pmra"]],
         targets[coldict["pmdec"]],
-        np.array([0.0] * ntgt),  # parallax
+        np.full(ntgt, 0.0),  # parallax
         targets["phot_g_mean_mag"],
-        np.array(["??"] * ntgt),  # passband
-        np.array([0.0] * ntgt),  # color
+        np.full(ntgt, "g_gaia"),  # passband
+        np.full(ntgt, 0.0),  # color
         targets["agid"],  # AG camera ID
         targets["agpix_x"],  # AG x pixel coordinate
         targets["agpix_y"],  # AG y pixel coordinate
-        -42.0,  # telescope elevation, don't know how to obtain,
-        0,  # numerical ID assigned to the GAIA catalogue
+        args.telescope_elevation,  # telescope elevation, don't know how to obtain,
+        2,  # numerical ID assigned to the GAIA catalogue
     )
     # output_design.guideStars = guidestars
     # output_design.write(dirName=args.design_dir)
@@ -1007,7 +1133,7 @@ def create_guidestars(args):
         np.array([0.0] * ntgt),  # parallax
         targets["phot_g_mean_mag"],
         # np.array(["??"] * ntgt),  # passband
-        np.array(["g"] * ntgt),  # passband
+        np.full(ntgt, "g"),  # passband
         np.array([0.0] * ntgt),  # color
         targets["agid"],  # AG camera ID
         targets["agpix_x"],  # AG x pixel coordinate
@@ -1021,10 +1147,22 @@ def create_guidestars(args):
 def main():
 
     args = get_arguments()
+
+    for d in [args.design_dir, args.cobra_coach_dir]:
+        try:
+            os.makedirs(d, exist_ok=False)
+        except:
+            pass
+
     # # listname = gen_target_list(args)
     listname_fluxstds, tbl_fluxstds = gen_target_list_from_targetdb(args)
     listname_targets, tbl_targets = gen_target_list_from_gaiadb(args)
-    design = gen_assignment(args, listname_targets, listname_fluxstds)
+    vis, tp, tel, tgt, classdict = gen_assignment(
+        args, listname_targets, listname_fluxstds
+    )
+    design = generate_pfs_design(
+        vis, tp, tel, tgt, classdict, tbl_targets, tbl_fluxstds
+    )
     # # guidestars = create_guidestars(args)
 
     # # design.psfFlux = [np.array([f]) for f in tbl["psfFlux"].data]
@@ -1034,6 +1172,7 @@ def main():
     design.guideStars = guidestars
 
     filename = pfs.datamodel.PfsDesign.fileNameFormat % (design.pfsDesignId)
+    # filename = design.designName
     design.write(dirName=args.design_dir, fileName=filename)
 
 

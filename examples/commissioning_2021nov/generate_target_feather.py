@@ -22,7 +22,8 @@ def main(csv, out_prefix, outdir=".", nline=None):
             "obj_id": df["objid"],
             "ra": df["ra"],
             "dec": df["decl"],
-            "epoch": df["epoch"],
+            # "epoch": df["epoch"],
+            "epoch": ["J2000.0"] * n_target,
             # "tract": df["tract"],
             # "patch": df["patch"],
             "target_type_name": ["FLUXSTD"] * n_target,
@@ -34,11 +35,11 @@ def main(csv, out_prefix, outdir=".", nline=None):
             "psf_mag_i": df["iPS1"],
             "psf_mag_z": df["zPS1"],
             "psf_mag_y": df["yPS1"],
-            "psf_flux_g": df["gFluxJy"],
-            "psf_flux_r": df["rFluxJy"],
-            "psf_flux_i": df["iFluxJy"],
-            "psf_flux_z": df["zFluxJy"],
-            "psf_flux_y": df["yFluxJy"],
+            "psf_flux_g": df["gFluxJy"] * 1e9,  # [Jy] --> [nJy]
+            "psf_flux_r": df["rFluxJy"] * 1e9,  # [Jy] --> [nJy]
+            "psf_flux_i": df["iFluxJy"] * 1e9,  # [Jy] --> [nJy]
+            "psf_flux_z": df["zFluxJy"] * 1e9,  # [Jy] --> [nJy]
+            "psf_flux_y": df["yFluxJy"] * 1e9,  # [Jy] --> [nJy]
             "prob_f_star": df["probfstar"],
         }
     )
