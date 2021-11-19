@@ -6,7 +6,7 @@
 # All of them were at the HEAD of the respective master branches, with the
 # exception of "ets_fiber_assigner" (must be on branch "commissioning_demo").
 #
-# Also the "pulp" Python package (vrsion 1.6!) is required to solve the fiber assignment
+# Also the "pulp" Python package (version 1.6!) is required to solve the fiber assignment
 # problem.
 #
 # Also, the environment variable PFS_INSTDATA_DIR must be set correctly.
@@ -132,8 +132,8 @@ def get_arguments():
     parser.add_argument(
         "--observation_time",
         type=str,
-        default="2021-11-20 15:00:00",
-        help="planned time of observation (default: 2021-11-20 15:00:00)",
+        default="2021-11-20T15:00:00Z",
+        help="planned time of observation in UTC (default: 2021-11-20 15:00:00)",
     )
     parser.add_argument(
         "--lim_target_mag",
