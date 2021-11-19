@@ -1154,7 +1154,6 @@ def main():
         except:
             pass
 
-    # # listname = gen_target_list(args)
     listname_fluxstds, tbl_fluxstds = gen_target_list_from_targetdb(args)
     listname_targets, tbl_targets = gen_target_list_from_gaiadb(args)
     vis, tp, tel, tgt, classdict = gen_assignment(
@@ -1163,16 +1162,12 @@ def main():
     design = generate_pfs_design(
         vis, tp, tel, tgt, classdict, tbl_targets, tbl_fluxstds
     )
-    # # guidestars = create_guidestars(args)
-
-    # # design.psfFlux = [np.array([f]) for f in tbl["psfFlux"].data]
-    # # design.filterNames = [[f] for f in tbl["filterNames"].data]
 
     guidestars = create_guidestars_from_gaiadb(args)
     design.guideStars = guidestars
 
-    filename = pfs.datamodel.PfsDesign.fileNameFormat % (design.pfsDesignId)
-    # filename = design.designName
+    # filename = pfs.datamodel.PfsDesign.fileNameFormat % (design.pfsDesignId)
+    filename = design.filename
     design.write(dirName=args.design_dir, fileName=filename)
 
 
