@@ -60,7 +60,7 @@ pip install tabulate
 pip install logzero
 ```
 
-You also need a Gurobi package.
+You also need a Gurobi package and setup required environment variables.
 
 
 ### Install PFS packages
@@ -125,7 +125,7 @@ pip install -e .
 Before you run the script you need a couple of configuration files for gaiaDB and targetDB at Subaru.  Please contact M. Onodera for these files.  A template file is included in `examples/commissioning_2021nov`.
 
 
-### some additional setup
+### Some additional setup
 
 You need to setup some additional environment variables.
 
@@ -134,6 +134,10 @@ EUPS_DIR="/work/stack/eups/current/"
 source "${EUPS_DIR}/bin/setups.zsh"
 export EUPS_PKGROOT='https://eups.lsst.codes/stack/redhat/el7/devtoolset-6/miniconda3-4.5.12-1172c30|https://eups.lsst.codes/stack/src'
 export PFS_UTILS_DIR=/work/monodera/Subaru-PFS/pfs_utils/
+
+export GUROBI_HOME="/home/monodera/packages/gurobi912/linux64"
+export PATH="/home/monodera/usr/bin":${GUROBI_HOME}/bin:$PATH
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${GUROBI_HOME}/lib
 ```
 
 Move to a working directory and copy the script.
