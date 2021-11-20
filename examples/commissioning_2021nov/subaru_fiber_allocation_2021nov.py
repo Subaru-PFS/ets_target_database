@@ -772,20 +772,23 @@ def create_guidestars_from_gaiadb(args):
         "id": "source_id",
         "ra": "ra",
         "dec": "dec",
+        "parallax": "parallax",
         "pmra": "pmra",
         "pmdec": "pmdec",
+        "mag": "phot_g_mean_mag",
+        "color": "bp_rp",
     }
     racol, deccol = coldict["ra"], coldict["dec"]
-    req_columns = [
-        coldict["id"],
-        racol,
-        deccol,
-        coldict["pmra"],
-        coldict["pmdec"],
-        "phot_g_mean_mag",
-    ]
+    # req_columns = [
+    #     coldict["id"],
+    #     racol,
+    #     deccol,
+    #     coldict["pmra"],
+    #     coldict["pmdec"],
+    #     "phot_g_mean_mag",
+    # ]
 
-    query_string = """SELECT source_id,ra,dec,pmra,pmdec,phot_g_mean_mag
+    query_string = """SELECT source_id,ra,dec,parallax,pmra,pmdec,phot_g_mean_mag,bp_rp
     FROM gaia
     WHERE q3c_radial_query(ra, dec, {:}, {:}, {:})
     AND {:s} IS NOT NULL AND {:s} IS NOT NULL
@@ -806,7 +809,16 @@ def create_guidestars_from_gaiadb(args):
 
     df_res = pd.DataFrame(
         cur.fetchall(),
-        columns=["source_id", "ra", "dec", "pmra", "pmdec", "phot_g_mean_mag"],
+        columns=[
+            "source_id",
+            "ra",
+            "dec",
+            "parallax",
+            "pmra",
+            "pmdec",
+            "phot_g_mean_mag",
+            "bp_rp",
+        ],
     )
 
     res = {}
@@ -826,7 +838,7 @@ def create_guidestars_from_gaiadb(args):
         res[deccol],
         res[coldict["pmra"]],
         res[coldict["pmdec"]],
-        2015.5,  # Gaia DR2 use 2015.5
+        2015.5,  # Gaia DR2 uses 2015.5
         epoch,
     )
 
@@ -919,10 +931,10 @@ def create_guidestars_from_gaiadb(args):
         targets[coldict["dec"]],
         targets[coldict["pmra"]],
         targets[coldict["pmdec"]],
-        np.full(ntgt, 0.0),  # parallax
-        targets["phot_g_mean_mag"],
+        targets[coldict["parallax"]],
+        targets[coldict["mag"]],
         np.full(ntgt, "g_gaia"),  # passband
-        np.full(ntgt, 0.0),  # color
+        targets[coldict["color"]],  # color
         targets["agid"],  # AG camera ID
         targets["agpix_x"],  # AG x pixel coordinate
         targets["agpix_y"],  # AG y pixel coordinate
