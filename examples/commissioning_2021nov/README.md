@@ -52,7 +52,7 @@ pip install astroplan
 pip install bokeh
 ```
 
-Further prerequisites for `targetDB` (thye are atually optional).
+Further prerequisites for `targetDB` (thye are actually optional).
 
 ```
 pip install sqlalchemy-utils
@@ -149,7 +149,15 @@ cp ../../Subaru-PFS/ets_target_database/examples/commissioning_2021nov/subaru_fi
 ### Run the script
 
 ```
-python ./subaru_fiber_allocation_2021nov.py --use_gurobi --design_dir="design" --cobra_coach_dir="cobracoach" --ra=150 --dec=2 --targetdb_conf ../../Subaru-PFS/database_configs/targetdb_config_pfsa-db01-gb.ini --gaiadb_conf ../../Subaru-PFS/database_configs/gaiadb_config_hilo.ini --pfs_instdata_dir /work/monodera/Subaru-PFS/pfs_instdata
+python ./subaru_fiber_allocation_2021nov.py \
+  --use_gurobi \
+  --design_dir "design" \
+  --cobra_coach_dir "cobracoach" \
+  --ra 150 \
+  --dec 2 \
+  --targetdb_conf ../../Subaru-PFS/database_configs/targetdb_config_pfsa-db01-gb.ini \
+  --gaiadb_conf ../../Subaru-PFS/database_configs/gaiadb_config_hilo.ini \
+  --pfs_instdata_dir /work/monodera/Subaru-PFS/pfs_instdata
 
 ```
 
