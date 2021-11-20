@@ -415,6 +415,11 @@ def gen_target_list_from_targetdb(args):
     tbl["Exposure Time"] = tbl_tmp["effective_exptime"]
     tbl["Priority"] = np.array(tbl_tmp["priority"], dtype=int)
 
+    # FIXME: I think it is worth putting the table file in a non-tmp directory
+    with tempfile.NamedTemporaryFile(dir="/tmp", delete=False) as tmpfile:
+        outfile = tmpfile.name
+    tbl.write(outfile, format="ascii.ecsv", overwrite=True)
+
     tbl["psfFlux"] = [
         np.array(
             [
@@ -425,15 +430,9 @@ def gen_target_list_from_targetdb(args):
         )
         for i in range(len(tbl["ID"]))
     ]
-
     tbl["filterNames"] = [["g_ps1", "r_ps1", "i_ps1"]] * len(tbl["ID"])
     tbl["target_type_id"] = tbl_tmp["target_type_id"]
     tbl["input_catalog_id"] = tbl_tmp["input_catalog_id"]
-
-    # FIXME: I think it is worth putting the table file in a non-tmp directory
-    with tempfile.NamedTemporaryFile(dir="/tmp", delete=False) as tmpfile:
-        outfile = tmpfile.name
-    tbl.write(outfile, format="ascii.ecsv", overwrite=True)
 
     db.close()
 
@@ -515,16 +514,15 @@ def gen_target_list_from_gaiadb(args):
             ]
         )
 
-    tbl["totalFlux"] = totalfluxes
-    tbl["filterNames"] = filternames
-    tbl["target_type_id"] = np.full(n_target, 1)  # 1: SCIENCE
-    tbl["input_catalog_id"] = np.full(n_target, 2)  # 2: gaia_dr2
-
     # FIXME: I think it is worth putting the table file in a non-tmp directory
     with tempfile.NamedTemporaryFile(dir="/tmp", delete=False) as tmpfile:
         outfile = tmpfile.name
     tbl.write(outfile, format="ascii.ecsv", overwrite=True)
-    print(outfile)
+
+    tbl["totalFlux"] = totalfluxes
+    tbl["filterNames"] = filternames
+    tbl["target_type_id"] = np.full(n_target, 1)  # 1: SCIENCE
+    tbl["input_catalog_id"] = np.full(n_target, 2)  # 2: gaia_dr2
 
     return outfile, tbl
 
