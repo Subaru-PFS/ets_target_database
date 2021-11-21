@@ -135,9 +135,12 @@ source "${EUPS_DIR}/bin/setups.zsh"
 export EUPS_PKGROOT='https://eups.lsst.codes/stack/redhat/el7/devtoolset-6/miniconda3-4.5.12-1172c30|https://eups.lsst.codes/stack/src'
 export PFS_UTILS_DIR=/work/monodera/Subaru-PFS/pfs_utils/
 
-export GUROBI_HOME="/home/monodera/packages/gurobi912/linux64"
-export PATH="/home/monodera/usr/bin":${GUROBI_HOME}/bin:$PATH
+GUROBI_DIR=/work/monodera/gurobi
+
+export GUROBI_HOME="${GUROBI_DIR}/gurobi912/linux64"
+export PATH="${GUROBI_HOME}/bin":$PATH
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${GUROBI_HOME}/lib
+export GRB_LICENSE_FILE="${GUROBI_DIR}/gurobi_`hostname -s`.lic"
 ```
 
 Move to a working directory and copy the script.
