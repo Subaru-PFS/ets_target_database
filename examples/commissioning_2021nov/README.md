@@ -105,9 +105,8 @@ I created a `subaru_pfs.pth` containing the following lines and put it in `/work
 /work/monodera/Subaru-PFS/ics_fpsActor/python/
 /work/monodera/Subaru-PFS/ets_shuffle/
 /work/monodera/Subaru-PFS/ets_fiberalloc/
-/home/monodera/packages/gurobi912/linux64/lib/python3.6_utf32/
+/work/monodera/gurobi/gurobi912/linux64/lib/python3.6_utf32/
 ```
-
 
 ### Install targetDB package
 
