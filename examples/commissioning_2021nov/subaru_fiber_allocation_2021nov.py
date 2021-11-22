@@ -972,6 +972,12 @@ def main():
 
     design.write(dirName=args.design_dir, fileName=design.filename)
 
+    print(
+        "pfsDesign file {:s} is created in the {:s} directory.".format(
+            design.filename, args.design_dir
+        )
+    )
+
 
 if __name__ == "__main__":
     main()
