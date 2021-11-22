@@ -143,19 +143,19 @@ export GRB_LICENSE_FILE="${GUROBI_DIR}/gurobi_`hostname -s`.lic"
 ```
 
 Move to a working directory and copy the script.
-```
+```shell
 cd /work/monodera/fiber_allocation_commissioning_2021nov
 . ./venv/bin/activate
 mkdir work
 cd work
-cp ../../Subaru-PFS/ets_target_database/examples/commissioning_2021nov/subaru_fiber_allocation_2021nov.py .
+# cp ../../Subaru-PFS/ets_target_database/examples/commissioning_2021nov/subaru_fiber_allocation_2021nov.py .
 ```
 
 
 ### Run the script
 
-```
-python ./subaru_fiber_allocation_2021nov.py \
+```shell
+python /work/monodera/Subaru-PFS/ets_target_database/examples/commissioning_2021nov/subaru_fiber_allocation_2021nov.py \
   --use_gurobi \
   --design_dir "design" \
   --cobra_coach_dir "cobracoach" \
@@ -171,7 +171,7 @@ The output is saved as `design/pfsDesign-0x6a119411f0b96b28.fits`.
 
 The full options of the script can be found as follows.
 
-```
+```shell
 $ python ./subaru_fiber_allocation_2021nov.py -h
 usage: subaru_fiber_allocation_2021nov.py [-h] [--ra RA] [--dec DEC] [--pa PA]
                                           [--observation_time OBSERVATION_TIME]
