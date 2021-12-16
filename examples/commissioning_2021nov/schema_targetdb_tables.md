@@ -65,11 +65,24 @@
 | fiber_mag_z            | FLOAT    | False         | False           | z-band magnitude within a fiber (AB mag)                                                              |
 | fiber_mag_y            | FLOAT    | False         | False           | y-band magnitude within a fiber (AB mag)                                                              |
 | fiber_mag_j            | FLOAT    | False         | False           | J band magnitude within a fiber (AB mag)                                                              |
+| psf_mag_g              | FLOAT    | False         | False           | g-band PSF magnitude (AB mag)                                                                         |
+| psf_mag_r              | FLOAT    | False         | False           | r-band PSF magnitude (AB mag)                                                                         |
+| psf_mag_i              | FLOAT    | False         | False           | i-band PSF magnitude (AB mag)                                                                         |
+| psf_mag_z              | FLOAT    | False         | False           | z-band PSF magnitude (AB mag)                                                                         |
+| psf_mag_y              | FLOAT    | False         | False           | y-band PSF magnitude (AB mag)                                                                         |
+| psf_mag_j              | FLOAT    | False         | False           | J band PSF magnitude (AB mag)                                                                         |
+| psf_flux_g             | FLOAT    | False         | False           | g-band PSF flux (nJy)                                                                                 |
+| psf_flux_r             | FLOAT    | False         | False           | r-band PSF flux (nJy)                                                                                 |
+| psf_flux_i             | FLOAT    | False         | False           | i-band PSF flux (nJy)                                                                                 |
+| psf_flux_z             | FLOAT    | False         | False           | z-band PSF flux (nJy)                                                                                 |
+| psf_flux_y             | FLOAT    | False         | False           | y-band PSF flux (nJy)                                                                                 |
+| psf_flux_j             | FLOAT    | False         | False           | J band PSF flux (nJy)                                                                                 |
 | priority               | FLOAT    | False         | False           | Priority of the target specified by the observer within the proposal                                  |
 | effective_exptime      | FLOAT    | False         | False           | Requested effective exposure time (s)                                                                 |
 | is_medium_resolution   | BOOLEAN  | False         | False           | True if the medium resolution mode is requested                                                       |
 | qa_relative_throughput | FLOAT    | False         | False           | Relative throughput to the reference value requested by the observer                                  |
 | qa_relative_noise      | FLOAT    | False         | False           | Relative noise to the reference value requested by the observer                                       |
 | qa_reference_lambda    | FLOAT    | False         | False           | Reference wavelength to evaluate effective exposure time (angstrom or nm?)                            |
+| prob_f_star            | FLOAT    | False         | False           | Probability to be a F-star                                                                            |
 | created_at             | DATETIME | False         | False           |                                                                                                       |
 | updated_at             | DATETIME | False         | False           |                                                                                                       |

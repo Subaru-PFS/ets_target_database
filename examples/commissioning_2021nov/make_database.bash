@@ -30,25 +30,26 @@ cfg.parser() {
     eval "$(echo "${ini[*]}")"             # eval the result
 }
 
-cfg.parser "targetdb_config.ini"
+# cfg.parser "targetdb_config.ini"
+cfg.parser "../../../database_configs/targetdb_config_pfsa-db01-gb.ini"
 cfg.section.dbinfo
 cfg.section.schemacrawler
 
 drop_all="--drop_all"
 # drop_all=""
-out_dir="../output"
+out_dir="./"
 out_md="schema_targetdb_tables.md"
 schema_md="--schema_md=${out_dir}/${out_md}"
 
 ## make schema ##
-url="postgresql://${username}:${passwd}@${hostname}:${port}/${dbname}"
+url="postgresql://${user}:${password}@${host}:${port}/${dbname}"
 
 # echo $url
 
 # exit
 
 # # CAUTION: drop database
-pfs_targetdb_drop_database ${url}
+# pfs_targetdb_drop_database ${url}
 
 # create database if it does not exist
 
@@ -59,6 +60,8 @@ echo ""
 echo "Creating schema:"
 pfs_targetdb_create_schema ${url} ${drop_all}
 echo ""
+
+# exit
 
 echo "Writing Markdown tables for the schema"
 pfs_targetdb_generate_mdtable ${schema_md}
@@ -73,6 +76,8 @@ if [ $success -ne 0 ]; then
     echo ""
     exit 1
 fi
+
+# exit
 
 { # try
     # md-to-pdf schema_targetdb_tables.md
@@ -111,12 +116,12 @@ rm -f ${SC_OUTPUT_FILE_PREFIX}.pdf
 
 ./${SCHEMACRAWLERDIR}/_schemacrawler/schemacrawler.sh \
     --server=postgresql \
-    --host=${hostname} \
+    --host=${host} \
     --port=${port} \
     --database=${dbname} \
     --schemas=public \
-    --user=${username} \
-    --password=${passwd} \
+    --user=${user} \
+    --password=${password} \
     --info-level=${SC_INFO_LEVEL} \
     --command=schema \
     --log-level=${SC_LOG_LEVEL} \

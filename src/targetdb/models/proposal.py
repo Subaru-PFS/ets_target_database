@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+# from sqlalchemy import ForeignKeyConstraint
 from sqlalchemy import BigInteger
 from sqlalchemy import Boolean
 from sqlalchemy import Column
@@ -8,6 +9,7 @@ from sqlalchemy import Float
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import String
+from sqlalchemy import UniqueConstraint
 
 # from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import backref
@@ -21,6 +23,7 @@ class proposal(Base):
     """Defines a scientific observing proposal."""
 
     __tablename__ = "proposal"
+    # __table_args__ = (UniqueConstraint("proposal_id", "group_id"), {})
 
     proposal_id = Column(
         String,
@@ -29,7 +32,13 @@ class proposal(Base):
         autoincrement=False,
         comment="Unique identifier for proposal (e.g, S21B-OT06?)",
     )
-    group_id = Column(String, comment="Group ID in STARS (e.g., o21195?)")
+    group_id = Column(
+        String,
+        # primary_key=True,
+        # unique=True,
+        autoincrement=False,
+        comment="Group ID in STARS (e.g., o21195?)",
+    )
     pi_first_name = Column(String, comment="PI's first name")
     pi_last_name = Column(String, comment="PI's last name")
     pi_middle_name = Column(String, comment="PI's middle name")
