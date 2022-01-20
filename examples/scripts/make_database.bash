@@ -30,7 +30,7 @@ cfg.parser() {
     eval "$(echo "${ini[*]}")"             # eval the result
 }
 
-cfg.parser "targetdb_config.ini"
+cfg.parser "../../../database_configs/targetdb_config.ini"
 cfg.section.dbinfo
 cfg.section.schemacrawler
 
