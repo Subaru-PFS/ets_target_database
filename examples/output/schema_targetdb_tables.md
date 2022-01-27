@@ -29,6 +29,35 @@
 | created_at              | DATETIME | False         | False           |                                    |
 | updated_at              | DATETIME | False         | False           |                                    |
 
+## fluxstd
+
+| name             | type     | primary_key   | autoincrement   | comment                                                                                               |
+|:-----------------|:---------|:--------------|:----------------|:------------------------------------------------------------------------------------------------------|
+| fluxstd_id       | BIGINT   | True          | True            | Unique identifier for each flux standard star                                                         |
+| obj_id           | BIGINT   | False         | False           | Object ID from the catalog from which the object is extracted                                         |
+| ra               | FLOAT    | False         | False           | RA (ICRS, degree)                                                                                     |
+| dec              | FLOAT    | False         | False           | Dec (ICRS, degree)                                                                                    |
+| epoch            | VARCHAR  | False         | False           | Epoch (e.g., J2000.0, J2015.5, etc.)                                                                  |
+| tract            | INTEGER  | False         | False           | same definition as HSC-SSP?; can be derived from the coordinate                                       |
+| patch            | INTEGER  | False         | False           | same definition as HSC-SSP?; can be derived from the coordinate; Note that it's defined as an integer |
+| target_type_id   | INTEGER  | False         | False           | target_type_id must be 3 for FLUXSTD                                                                  |
+| input_catalog_id | INTEGER  | False         | False           | Input catalog ID from the input_catalog table                                                         |
+| psf_mag_g        | FLOAT    | False         | False           | g-band PSF magnitude (AB mag)                                                                         |
+| psf_mag_r        | FLOAT    | False         | False           | r-band PSF magnitude (AB mag)                                                                         |
+| psf_mag_i        | FLOAT    | False         | False           | i-band PSF magnitude (AB mag)                                                                         |
+| psf_mag_z        | FLOAT    | False         | False           | z-band PSF magnitude (AB mag)                                                                         |
+| psf_mag_y        | FLOAT    | False         | False           | y-band PSF magnitude (AB mag)                                                                         |
+| psf_mag_j        | FLOAT    | False         | False           | J band PSF magnitude (AB mag)                                                                         |
+| psf_flux_g       | FLOAT    | False         | False           | g-band PSF flux (nJy)                                                                                 |
+| psf_flux_r       | FLOAT    | False         | False           | r-band PSF flux (nJy)                                                                                 |
+| psf_flux_i       | FLOAT    | False         | False           | i-band PSF flux (nJy)                                                                                 |
+| psf_flux_z       | FLOAT    | False         | False           | z-band PSF flux (nJy)                                                                                 |
+| psf_flux_y       | FLOAT    | False         | False           | y-band PSF flux (nJy)                                                                                 |
+| psf_flux_j       | FLOAT    | False         | False           | J band PSF flux (nJy)                                                                                 |
+| prob_f_star      | FLOAT    | False         | False           | Probability to be a F-star                                                                            |
+| created_at       | DATETIME | False         | False           |                                                                                                       |
+| updated_at       | DATETIME | False         | False           |                                                                                                       |
+
 ## proposal
 
 | name                 | type     | primary_key   | autoincrement   | comment                                           |
@@ -65,6 +94,18 @@
 | fiber_mag_z            | FLOAT    | False         | False           | z-band magnitude within a fiber (AB mag)                                                              |
 | fiber_mag_y            | FLOAT    | False         | False           | y-band magnitude within a fiber (AB mag)                                                              |
 | fiber_mag_j            | FLOAT    | False         | False           | J band magnitude within a fiber (AB mag)                                                              |
+| psf_mag_g              | FLOAT    | False         | False           | g-band PSF magnitude (AB mag)                                                                         |
+| psf_mag_r              | FLOAT    | False         | False           | r-band PSF magnitude (AB mag)                                                                         |
+| psf_mag_i              | FLOAT    | False         | False           | i-band PSF magnitude (AB mag)                                                                         |
+| psf_mag_z              | FLOAT    | False         | False           | z-band PSF magnitude (AB mag)                                                                         |
+| psf_mag_y              | FLOAT    | False         | False           | y-band PSF magnitude (AB mag)                                                                         |
+| psf_mag_j              | FLOAT    | False         | False           | J band PSF magnitude (AB mag)                                                                         |
+| psf_flux_g             | FLOAT    | False         | False           | g-band PSF flux (nJy)                                                                                 |
+| psf_flux_r             | FLOAT    | False         | False           | r-band PSF flux (nJy)                                                                                 |
+| psf_flux_i             | FLOAT    | False         | False           | i-band PSF flux (nJy)                                                                                 |
+| psf_flux_z             | FLOAT    | False         | False           | z-band PSF flux (nJy)                                                                                 |
+| psf_flux_y             | FLOAT    | False         | False           | y-band PSF flux (nJy)                                                                                 |
+| psf_flux_j             | FLOAT    | False         | False           | J band PSF flux (nJy)                                                                                 |
 | priority               | FLOAT    | False         | False           | Priority of the target specified by the observer within the proposal                                  |
 | effective_exptime      | FLOAT    | False         | False           | Requested effective exposure time (s)                                                                 |
 | is_medium_resolution   | BOOLEAN  | False         | False           | True if the medium resolution mode is requested                                                       |

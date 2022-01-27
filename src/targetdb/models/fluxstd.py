@@ -21,47 +21,32 @@ from . import target_type
 # from . import unique_object
 
 
-class target(Base):
-    __tablename__ = "target"
+class fluxstd(Base):
+    __tablename__ = "fluxstd"
 
-    target_id = Column(
+    fluxstd_id = Column(
         BigInteger,
         primary_key=True,
         unique=True,
         autoincrement=True,
-        comment="Unique identifier for each target",
+        comment="Unique identifier for each flux standard star",
     )
     # unique_object_id = Column(BigInteger, ForeignKey("unique_object.unique_object_id"))
 
-    proposal_id = Column(String, ForeignKey("proposal.proposal_id"))
+    # proposal_id = Column(String, ForeignKey("proposal.proposal_id"))
     # group_id = Column(String, ForeignKey("proposal.group_id"))
 
     obj_id = Column(
         BigInteger,
-        comment="Object ID as specified by the observer at Phase 2 (can be same as the input_catalog_object_id)",
+        comment="Object ID from the catalog from which the object is extracted",
     )  # xxxx: need to understand more
-
-    # user_ra = Column(
-    #     Float, comment="Original RA submitted by the observer at Phase 2 (ICRS, degree)"
-    # )
-    # user_dec = Column(
-    #     Float,
-    #     comment="Original Dec submitted by the observer at Phase 2 (ICRS, degree)",
-    # )
-    # user_epoch = Column(
-    #     String, comment="Original Epoch submitted by the observer at Phase 2"
-    # )
-    # match_distance = Column(
-    #     Float,
-    #     comment="Distance between the matched unique_object and the original coordinate (arcsec)",
-    # )
 
     ra = Column(Float, comment="RA (ICRS, degree)")
     dec = Column(
         Float,
         comment="Dec (ICRS, degree)",
     )
-    epoch = Column(String, comment="Epoch")
+    epoch = Column(String, comment="Epoch (e.g., J2000.0, J2015.5, etc.)")
 
     tract = Column(
         Integer,
@@ -72,7 +57,11 @@ class target(Base):
         comment="same definition as HSC-SSP?; can be derived from the coordinate; Note that it's defined as an integer",
     )  # xxxx: needed?
 
-    target_type_id = Column(Integer, ForeignKey("target_type.target_type_id"))
+    target_type_id = Column(
+        Integer,
+        ForeignKey("target_type.target_type_id"),
+        comment="target_type_id must be 3 for FLUXSTD",
+    )
 
     input_catalog_id = Column(
         Integer,
@@ -83,12 +72,12 @@ class target(Base):
     #     BigInteger, comment="Object ID in the specified input catalog"
     # )
 
-    fiber_mag_g = Column(Float, comment="g-band magnitude within a fiber (AB mag)")
-    fiber_mag_r = Column(Float, comment="r-band magnitude within a fiber (AB mag)")
-    fiber_mag_i = Column(Float, comment="i-band magnitude within a fiber (AB mag)")
-    fiber_mag_z = Column(Float, comment="z-band magnitude within a fiber (AB mag)")
-    fiber_mag_y = Column(Float, comment="y-band magnitude within a fiber (AB mag)")
-    fiber_mag_j = Column(Float, comment="J band magnitude within a fiber (AB mag)")
+    # fiber_mag_g = Column(Float, comment="g-band magnitude within a fiber (AB mag)")
+    # fiber_mag_r = Column(Float, comment="r-band magnitude within a fiber (AB mag)")
+    # fiber_mag_i = Column(Float, comment="i-band magnitude within a fiber (AB mag)")
+    # fiber_mag_z = Column(Float, comment="z-band magnitude within a fiber (AB mag)")
+    # fiber_mag_y = Column(Float, comment="y-band magnitude within a fiber (AB mag)")
+    # fiber_mag_j = Column(Float, comment="J band magnitude within a fiber (AB mag)")
 
     psf_mag_g = Column(Float, comment="g-band PSF magnitude (AB mag)")
     psf_mag_r = Column(Float, comment="r-band PSF magnitude (AB mag)")
@@ -104,65 +93,37 @@ class target(Base):
     psf_flux_y = Column(Float, comment="y-band PSF flux (nJy)")
     psf_flux_j = Column(Float, comment="J band PSF flux (nJy)")
 
-    # photoz = Column(Float, comment="Photometric redshift for the object")
-
-    priority = Column(
-        Float,
-        comment="Priority of the target specified by the observer within the proposal",
-    )
-    effective_exptime = Column(Float, comment="Requested effective exposure time (s)")
-
-    is_medium_resolution = Column(
-        Boolean, comment="True if the medium resolution mode is requested"
-    )
-
-    # QA information
-    qa_relative_throughput = Column(
-        Float,
-        comment="Relative throughput to the reference value requested by the observer",
-    )
-    qa_relative_noise = Column(
-        Float, comment="Relative noise to the reference value requested by the observer"
-    )
-    qa_reference_lambda = Column(
-        Float,
-        comment="Reference wavelength to evaluate effective exposure time (angstrom or nm?)",
-    )
+    # NOTE: `probfstar` will be used for the Nov 2021 engineering, but not sure for the future releases
+    # Probability to be a F-star (Ishigaki-san)
+    prob_f_star = Column(Float, comment="Probability to be a F-star")
 
     # timestamp
     created_at = Column(DateTime)
     updated_at = Column(DateTime)
 
     # unique_objects = relation(unique_object, backref=backref("target"))
-    proposals = relation(proposal, backref=backref("target"))
     target_types = relation(target_type, backref=backref("target"))
     input_catalogs = relation(input_catalog, backref=backref("target"))
 
     def __init__(
         self,
         # unique_object_id,
-        proposal_id,
-        # group_id,
         obj_id,
         ra,
         dec,
         epoch,
-        # user_ra,
-        # user_dec,
-        # user_epoch,
-        # match_distance,
         tract,
         patch,
         target_type_id,
         input_catalog_id,
-        # input_catalog_obj_id,
-        fiber_mag_g,
-        fiber_mag_r,
-        fiber_mag_i,
-        fiber_mag_z,
-        fiber_mag_y,
-        fiber_mag_j,
-        #
+        # #
+        # fiber_mag_g,
+        # fiber_mag_r,
+        # fiber_mag_i,
+        # fiber_mag_z,
+        # fiber_mag_y,
+        # fiber_mag_j,
+        # #
         psf_mag_g,
         psf_mag_r,
         psf_mag_i,
@@ -177,42 +138,27 @@ class target(Base):
         psf_flux_y,
         psf_flux_j,
         #
-        # photoz,
-        #
-        priority,
-        effective_exptime,
-        is_medium_resolution,
-        #
-        qa_relative_throughput,
-        qa_relative_noise,
-        qa_reference_lambda,
+        prob_f_star,
         #
         created_at,
         updated_at,
     ):
         # self.unique_object_id = unique_object_id
-        self.proposal_id = proposal_id
-        # self.group_id = group_id
         self.obj_id = obj_id
         self.ra = ra
         self.dec = dec
         self.epoch = epoch
-        # self.user_ra = user_ra
-        # self.user_dec = user_dec
-        # self.user_epoch = user_epoch
-        # self.match_distance = match_distance
         self.tract = tract
         self.patch = patch
         self.target_type_id = target_type_id
         self.input_catalog_id = input_catalog_id
-        # self.input_catalog_obj_id = input_catalog_obj_id
         #
-        self.fiber_mag_g = fiber_mag_g
-        self.fiber_mag_r = fiber_mag_r
-        self.fiber_mag_i = fiber_mag_i
-        self.fiber_mag_z = fiber_mag_z
-        self.fiber_mag_y = fiber_mag_y
-        self.fiber_mag_j = fiber_mag_j
+        # self.fiber_mag_g = fiber_mag_g
+        # self.fiber_mag_r = fiber_mag_r
+        # self.fiber_mag_i = fiber_mag_i
+        # self.fiber_mag_z = fiber_mag_z
+        # self.fiber_mag_y = fiber_mag_y
+        # self.fiber_mag_j = fiber_mag_j
         #
         self.psf_mag_g = psf_mag_g
         self.psf_mag_r = psf_mag_r
@@ -228,15 +174,7 @@ class target(Base):
         self.psf_flux_y = psf_flux_y
         self.psf_flux_j = psf_flux_j
         #
-        # self.photoz = photoz
-        #
-        self.priority = priority
-        self.effective_exptime = effective_exptime
-        self.is_medium_resolution = is_medium_resolution
-        #
-        self.qa_relative_throughput = qa_relative_throughput
-        self.qa_relative_noise = qa_relative_noise
-        self.qa_reference_lambda = qa_reference_lambda
+        self.prob_f_star = prob_f_star
         #
         self.created_at = created_at
         self.updated_at = updated_at
