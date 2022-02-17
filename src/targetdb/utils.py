@@ -26,17 +26,19 @@ def generate_schema_markdown(schema_md=sys.stdout):
             else:
                 autoincrement = False
 
-            series = pd.Series(
-                {
-                    "name": c.name,
-                    "type": c.type,
-                    "primary_key": c.primary_key,
-                    "autoincrement": autoincrement,
-                    "comment": c.comment,
+            df_tmp = pd.DataFrame(
+                data={
+                    "name": [c.name],
+                    "type": [c.type],
+                    "primary_key": [c.primary_key],
+                    "autoincrement": [autoincrement],
+                    "comment": [c.comment],
                 },
             )
-
-            df = df.append(series, ignore_index=True)
+            df = pd.concat(
+                [df, df_tmp],
+                ignore_index=True,
+            )
 
         out_md += df.to_markdown(index=False)
 

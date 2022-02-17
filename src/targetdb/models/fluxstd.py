@@ -102,8 +102,8 @@ class fluxstd(Base):
     updated_at = Column(DateTime)
 
     # unique_objects = relation(unique_object, backref=backref("target"))
-    target_types = relation(target_type, backref=backref("target"))
-    input_catalogs = relation(input_catalog, backref=backref("target"))
+    target_types = relation(target_type, backref=backref("fluxstd"))
+    input_catalogs = relation(input_catalog, backref=backref("fluxstd"))
 
     def __init__(
         self,
