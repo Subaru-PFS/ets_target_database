@@ -88,24 +88,13 @@
 | patch                  | INTEGER  | False         | False           | same definition as HSC-SSP?; can be derived from the coordinate; Note that it's defined as an integer |
 | target_type_id         | INTEGER  | False         | False           |                                                                                                       |
 | input_catalog_id       | INTEGER  | False         | False           | Input catalog ID from the input_catalog table                                                         |
-| fiber_mag_g            | FLOAT    | False         | False           | g-band magnitude within a fiber (AB mag)                                                              |
-| fiber_mag_r            | FLOAT    | False         | False           | r-band magnitude within a fiber (AB mag)                                                              |
-| fiber_mag_i            | FLOAT    | False         | False           | i-band magnitude within a fiber (AB mag)                                                              |
-| fiber_mag_z            | FLOAT    | False         | False           | z-band magnitude within a fiber (AB mag)                                                              |
-| fiber_mag_y            | FLOAT    | False         | False           | y-band magnitude within a fiber (AB mag)                                                              |
-| fiber_mag_j            | FLOAT    | False         | False           | J band magnitude within a fiber (AB mag)                                                              |
-| psf_mag_g              | FLOAT    | False         | False           | g-band PSF magnitude (AB mag)                                                                         |
-| psf_mag_r              | FLOAT    | False         | False           | r-band PSF magnitude (AB mag)                                                                         |
-| psf_mag_i              | FLOAT    | False         | False           | i-band PSF magnitude (AB mag)                                                                         |
-| psf_mag_z              | FLOAT    | False         | False           | z-band PSF magnitude (AB mag)                                                                         |
-| psf_mag_y              | FLOAT    | False         | False           | y-band PSF magnitude (AB mag)                                                                         |
-| psf_mag_j              | FLOAT    | False         | False           | J band PSF magnitude (AB mag)                                                                         |
-| psf_flux_g             | FLOAT    | False         | False           | g-band PSF flux (nJy)                                                                                 |
-| psf_flux_r             | FLOAT    | False         | False           | r-band PSF flux (nJy)                                                                                 |
-| psf_flux_i             | FLOAT    | False         | False           | i-band PSF flux (nJy)                                                                                 |
-| psf_flux_z             | FLOAT    | False         | False           | z-band PSF flux (nJy)                                                                                 |
-| psf_flux_y             | FLOAT    | False         | False           | y-band PSF flux (nJy)                                                                                 |
-| psf_flux_j             | FLOAT    | False         | False           | J band PSF flux (nJy)                                                                                 |
+| filter_name            | ARRAY    | False         | False           | List of filter(s) used for fluxes and magnitudes of objects                                           |
+| fiber_flux             | ARRAY    | False         | False           | Fiber fluxes (nJy) in filters specified in `filter_name`                                              |
+| fiber_flux_err         | ARRAY    | False         | False           | Error in fiber fluxes (nJy) in filters specified in `filter_name`                                     |
+| psf_flux               | ARRAY    | False         | False           | PSF fluxes (nJy) in filters specified in `filter_name`                                                |
+| psf_flux_err           | ARRAY    | False         | False           | Error in PSF fluxes (nJy) in filters specified in `filter_name`                                       |
+| total_flux             | ARRAY    | False         | False           | Total fluxes (nJy) in filters specified in `filter_name`                                              |
+| total_flux_err         | ARRAY    | False         | False           | Error in total fluxes (nJy) in filters specified in `filter_name`                                     |
 | priority               | FLOAT    | False         | False           | Priority of the target specified by the observer within the proposal                                  |
 | effective_exptime      | FLOAT    | False         | False           | Requested effective exposure time (s)                                                                 |
 | is_medium_resolution   | BOOLEAN  | False         | False           | True if the medium resolution mode is requested                                                       |

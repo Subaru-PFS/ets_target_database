@@ -8,6 +8,7 @@ from sqlalchemy import Float
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import String
+from sqlalchemy.dialects.postgresql import ARRAY
 
 # from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import backref
@@ -83,26 +84,56 @@ class target(Base):
     #     BigInteger, comment="Object ID in the specified input catalog"
     # )
 
-    fiber_mag_g = Column(Float, comment="g-band magnitude within a fiber (AB mag)")
-    fiber_mag_r = Column(Float, comment="r-band magnitude within a fiber (AB mag)")
-    fiber_mag_i = Column(Float, comment="i-band magnitude within a fiber (AB mag)")
-    fiber_mag_z = Column(Float, comment="z-band magnitude within a fiber (AB mag)")
-    fiber_mag_y = Column(Float, comment="y-band magnitude within a fiber (AB mag)")
-    fiber_mag_j = Column(Float, comment="J band magnitude within a fiber (AB mag)")
+    filter_name = Column(
+        ARRAY(String, dimensions=1),
+        comment="List of filter(s) used for fluxes and magnitudes of objects",
+    )
 
-    psf_mag_g = Column(Float, comment="g-band PSF magnitude (AB mag)")
-    psf_mag_r = Column(Float, comment="r-band PSF magnitude (AB mag)")
-    psf_mag_i = Column(Float, comment="i-band PSF magnitude (AB mag)")
-    psf_mag_z = Column(Float, comment="z-band PSF magnitude (AB mag)")
-    psf_mag_y = Column(Float, comment="y-band PSF magnitude (AB mag)")
-    psf_mag_j = Column(Float, comment="J band PSF magnitude (AB mag)")
+    fiber_flux = Column(
+        ARRAY(Float, dimensions=1),
+        comment="Fiber fluxes (nJy) in filters specified in `filter_name`",
+    )
+    fiber_flux_err = Column(
+        ARRAY(Float, dimensions=1),
+        comment="Error in fiber fluxes (nJy) in filters specified in `filter_name`",
+    )
+    psf_flux = Column(
+        ARRAY(Float, dimensions=1),
+        comment="PSF fluxes (nJy) in filters specified in `filter_name`",
+    )
+    psf_flux_err = Column(
+        ARRAY(Float, dimensions=1),
+        comment="Error in PSF fluxes (nJy) in filters specified in `filter_name`",
+    )
+    total_flux = Column(
+        ARRAY(Float, dimensions=1),
+        comment="Total fluxes (nJy) in filters specified in `filter_name`",
+    )
+    total_flux_err = Column(
+        ARRAY(Float, dimensions=1),
+        comment="Error in total fluxes (nJy) in filters specified in `filter_name`",
+    )
 
-    psf_flux_g = Column(Float, comment="g-band PSF flux (nJy)")
-    psf_flux_r = Column(Float, comment="r-band PSF flux (nJy)")
-    psf_flux_i = Column(Float, comment="i-band PSF flux (nJy)")
-    psf_flux_z = Column(Float, comment="z-band PSF flux (nJy)")
-    psf_flux_y = Column(Float, comment="y-band PSF flux (nJy)")
-    psf_flux_j = Column(Float, comment="J band PSF flux (nJy)")
+    # fiber_mag_g = Column(Float, comment="g-band magnitude within a fiber (AB mag)")
+    # fiber_mag_r = Column(Float, comment="r-band magnitude within a fiber (AB mag)")
+    # fiber_mag_i = Column(Float, comment="i-band magnitude within a fiber (AB mag)")
+    # fiber_mag_z = Column(Float, comment="z-band magnitude within a fiber (AB mag)")
+    # fiber_mag_y = Column(Float, comment="y-band magnitude within a fiber (AB mag)")
+    # fiber_mag_j = Column(Float, comment="J band magnitude within a fiber (AB mag)")
+
+    # psf_mag_g = Column(Float, comment="g-band PSF magnitude (AB mag)")
+    # psf_mag_r = Column(Float, comment="r-band PSF magnitude (AB mag)")
+    # psf_mag_i = Column(Float, comment="i-band PSF magnitude (AB mag)")
+    # psf_mag_z = Column(Float, comment="z-band PSF magnitude (AB mag)")
+    # psf_mag_y = Column(Float, comment="y-band PSF magnitude (AB mag)")
+    # psf_mag_j = Column(Float, comment="J band PSF magnitude (AB mag)")
+
+    # psf_flux_g = Column(Float, comment="g-band PSF flux (nJy)")
+    # psf_flux_r = Column(Float, comment="r-band PSF flux (nJy)")
+    # psf_flux_i = Column(Float, comment="i-band PSF flux (nJy)")
+    # psf_flux_z = Column(Float, comment="z-band PSF flux (nJy)")
+    # psf_flux_y = Column(Float, comment="y-band PSF flux (nJy)")
+    # psf_flux_j = Column(Float, comment="J band PSF flux (nJy)")
 
     # photoz = Column(Float, comment="Photometric redshift for the object")
 
@@ -156,26 +187,35 @@ class target(Base):
         target_type_id,
         input_catalog_id,
         # input_catalog_obj_id,
-        fiber_mag_g,
-        fiber_mag_r,
-        fiber_mag_i,
-        fiber_mag_z,
-        fiber_mag_y,
-        fiber_mag_j,
         #
-        psf_mag_g,
-        psf_mag_r,
-        psf_mag_i,
-        psf_mag_z,
-        psf_mag_y,
-        psf_mag_j,
+        filter_name,
+        fiber_flux,
+        fiber_flux_err,
+        psf_flux,
+        psf_flux_err,
+        total_flux,
+        total_flux_err,
         #
-        psf_flux_g,
-        psf_flux_r,
-        psf_flux_i,
-        psf_flux_z,
-        psf_flux_y,
-        psf_flux_j,
+        # fiber_mag_g,
+        # fiber_mag_r,
+        # fiber_mag_i,
+        # fiber_mag_z,
+        # fiber_mag_y,
+        # fiber_mag_j,
+        # #
+        # psf_mag_g,
+        # psf_mag_r,
+        # psf_mag_i,
+        # psf_mag_z,
+        # psf_mag_y,
+        # psf_mag_j,
+        #
+        # psf_flux_g,
+        # psf_flux_r,
+        # psf_flux_i,
+        # psf_flux_z,
+        # psf_flux_y,
+        # psf_flux_j,
         #
         # photoz,
         #
@@ -207,26 +247,34 @@ class target(Base):
         self.input_catalog_id = input_catalog_id
         # self.input_catalog_obj_id = input_catalog_obj_id
         #
-        self.fiber_mag_g = fiber_mag_g
-        self.fiber_mag_r = fiber_mag_r
-        self.fiber_mag_i = fiber_mag_i
-        self.fiber_mag_z = fiber_mag_z
-        self.fiber_mag_y = fiber_mag_y
-        self.fiber_mag_j = fiber_mag_j
+        self.filter_name = filter_name
+        self.fiber_flux = fiber_flux
+        self.fiber_flux_err = fiber_flux_err
+        self.psf_flux = psf_flux
+        self.psf_flux_err = psf_flux_err
+        self.total_flux = total_flux
+        self.total_flux_err = total_flux_err
         #
-        self.psf_mag_g = psf_mag_g
-        self.psf_mag_r = psf_mag_r
-        self.psf_mag_i = psf_mag_i
-        self.psf_mag_z = psf_mag_z
-        self.psf_mag_y = psf_mag_y
-        self.psf_mag_j = psf_mag_j
-        #
-        self.psf_flux_g = psf_flux_g
-        self.psf_flux_r = psf_flux_r
-        self.psf_flux_i = psf_flux_i
-        self.psf_flux_z = psf_flux_z
-        self.psf_flux_y = psf_flux_y
-        self.psf_flux_j = psf_flux_j
+        # self.fiber_mag_g = fiber_mag_g
+        # self.fiber_mag_r = fiber_mag_r
+        # self.fiber_mag_i = fiber_mag_i
+        # self.fiber_mag_z = fiber_mag_z
+        # self.fiber_mag_y = fiber_mag_y
+        # self.fiber_mag_j = fiber_mag_j
+        # #
+        # self.psf_mag_g = psf_mag_g
+        # self.psf_mag_r = psf_mag_r
+        # self.psf_mag_i = psf_mag_i
+        # self.psf_mag_z = psf_mag_z
+        # self.psf_mag_y = psf_mag_y
+        # self.psf_mag_j = psf_mag_j
+        # #
+        # self.psf_flux_g = psf_flux_g
+        # self.psf_flux_r = psf_flux_r
+        # self.psf_flux_i = psf_flux_i
+        # self.psf_flux_z = psf_flux_z
+        # self.psf_flux_y = psf_flux_y
+        # self.psf_flux_j = psf_flux_j
         #
         # self.photoz = photoz
         #

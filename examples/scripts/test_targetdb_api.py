@@ -48,6 +48,21 @@ def get_arguments():
         action="store_true",
         help="Skip inserting test data into the target_type table (default: False)",
     )
+    parser.add_argument(
+        "--skip_target",
+        action="store_true",
+        help="Skip inserting test data into the target table (default: False)",
+    )
+    # parser.add_argument(
+    #     "--skip_unique_object",
+    #     action="store_true",
+    #     help="Skip inserting test data into the unique_object table (default: False)",
+    # )
+    parser.add_argument(
+        "--target",
+        default="../data/target_s21b-en01.csv",
+        help="Sample csv file for targets (default: ../data/target_s21b-en01.csv)",
+    )
 
     args = parser.parse_args()
 
@@ -120,8 +135,9 @@ def join_backref_values(df, db=None, table=None, key=None, check_key=None):
     return df_joined
 
 
-def insert_proposal(db):
-    df_proposal = pd.read_csv("../data/proposal.csv")
+def insert_proposal(db, csv=None):
+    # df_proposal = pd.read_csv("../data/proposal.csv")
+    df_proposal = pd.read_csv(csv)
     n_proposal = len(df_proposal.index)
 
     df_joined = join_backref_values(
@@ -133,6 +149,35 @@ def insert_proposal(db):
     )
 
     db = insert_simple(db, table="proposal", df=df_joined)
+
+    return db
+
+
+def insert_target(db, csv=None):
+
+    logger.info("Loading data from {:s}".format(csv))
+    df = pd.read_csv(csv)
+
+    # copy dataframe (may not be needed)
+    df_target_tmp = df.copy()
+
+    # add target_type_name as SCIENCE by default for openuse proposals
+    df_target_tmp["target_type_name"] = ["SCIENCE"] * len(df_target_tmp.index)
+
+    backref_tables = ["proposal", "input_catalog", "target_type"]
+    backref_keys = ["proposal_id", "input_catalog_name", "target_type_name"]
+    backref_check_keys = ["proposal_id", "input_catalog_id", "target_type_id"]
+
+    for i in range(len(backref_tables)):
+        df_target_tmp = join_backref_values(
+            df_target_tmp,
+            db=db,
+            table=backref_tables[i],
+            key=backref_keys[i],
+            check_key=backref_check_keys[i],
+        )
+
+    db = insert_simple(db, table="target", df=df_target_tmp)
 
     return db
 
@@ -155,7 +200,7 @@ def main():
 
     if not args.skip_proposal:
         logger.info("Inserting sample data into the proposal table")
-        db = insert_proposal(db)
+        db = insert_proposal(db, csv="../data/proposal.csv")
 
     if not args.skip_input_catalog:
         logger.info("Inserting sample data into the input_catalog table")
@@ -164,6 +209,10 @@ def main():
     if not args.skip_target_type:
         logger.info("Inserting sample data into the target_type table")
         db = insert_simple(db, table="target_type", csv="../data/target_type.csv")
+
+    if not args.skip_target:
+        logger.info("Inserting sample data into the target/unique_object table")
+        db = insert_target(db, csv=args.target)
 
     db.close()
 

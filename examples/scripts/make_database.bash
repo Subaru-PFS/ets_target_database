@@ -41,7 +41,7 @@ out_md="schema_targetdb_tables.md"
 schema_md="--schema_md=${out_dir}/${out_md}"
 
 ## make schema ##
-url="postgresql://${username}:${passwd}@${hostname}:${port}/${dbname}"
+url="postgresql://${user}:${password}@${host}:${port}/${dbname}"
 
 # echo $url
 
@@ -55,6 +55,7 @@ pfs_targetdb_drop_database ${url}
 echo "Creating database:"
 pfs_targetdb_create_database ${url}
 echo ""
+# exit
 
 echo "Creating schema:"
 pfs_targetdb_create_schema ${url} ${drop_all}
@@ -111,12 +112,12 @@ rm -f ${SC_OUTPUT_FILE_PREFIX}.pdf
 
 ./${SCHEMACRAWLERDIR}/_schemacrawler/schemacrawler.sh \
     --server=postgresql \
-    --host=${hostname} \
+    --host=${host} \
     --port=${port} \
     --database=${dbname} \
     --schemas=public \
-    --user=${username} \
-    --password=${passwd} \
+    --user=${user} \
+    --password=${password} \
     --info-level=${SC_INFO_LEVEL} \
     --command=schema \
     --log-level=${SC_LOG_LEVEL} \

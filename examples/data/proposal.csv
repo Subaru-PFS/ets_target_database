@@ -6,3 +6,4 @@ proposal_id,group_id,pi_first_name,pi_last_name,pi_middle_name,rank,grade,alloca
 "S21B-TE114-GQ","o21154","David","Sand",None,9.5,a,12000,"gemini"
 "S21B-UH006-A1Q","o21165","Lukas","Zalesky","M.",9.5,a,4800,"uh"
 "S21B-EN99","o21999","Masato","Onodera",None,1.0,a,1,"openuse"
+"S22A-EN16","o22016","Shintaro","Koshida",None,1.0,a,240000,"openuse"
