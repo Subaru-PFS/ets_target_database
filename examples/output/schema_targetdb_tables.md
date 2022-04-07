@@ -34,14 +34,14 @@
 | name             | type     | primary_key   | autoincrement   | comment                                                                                               |
 |:-----------------|:---------|:--------------|:----------------|:------------------------------------------------------------------------------------------------------|
 | fluxstd_id       | BIGINT   | True          | True            | Unique identifier for each flux standard star                                                         |
-| obj_id           | BIGINT   | False         | False           | Object ID from the catalog from which the object is extracted                                         |
+| obj_id           | BIGINT   | False         | False           | Gaia EDR3 sourceid                                                                                    |
 | ra               | FLOAT    | False         | False           | RA (ICRS, degree)                                                                                     |
 | dec              | FLOAT    | False         | False           | Dec (ICRS, degree)                                                                                    |
 | epoch            | VARCHAR  | False         | False           | Epoch (e.g., J2000.0, J2015.5, etc.)                                                                  |
 | tract            | INTEGER  | False         | False           | same definition as HSC-SSP?; can be derived from the coordinate                                       |
 | patch            | INTEGER  | False         | False           | same definition as HSC-SSP?; can be derived from the coordinate; Note that it's defined as an integer |
-| target_type_id   | INTEGER  | False         | False           | target_type_id must be 3 for FLUXSTD                                                                  |
-| input_catalog_id | INTEGER  | False         | False           | Input catalog ID from the input_catalog table                                                         |
+| target_type_id   | INTEGER  | False         | False           | target_type_id from the target_type table (must be 3 for FLUXSTD)                                     |
+| input_catalog_id | INTEGER  | False         | False           | input_catalog_id from the input_catalog table                                                         |
 | psf_mag_g        | FLOAT    | False         | False           | g-band PSF magnitude (AB mag)                                                                         |
 | psf_mag_r        | FLOAT    | False         | False           | r-band PSF magnitude (AB mag)                                                                         |
 | psf_mag_i        | FLOAT    | False         | False           | i-band PSF magnitude (AB mag)                                                                         |
@@ -55,6 +55,8 @@
 | psf_flux_y       | FLOAT    | False         | False           | y-band PSF flux (nJy)                                                                                 |
 | psf_flux_j       | FLOAT    | False         | False           | J band PSF flux (nJy)                                                                                 |
 | prob_f_star      | FLOAT    | False         | False           | Probability to be a F-star                                                                            |
+| flag_dist        | BOOLEAN  | False         | False           | True if the separation between Gaia EDR3 and PS1 entries is too large                                 |
+| flag_ebv         | BOOLEAN  | False         | False           | True if the Galactic extinction is too large                                                          |
 | created_at       | DATETIME | False         | False           |                                                                                                       |
 | updated_at       | DATETIME | False         | False           |                                                                                                       |
 

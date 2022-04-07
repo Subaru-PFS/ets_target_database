@@ -18,8 +18,6 @@ from . import input_catalog
 from . import proposal
 from . import target_type
 
-# from . import unique_object
-
 
 class fluxstd(Base):
     __tablename__ = "fluxstd"
@@ -31,21 +29,14 @@ class fluxstd(Base):
         autoincrement=True,
         comment="Unique identifier for each flux standard star",
     )
-    # unique_object_id = Column(BigInteger, ForeignKey("unique_object.unique_object_id"))
-
-    # proposal_id = Column(String, ForeignKey("proposal.proposal_id"))
-    # group_id = Column(String, ForeignKey("proposal.group_id"))
 
     obj_id = Column(
         BigInteger,
-        comment="Object ID from the catalog from which the object is extracted",
+        comment="Gaia EDR3 sourceid",
     )  # xxxx: need to understand more
 
     ra = Column(Float, comment="RA (ICRS, degree)")
-    dec = Column(
-        Float,
-        comment="Dec (ICRS, degree)",
-    )
+    dec = Column(Float, comment="Dec (ICRS, degree)")
     epoch = Column(String, comment="Epoch (e.g., J2000.0, J2015.5, etc.)")
 
     tract = Column(
@@ -60,24 +51,14 @@ class fluxstd(Base):
     target_type_id = Column(
         Integer,
         ForeignKey("target_type.target_type_id"),
-        comment="target_type_id must be 3 for FLUXSTD",
+        comment="target_type_id from the target_type table (must be 3 for FLUXSTD)",
     )
 
     input_catalog_id = Column(
         Integer,
         ForeignKey("input_catalog.input_catalog_id"),
-        comment="Input catalog ID from the input_catalog table",
+        comment="input_catalog_id from the input_catalog table",
     )
-    # input_catalog_obj_id = Column(
-    #     BigInteger, comment="Object ID in the specified input catalog"
-    # )
-
-    # fiber_mag_g = Column(Float, comment="g-band magnitude within a fiber (AB mag)")
-    # fiber_mag_r = Column(Float, comment="r-band magnitude within a fiber (AB mag)")
-    # fiber_mag_i = Column(Float, comment="i-band magnitude within a fiber (AB mag)")
-    # fiber_mag_z = Column(Float, comment="z-band magnitude within a fiber (AB mag)")
-    # fiber_mag_y = Column(Float, comment="y-band magnitude within a fiber (AB mag)")
-    # fiber_mag_j = Column(Float, comment="J band magnitude within a fiber (AB mag)")
 
     psf_mag_g = Column(Float, comment="g-band PSF magnitude (AB mag)")
     psf_mag_r = Column(Float, comment="r-band PSF magnitude (AB mag)")
@@ -93,21 +74,23 @@ class fluxstd(Base):
     psf_flux_y = Column(Float, comment="y-band PSF flux (nJy)")
     psf_flux_j = Column(Float, comment="J band PSF flux (nJy)")
 
-    # NOTE: `probfstar` will be used for the Nov 2021 engineering, but not sure for the future releases
-    # Probability to be a F-star (Ishigaki-san)
     prob_f_star = Column(Float, comment="Probability to be a F-star")
+    flag_dist = Column(
+        Boolean,
+        comment="True if the separation between Gaia EDR3 and PS1 entries is too large",
+    )
+    flag_ebv = Column(Boolean, comment="True if the Galactic extinction is too large")
 
     # timestamp
     created_at = Column(DateTime)
     updated_at = Column(DateTime)
 
-    # unique_objects = relation(unique_object, backref=backref("target"))
+    # relations to other tables
     target_types = relation(target_type, backref=backref("fluxstd"))
     input_catalogs = relation(input_catalog, backref=backref("fluxstd"))
 
     def __init__(
         self,
-        # unique_object_id,
         obj_id,
         ra,
         dec,
@@ -116,34 +99,24 @@ class fluxstd(Base):
         patch,
         target_type_id,
         input_catalog_id,
-        # #
-        # fiber_mag_g,
-        # fiber_mag_r,
-        # fiber_mag_i,
-        # fiber_mag_z,
-        # fiber_mag_y,
-        # fiber_mag_j,
-        # #
         psf_mag_g,
         psf_mag_r,
         psf_mag_i,
         psf_mag_z,
         psf_mag_y,
         psf_mag_j,
-        #
         psf_flux_g,
         psf_flux_r,
         psf_flux_i,
         psf_flux_z,
         psf_flux_y,
         psf_flux_j,
-        #
         prob_f_star,
-        #
+        flag_dist,
+        flag_ebv,
         created_at,
         updated_at,
     ):
-        # self.unique_object_id = unique_object_id
         self.obj_id = obj_id
         self.ra = ra
         self.dec = dec
@@ -152,29 +125,20 @@ class fluxstd(Base):
         self.patch = patch
         self.target_type_id = target_type_id
         self.input_catalog_id = input_catalog_id
-        #
-        # self.fiber_mag_g = fiber_mag_g
-        # self.fiber_mag_r = fiber_mag_r
-        # self.fiber_mag_i = fiber_mag_i
-        # self.fiber_mag_z = fiber_mag_z
-        # self.fiber_mag_y = fiber_mag_y
-        # self.fiber_mag_j = fiber_mag_j
-        #
         self.psf_mag_g = psf_mag_g
         self.psf_mag_r = psf_mag_r
         self.psf_mag_i = psf_mag_i
         self.psf_mag_z = psf_mag_z
         self.psf_mag_y = psf_mag_y
         self.psf_mag_j = psf_mag_j
-        #
         self.psf_flux_g = psf_flux_g
         self.psf_flux_r = psf_flux_r
         self.psf_flux_i = psf_flux_i
         self.psf_flux_z = psf_flux_z
         self.psf_flux_y = psf_flux_y
         self.psf_flux_j = psf_flux_j
-        #
         self.prob_f_star = prob_f_star
-        #
+        self.flag_dist = flag_dist
+        self.flag_ebv = flag_ebv
         self.created_at = created_at
         self.updated_at = updated_at
