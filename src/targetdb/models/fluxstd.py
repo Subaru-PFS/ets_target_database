@@ -77,9 +77,11 @@ class fluxstd(Base):
     prob_f_star = Column(Float, comment="Probability to be a F-star")
     flag_dist = Column(
         Boolean,
-        comment="True if the separation between Gaia EDR3 and PS1 entries is too large",
+        comment="True if the uncertainty of the distance estimate is too large (>20%)",
     )
-    flag_ebv = Column(Boolean, comment="True if the Galactic extinction is too large")
+    flag_ebv = Column(
+        Boolean, comment="True if the uncertainty of E(B-V) is too large (>0.2 mag)"
+    )
 
     # timestamp
     created_at = Column(DateTime)

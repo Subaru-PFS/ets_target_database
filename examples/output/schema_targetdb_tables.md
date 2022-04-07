@@ -55,8 +55,8 @@
 | psf_flux_y       | FLOAT    | False         | False           | y-band PSF flux (nJy)                                                                                 |
 | psf_flux_j       | FLOAT    | False         | False           | J band PSF flux (nJy)                                                                                 |
 | prob_f_star      | FLOAT    | False         | False           | Probability to be a F-star                                                                            |
-| flag_dist        | BOOLEAN  | False         | False           | True if the separation between Gaia EDR3 and PS1 entries is too large                                 |
-| flag_ebv         | BOOLEAN  | False         | False           | True if the Galactic extinction is too large                                                          |
+| flag_dist        | BOOLEAN  | False         | False           | True if the uncertainty of the distance estimate is too large (>20%)                                  |
+| flag_ebv         | BOOLEAN  | False         | False           | True if the uncertainty of E(B-V) is too large (>0.2 mag)                                             |
 | created_at       | DATETIME | False         | False           |                                                                                                       |
 | updated_at       | DATETIME | False         | False           |                                                                                                       |
 

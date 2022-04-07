@@ -109,7 +109,7 @@ SC_OUTPUT_FILE_PREFIX="schema_targetdb"
 
 rm -f ${SC_OUTPUT_FILE_PREFIX}.pdf
 
-./${SCHEMACRAWLERDIR}/_schemacrawler/schemacrawler.sh \
+./${SCHEMACRAWLERDIR}/_schemacrawler/bin/schemacrawler.sh \
     --server=postgresql \
     --host=${host} \
     --port=${port} \
