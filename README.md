@@ -99,20 +99,20 @@ PFS Target Database is an implementation of `targetDB` for Prime Focus Spectrogr
 
 The following packages and their dependencies are required to use the main functionality of the package.
 
-* [Python 3.9.7](https://www.python.org/)
-* [SQLAlchemy 1.4.25](https://www.sqlalchemy.org/)
-* [NumPy 1.21.2](https://numpy.org/)
-* [pandas 1.3.3](https://pandas.pydata.org/)
+* [Python 3.9.12](https://www.python.org/)
+* [SQLAlchemy 1.4.32](https://www.sqlalchemy.org/)
+* [NumPy 1.22.3](https://numpy.org/)
+* [pandas 1.4.1](https://pandas.pydata.org/)
 
 Additionally, the following packages and their dependencies are required to use additional functionality of the package and run some example scripts.
 
-* [SQLAlchemy-Utils 0.37.8](https://sqlalchemy-utils.readthedocs.io/en/latest/)
+* [SQLAlchemy-Utils 0.38.2](https://sqlalchemy-utils.readthedocs.io/en/latest/)
 * [tabulate 0.8.9](https://pypi.org/project/tabulate/)
-* [Astropy 4.3.1](https://www.astropy.org/)
+* [Astropy 5.0.3](https://www.astropy.org/)
 * [logzero 1.7.0](https://logzero.readthedocs.io/en/latest/)
-* [SchemaCrawler 16.15.7](https://www.schemacrawler.com/)
-* [md-to-pdf 5.0.0](https://github.com/simonhaenisch/md-to-pdf)
-* [Docker 20.10.8](https://www.docker.com/)
+* [SchemaCrawler 16.16.14](https://www.schemacrawler.com/)
+* [md-to-pdf 5.0.1](https://github.com/simonhaenisch/md-to-pdf)
+* [Docker 20.10.13](https://www.docker.com/)
 
 Some other useful tools.
 * [DBeaver](https://dbeaver.io/)
