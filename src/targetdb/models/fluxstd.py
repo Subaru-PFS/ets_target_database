@@ -39,6 +39,13 @@ class fluxstd(Base):
     dec = Column(Float, comment="Dec (ICRS, degree)")
     epoch = Column(String, comment="Epoch (e.g., J2000.0, J2015.5, etc.)")
 
+    parallax = Column(Float, comment="Parallax (mas)")
+    parallax_error = Column(Float, comment="Standard error of parallax (mas)")
+    pmra = Column(Float, comment="Proper motion in right ascension direction (mas/yr)")
+    pmra_error = Column(Float, comment="Standard error of pmra (mas/yr)")
+    pmdec = Column(Float, comment="Proper motion in declination direction (mas/yr)")
+    pmdec_error = Column(Float, comment="Standard error of pmdec (mas/yr)")
+
     tract = Column(
         Integer,
         comment="same definition as HSC-SSP?; can be derived from the coordinate",
@@ -74,12 +81,15 @@ class fluxstd(Base):
     psf_flux_y = Column(Float, comment="y-band PSF flux (nJy)")
     psf_flux_j = Column(Float, comment="J band PSF flux (nJy)")
 
-    prob_f_star = Column(Float, comment="Probability to be a F-star")
-    flag_dist = Column(
+    prob_f_star = Column(Float, comment="Probability of being an F-type star")
+    flags_dist = Column(
         Boolean,
-        comment="True if the separation between Gaia EDR3 and PS1 entries is too large",
+        comment="Distance uncertanty flag, True if parallax_error/parallax > 0.2",
     )
-    flag_ebv = Column(Boolean, comment="True if the Galactic extinction is too large")
+    flags_ebv = Column(
+        Boolean,
+        comment="E(B-V) uncertainty flag, True if E(B-V) uncertainty is greater than 20%",
+    )
 
     # timestamp
     created_at = Column(DateTime)
@@ -95,6 +105,12 @@ class fluxstd(Base):
         ra,
         dec,
         epoch,
+        parallax,
+        parallax_error,
+        pmra,
+        pmra_error,
+        pmdec,
+        pmdec_error,
         tract,
         patch,
         target_type_id,
@@ -112,8 +128,8 @@ class fluxstd(Base):
         psf_flux_y,
         psf_flux_j,
         prob_f_star,
-        flag_dist,
-        flag_ebv,
+        flags_dist,
+        flags_ebv,
         created_at,
         updated_at,
     ):
@@ -121,6 +137,12 @@ class fluxstd(Base):
         self.ra = ra
         self.dec = dec
         self.epoch = epoch
+        self.parallax = parallax
+        self.parallax_error = parallax_error
+        self.pmra = pmra
+        self.pmra_error = pmra_error
+        self.pmdec = pmdec
+        self.pmdec_error = pmdec_error
         self.tract = tract
         self.patch = patch
         self.target_type_id = target_type_id
@@ -138,7 +160,7 @@ class fluxstd(Base):
         self.psf_flux_y = psf_flux_y
         self.psf_flux_j = psf_flux_j
         self.prob_f_star = prob_f_star
-        self.flag_dist = flag_dist
-        self.flag_ebv = flag_ebv
+        self.flags_dist = flags_dist
+        self.flags_ebv = flags_ebv
         self.created_at = created_at
         self.updated_at = updated_at
