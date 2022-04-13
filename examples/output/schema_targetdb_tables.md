@@ -38,6 +38,12 @@
 | ra               | FLOAT    | False         | False           | RA (ICRS, degree)                                                                                     |
 | dec              | FLOAT    | False         | False           | Dec (ICRS, degree)                                                                                    |
 | epoch            | VARCHAR  | False         | False           | Epoch (e.g., J2000.0, J2015.5, etc.)                                                                  |
+| parallax         | FLOAT    | False         | False           | Parallax (mas)                                                                                        |
+| parallax_error   | FLOAT    | False         | False           | Standard error of parallax (mas)                                                                      |
+| pmra             | FLOAT    | False         | False           | Proper motion in right ascension direction (mas/yr)                                                   |
+| pmra_error       | FLOAT    | False         | False           | Standard error of pmra (mas/yr)                                                                       |
+| pmdec            | FLOAT    | False         | False           | Proper motion in declination direction (mas/yr)                                                       |
+| pmdec_error      | FLOAT    | False         | False           | Standard error of pmdec (mas/yr)                                                                      |
 | tract            | INTEGER  | False         | False           | same definition as HSC-SSP?; can be derived from the coordinate                                       |
 | patch            | INTEGER  | False         | False           | same definition as HSC-SSP?; can be derived from the coordinate; Note that it's defined as an integer |
 | target_type_id   | INTEGER  | False         | False           | target_type_id from the target_type table (must be 3 for FLUXSTD)                                     |
@@ -54,9 +60,9 @@
 | psf_flux_z       | FLOAT    | False         | False           | z-band PSF flux (nJy)                                                                                 |
 | psf_flux_y       | FLOAT    | False         | False           | y-band PSF flux (nJy)                                                                                 |
 | psf_flux_j       | FLOAT    | False         | False           | J band PSF flux (nJy)                                                                                 |
-| prob_f_star      | FLOAT    | False         | False           | Probability to be a F-star                                                                            |
-| flag_dist        | BOOLEAN  | False         | False           | True if the uncertainty of the distance estimate is too large (>20%)                                  |
-| flag_ebv         | BOOLEAN  | False         | False           | True if the uncertainty of E(B-V) is too large (>0.2 mag)                                             |
+| prob_f_star      | FLOAT    | False         | False           | Probability of being an F-type star                                                                   |
+| flags_dist       | BOOLEAN  | False         | False           | Distance uncertanty flag, True if parallax_error/parallax > 0.2                                       |
+| flags_ebv        | BOOLEAN  | False         | False           | E(B-V) uncertainty flag, True if E(B-V) uncertainty is greater than 20%                               |
 | created_at       | DATETIME | False         | False           |                                                                                                       |
 | updated_at       | DATETIME | False         | False           |                                                                                                       |
 
@@ -114,5 +120,21 @@
 | qa_relative_throughput | FLOAT    | False         | False           | Relative throughput to the reference value requested by the observer                                  |
 | qa_relative_noise      | FLOAT    | False         | False           | Relative noise to the reference value requested by the observer                                       |
 | qa_reference_lambda    | FLOAT    | False         | False           | Reference wavelength to evaluate effective exposure time (angstrom or nm?)                            |
+| is_cluster             | BOOLEAN  | False         | False           | True if it is a cluster of multiple targets.                                                          |
 | created_at             | DATETIME | False         | False           |                                                                                                       |
 | updated_at             | DATETIME | False         | False           |                                                                                                       |
+
+## cluster
+
+| name             | type     | primary_key   | autoincrement   | comment                                                     |
+|:-----------------|:---------|:--------------|:----------------|:------------------------------------------------------------|
+| cluster_id       | INTEGER  | True          | False           | Unique identifier of clusters found at duplication checking |
+| target_id        | INTEGER  | False         | False           |                                                             |
+| n_targets        | INTEGER  | False         | False           | Number of targets in the cluster                            |
+| ra_cluster       | FLOAT    | False         | False           | Mean RA of targets in the cluster (ICRS, degree)            |
+| dec_cluster      | FLOAT    | False         | False           | Mean Dec of targets in the cluster (ICRS, degree)           |
+| d_ra             | FLOAT    | False         | False           | RA(target) - RA(cluster) (degree)                           |
+| d_dec            | FLOAT    | False         | False           | Dec(target) - Dec(cluster) (degree)                         |
+| input_catalog_id | INTEGER  | False         | False           | Input catalog ID from the input_catalog table               |
+| created_at       | DATETIME | False         | False           | UTC                                                         |
+| updated_at       | DATETIME | False         | False           | UTC                                                         |
