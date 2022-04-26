@@ -8,6 +8,7 @@ from sqlalchemy import Float
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import String
+from sqlalchemy import UniqueConstraint
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import relation
 
@@ -19,14 +20,23 @@ from . import target
 class cluster(Base):
     __tablename__ = "cluster"
 
+    __table_args__ = (
+        UniqueConstraint("cluster_id", "target_id"),
+        {},
+    )
+
     cluster_id = Column(
         BigInteger,
         primary_key=True,
-        unique=False,
         autoincrement=False,
         comment="Unique identifier of clusters found at duplication checking",
     )
-    target_id = Column(BigInteger, ForeignKey("target.target_id"))
+    target_id = Column(
+        BigInteger,
+        ForeignKey("target.target_id"),
+        primary_key=True,
+        autoincrement=False,
+    )
     n_targets = Column(Integer, comment="Number of targets in the cluster")
 
     # NOTE: ra_cluster and dec_cluster are inserted into the target table and become redundant...

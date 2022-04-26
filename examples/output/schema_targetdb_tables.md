@@ -128,8 +128,8 @@
 
 | name             | type     | primary_key   | autoincrement   | comment                                                     |
 |:-----------------|:---------|:--------------|:----------------|:------------------------------------------------------------|
-| cluster_id       | INTEGER  | True          | False           | Unique identifier of clusters found at duplication checking |
-| target_id        | INTEGER  | False         | False           |                                                             |
+| cluster_id       | BIGINT   | True          | False           | Unique identifier of clusters found at duplication checking |
+| target_id        | BIGINT   | True          | False           |                                                             |
 | n_targets        | INTEGER  | False         | False           | Number of targets in the cluster                            |
 | ra_cluster       | FLOAT    | False         | False           | Mean RA of targets in the cluster (ICRS, degree)            |
 | dec_cluster      | FLOAT    | False         | False           | Mean Dec of targets in the cluster (ICRS, degree)           |
