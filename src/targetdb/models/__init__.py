@@ -13,3 +13,4 @@ from .target_type import target_type  # isort:skip
 from .proposal import proposal  # isort:skip
 from .fluxstd import fluxstd  # isort:skip
 from .target import target  # isort:skip
+from .cluster import cluster  # isort:skip

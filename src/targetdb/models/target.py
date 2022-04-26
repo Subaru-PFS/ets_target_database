@@ -8,8 +8,6 @@ from sqlalchemy import Float
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import String
-
-# from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import relation
 
@@ -17,8 +15,6 @@ from . import Base
 from . import input_catalog
 from . import proposal
 from . import target_type
-
-# from . import unique_object
 
 
 class target(Base):
@@ -31,30 +27,13 @@ class target(Base):
         autoincrement=True,
         comment="Unique identifier for each target",
     )
-    # unique_object_id = Column(BigInteger, ForeignKey("unique_object.unique_object_id"))
 
     proposal_id = Column(String, ForeignKey("proposal.proposal_id"))
-    # group_id = Column(String, ForeignKey("proposal.group_id"))
 
     obj_id = Column(
         BigInteger,
         comment="Object ID as specified by the observer at Phase 2 (can be same as the input_catalog_object_id)",
     )  # xxxx: need to understand more
-
-    # user_ra = Column(
-    #     Float, comment="Original RA submitted by the observer at Phase 2 (ICRS, degree)"
-    # )
-    # user_dec = Column(
-    #     Float,
-    #     comment="Original Dec submitted by the observer at Phase 2 (ICRS, degree)",
-    # )
-    # user_epoch = Column(
-    #     String, comment="Original Epoch submitted by the observer at Phase 2"
-    # )
-    # match_distance = Column(
-    #     Float,
-    #     comment="Distance between the matched unique_object and the original coordinate (arcsec)",
-    # )
 
     ra = Column(Float, comment="RA (ICRS, degree)")
     dec = Column(
@@ -79,9 +58,6 @@ class target(Base):
         ForeignKey("input_catalog.input_catalog_id"),
         comment="Input catalog ID from the input_catalog table",
     )
-    # input_catalog_obj_id = Column(
-    #     BigInteger, comment="Object ID in the specified input catalog"
-    # )
 
     fiber_mag_g = Column(Float, comment="g-band magnitude within a fiber (AB mag)")
     fiber_mag_r = Column(Float, comment="r-band magnitude within a fiber (AB mag)")
@@ -104,8 +80,6 @@ class target(Base):
     psf_flux_y = Column(Float, comment="y-band PSF flux (nJy)")
     psf_flux_j = Column(Float, comment="J band PSF flux (nJy)")
 
-    # photoz = Column(Float, comment="Photometric redshift for the object")
-
     priority = Column(
         Float,
         comment="Priority of the target specified by the observer within the proposal",
@@ -113,7 +87,9 @@ class target(Base):
     effective_exptime = Column(Float, comment="Requested effective exposure time (s)")
 
     is_medium_resolution = Column(
-        Boolean, comment="True if the medium resolution mode is requested"
+        Boolean,
+        default=False,
+        comment="True if the medium resolution mode is requested",
     )
 
     # QA information
@@ -129,6 +105,10 @@ class target(Base):
         comment="Reference wavelength to evaluate effective exposure time (angstrom or nm?)",
     )
 
+    is_cluster = Column(
+        Boolean, default=False, comment="True if it is a cluster of multiple targets."
+    )
+
     # timestamp
     created_at = Column(DateTime)
     updated_at = Column(DateTime)
@@ -140,22 +120,15 @@ class target(Base):
 
     def __init__(
         self,
-        # unique_object_id,
         proposal_id,
-        # group_id,
         obj_id,
         ra,
         dec,
         epoch,
-        # user_ra,
-        # user_dec,
-        # user_epoch,
-        # match_distance,
         tract,
         patch,
         target_type_id,
         input_catalog_id,
-        # input_catalog_obj_id,
         fiber_mag_g,
         fiber_mag_r,
         fiber_mag_i,
@@ -177,7 +150,6 @@ class target(Base):
         psf_flux_y,
         psf_flux_j,
         #
-        # photoz,
         #
         priority,
         effective_exptime,
@@ -187,25 +159,20 @@ class target(Base):
         qa_relative_noise,
         qa_reference_lambda,
         #
+        is_cluster,
+        #
         created_at,
         updated_at,
     ):
-        # self.unique_object_id = unique_object_id
         self.proposal_id = proposal_id
-        # self.group_id = group_id
         self.obj_id = obj_id
         self.ra = ra
         self.dec = dec
         self.epoch = epoch
-        # self.user_ra = user_ra
-        # self.user_dec = user_dec
-        # self.user_epoch = user_epoch
-        # self.match_distance = match_distance
         self.tract = tract
         self.patch = patch
         self.target_type_id = target_type_id
         self.input_catalog_id = input_catalog_id
-        # self.input_catalog_obj_id = input_catalog_obj_id
         #
         self.fiber_mag_g = fiber_mag_g
         self.fiber_mag_r = fiber_mag_r
@@ -228,8 +195,6 @@ class target(Base):
         self.psf_flux_y = psf_flux_y
         self.psf_flux_j = psf_flux_j
         #
-        # self.photoz = photoz
-        #
         self.priority = priority
         self.effective_exptime = effective_exptime
         self.is_medium_resolution = is_medium_resolution
@@ -237,6 +202,8 @@ class target(Base):
         self.qa_relative_throughput = qa_relative_throughput
         self.qa_relative_noise = qa_relative_noise
         self.qa_reference_lambda = qa_reference_lambda
+        #
+        self.is_cluster = is_cluster
         #
         self.created_at = created_at
         self.updated_at = updated_at
