@@ -40,7 +40,7 @@ class target(Base):
         Float,
         comment="Dec (ICRS, degree)",
     )
-    epoch = Column(String, comment="Epoch")
+    epoch = Column(String, default="J2000.0", comment="Epoch (default: J2000.0)")
 
     tract = Column(
         Integer,
@@ -95,10 +95,12 @@ class target(Base):
     # QA information
     qa_relative_throughput = Column(
         Float,
-        comment="Relative throughput to the reference value requested by the observer",
+        default=1.0,
+        comment="Relative throughput to the reference value requested by the observer (default: 1.0)",
     )
     qa_relative_noise = Column(
-        Float, comment="Relative noise to the reference value requested by the observer"
+        default=1.0,
+        Float, comment="Relative noise to the reference value requested by the observer (default: 1.0)"
     )
     qa_reference_lambda = Column(
         Float,
