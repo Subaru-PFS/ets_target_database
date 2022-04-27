@@ -91,6 +91,9 @@ class fluxstd(Base):
         comment="E(B-V) uncertainty flag, True if E(B-V) uncertainty is greater than 20%",
     )
 
+    # version string
+    version = Column(String, comment="Version string of the F-star selection")
+
     # timestamp
     created_at = Column(DateTime)
     updated_at = Column(DateTime)
@@ -130,6 +133,7 @@ class fluxstd(Base):
         prob_f_star,
         flags_dist,
         flags_ebv,
+        version,
         created_at,
         updated_at,
     ):
@@ -162,5 +166,6 @@ class fluxstd(Base):
         self.prob_f_star = prob_f_star
         self.flags_dist = flags_dist
         self.flags_ebv = flags_ebv
+        self.version = version
         self.created_at = created_at
         self.updated_at = updated_at
