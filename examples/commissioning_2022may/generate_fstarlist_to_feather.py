@@ -68,7 +68,7 @@ def main(
         index_begin += nline
         i_out += 1
 
-    out_feather = os.path.join(outdir, "{:s}-{:06d}.feather".format(out_prefix, i_out))
+    out_feather = os.path.join(outdir, "{:s}-{:08d}.feather".format(out_prefix, i_out))
     print(out_feather)
     df[index_begin:].reset_index().to_feather(out_feather)
 
