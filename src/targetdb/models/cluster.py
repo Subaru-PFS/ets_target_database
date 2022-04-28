@@ -60,7 +60,7 @@ class cluster(Base):
     updated_at = Column(DateTime, comment="UTC")
 
     targets = relation(target, backref=backref("cluster"))
-    input_catalogs = relation(input_catalog, backref=backref("target"))
+    input_catalogs = relation(input_catalog, backref=backref("cluster"))
 
     def __init__(
         self,

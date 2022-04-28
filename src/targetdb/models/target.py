@@ -99,8 +99,9 @@ class target(Base):
         comment="Relative throughput to the reference value requested by the observer (default: 1.0)",
     )
     qa_relative_noise = Column(
+        Float,
         default=1.0,
-        Float, comment="Relative noise to the reference value requested by the observer (default: 1.0)"
+        comment="Relative noise to the reference value requested by the observer (default: 1.0)",
     )
     qa_reference_lambda = Column(
         Float,
@@ -108,7 +109,9 @@ class target(Base):
     )
 
     is_cluster = Column(
-        Boolean, default=False, comment="True if it is a cluster of multiple targets."
+        Boolean,
+        default=False,
+        comment="True if it is a cluster of multiple targets.",
     )
 
     # timestamp
