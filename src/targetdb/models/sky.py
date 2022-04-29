@@ -30,7 +30,7 @@ class sky(Base):
     # This is string in Murata-san's catalog.
     # Note: int/int64 for other tables.
     obj_id = Column(
-        String,
+        BigInteger,
         comment="Object ID in the sky catalog",
     )
 

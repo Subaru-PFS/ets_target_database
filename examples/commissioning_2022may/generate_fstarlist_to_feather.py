@@ -92,14 +92,16 @@ if __name__ == "__main__":
 
     hostname = socket.gethostname()
 
+    if hostname == "pfsa-usr01-gb.subaru.nao.ac.jp":
+        csv = "Fstar_v1.0.csv"
+    else:
+        csv = "Fstar_v1.0_probfstar0.5.csv"
+
+    work_dir = "../../../external_data/commissioning_2022may/fluxstd_ishigaki/"
     out_prefix = "fluxstd_v1.0"
 
-    if hostname == "pfsa-usr01-gb.subaru.nao.ac.jp":
-        csv = "../../../../star_catalog_ishigaki/commissioning_2022may/PFS_TargetList/Fstar_v1.0.csv"
-        out_dir = "../../../../star_catalog_ishigaki/commissioning_2022may/PFS_TargetList/feather"
-    else:
-        csv = "../../../../star_catalogs_ishigaki/commissioning_2022may/Fstar_v1.0_probfstar0.5.csv"
-        out_dir = "../../../../star_catalogs_ishigaki/commissioning_2022may/feather"
+    csv = os.path.join(work_dir, csv)
+    out_dir = os.path.join(work_dir, "feather")
 
     catalog_name = "gaia_edr3"
     version = "1.0"

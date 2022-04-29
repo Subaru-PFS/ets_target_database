@@ -64,11 +64,11 @@ def main(
 
 if __name__ == "__main__":
 
-    json_file = "../../../../sky_catalog_murata/commissioning_2022may/skypos_s21a_wide_9700_7,1.json"
+    work_dir = "../../../external_data/commissioning_2022may/sky_murata/"
+
+    json_file = os.path.join(work_dir, "skypos_s21a_wide_9700_7,1.json")
     out_prefix = "skypos_s21a_wide_9700_7,1"
-    out_dir = "../../../../sky_catalog_murata/commissioning_2022may/feather"
-    # catalog_name = ""
-    # proposal_id = "S22A-EN16"
+    out_dir = os.path.join(work_dir, "feather")
     version = "20220427"
 
     nline = 1000000
