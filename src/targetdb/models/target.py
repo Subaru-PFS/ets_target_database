@@ -42,6 +42,16 @@ class target(Base):
     )
     epoch = Column(String, default="J2000.0", comment="Epoch (default: J2000.0)")
 
+    parallax = Column(Float, comment="Parallax (mas)")
+    pmra = Column(
+        Float,
+        default=0.0,
+        comment="Proper motion in right ascension direction (mas/yr)",
+    )
+    pmdec = Column(
+        Float, default=0.0, comment="Proper motion in declination direction (mas/yr)"
+    )
+
     tract = Column(
         Integer,
         comment="same definition as HSC-SSP?; can be derived from the coordinate",
