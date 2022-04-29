@@ -1,6 +1,7 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import os
+import socket
 
 import numpy as np
 import pandas as pd
@@ -40,7 +41,6 @@ def main(
     df.rename(columns=column_mapper, inplace=True)
     print(df)
 
-    # df["proposal_id"] = [proposal_id] * n_target
     df["target_type_name"] = ["FLUXSTD"] * n_target
     df["input_catalog_name"] = [catalog_name] * n_target
     df["version"] = [version] * n_target
@@ -90,11 +90,18 @@ def main(
 
 if __name__ == "__main__":
 
-    csv = "../../../../star_catalogs_ishigaki/commissioning_2022may/Fstar_v1.0_probfstar0.5.csv"
-    out_prefix = "target_fstars_v1.0_s22a-en16"
-    out_dir = "../../../../star_catalogs_ishigaki/commissioning_2022may/feather"
+    hostname = socket.gethostname()
+
+    out_prefix = "fluxstd_v1.0"
+
+    if hostname == "pfsa-usr01-gb.subaru.nao.ac.jp":
+        csv = "../../../../star_catalog_ishigaki/commissioning_2022may/PFS_TargetList/Fstar_v1.0.csv"
+        out_dir = "../../../../star_catalog_ishigaki/commissioning_2022may/PFS_TargetList/feather"
+    else:
+        csv = "../../../../star_catalogs_ishigaki/commissioning_2022may/Fstar_v1.0_probfstar0.5.csv"
+        out_dir = "../../../../star_catalogs_ishigaki/commissioning_2022may/feather"
+
     catalog_name = "gaia_edr3"
-    # proposal_id = "S22A-EN16"
     version = "1.0"
 
     brightest_mags = {"g": 14.0, "r": 14.0, "i": 14.0, "z": 14.0, "y": 14.0}
@@ -107,7 +114,6 @@ if __name__ == "__main__":
         out_prefix,
         outdir=out_dir,
         nline=nline,
-        # proposal_id=proposal_id,
         catalog_name=catalog_name,
         version=version,
         brightest_mags=brightest_mags,
