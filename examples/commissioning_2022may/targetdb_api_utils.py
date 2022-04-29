@@ -59,6 +59,11 @@ def get_arguments():
         help="Skip inserting test data into the fluxstd table (default: False)",
     )
     parser.add_argument(
+        "--skip_sky",
+        action="store_true",
+        help="Skip inserting test data into the sky table (default: False)",
+    )
+    parser.add_argument(
         "--target",
         default=None,
         help="Sample file for targets (default: None)",
@@ -67,6 +72,11 @@ def get_arguments():
         "--fluxstd",
         default=None,
         help="Sample file for fluxstds (default: None)",
+    )
+    parser.add_argument(
+        "--sky",
+        default=None,
+        help="Sample file for sky (default: None)",
     )
 
     args = parser.parse_args()
@@ -232,6 +242,40 @@ def insert_fluxstd(db, infile=None, fetch_table=False):
     return db
 
 
+def insert_sky(db, infile=None, fetch_table=False):
+
+    _, ext = os.path.splitext(infile)
+
+    logger.info("Loading data from {:s}".format(infile))
+
+    if ext == ".csv":
+        df = pd.read_csv(infile)
+    elif ext == ".feather":
+        df = pd.read_feather(infile)
+    else:
+        logger.error("Filetype {:s} is not supported. Abort.".format(ext))
+
+    # copy dataframe (may not be needed)
+    df_tmp = df.copy()
+
+    backref_tables = ["input_catalog", "target_type"]
+    backref_keys = ["input_catalog_name", "target_type_name"]
+    backref_check_keys = ["input_catalog_id", "target_type_id"]
+
+    for i in range(len(backref_tables)):
+        df_tmp = join_backref_values(
+            df_tmp,
+            db=db,
+            table=backref_tables[i],
+            key=backref_keys[i],
+            check_key=backref_check_keys[i],
+        )
+
+    db = insert_simple(db, table="sky", df=df_tmp, fetch_table=fetch_table)
+
+    return db
+
+
 def main():
 
     args = get_arguments()
@@ -286,6 +330,10 @@ def main():
     if not args.skip_fluxstd:
         logger.info("Inserting sample data into the fluxstd table")
         db = insert_fluxstd(db, infile=args.fluxstd, fetch_table=False)
+
+    if not args.skip_sky:
+        logger.info("Inserting sample data into the sky table")
+        db = insert_sky(db, infile=args.sky, fetch_table=False)
 
     db.close()
 
