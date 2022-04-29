@@ -31,6 +31,11 @@ cfg.parser() {
 }
 
 cfg.parser "../../../database_configs/targetdb_config.ini"
+
+if [ $HOSTNAME == "pfsa-usr01-gb.subaru.nao.ac.jp" ]; then
+    cfg.parser "../../../database_configs/targetdb_config_pfsa-db01-gb_commissioning_2022may.ini"
+fi
+
 cfg.section.dbinfo
 cfg.section.schemacrawler
 
