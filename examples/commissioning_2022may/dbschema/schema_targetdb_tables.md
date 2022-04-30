@@ -89,6 +89,7 @@
 |:-----------------|:---------|:--------------|:----------------|:--------------------------------------------------------------|
 | sky_id           | BIGINT   | True          | True            | Unique identifier for each sky position                       |
 | obj_id           | BIGINT   | False         | False           | Object ID in the sky catalog                                  |
+| obj_id_orig      | VARCHAR  | False         | False           | Original object ID in the sky catalog                         |
 | ra               | FLOAT    | False         | False           | RA (ICRS, degree)                                             |
 | dec              | FLOAT    | False         | False           | Dec (ICRS, degree)                                            |
 | epoch            | VARCHAR  | False         | False           | Epoch (e.g., J2000.0, J2015.5, etc.)                          |

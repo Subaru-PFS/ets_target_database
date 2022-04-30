@@ -3,6 +3,7 @@
 import json
 import os
 
+import numpy as np
 import pandas as pd
 
 
@@ -26,14 +27,15 @@ def main(
 
     df = pd.DataFrame(
         {
-            "obj_id": data["objid"],
+            "obj_id": np.arange(n_obj),
+            "obj_id_orig": data["objid"],
             "ra": data["ra"],
             "dec": data["dec"],
             "epoch": ["J2000.0"] * n_obj,
             "tract": [tract] * n_obj,
             "patch": [patch] * n_obj,
             "target_type_name": ["SKY"] * n_obj,
-            "input_catalog_name": ["sky_s21a_wide"] * n_obj,
+            "input_catalog_name": ["sky_hscssp_s21a_wide"] * n_obj,
             "mag_thresh": [data["magThresh"]] * n_obj,
             "version": [version] * n_obj,
         }

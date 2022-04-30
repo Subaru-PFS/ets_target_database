@@ -33,6 +33,10 @@ class sky(Base):
         BigInteger,
         comment="Object ID in the sky catalog",
     )
+    obj_id_orig = Column(
+        String,
+        comment="Original object ID in the sky catalog",
+    )
 
     ra = Column(Float, comment="RA (ICRS, degree)")
     dec = Column(Float, comment="Dec (ICRS, degree)")
@@ -84,6 +88,7 @@ class sky(Base):
     def __init__(
         self,
         obj_id,
+        obj_id_orig,
         ra,
         dec,
         epoch,
@@ -97,6 +102,7 @@ class sky(Base):
         updated_at,
     ):
         self.obj_id = obj_id
+        self.obj_id_orig = obj_id_orig
         self.ra = ra
         self.dec = dec
         self.epoch = epoch
