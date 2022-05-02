@@ -1,8 +1,0 @@
-target_type_id,target_type_name,target_type_description
-1,"SCIENCE","the fiber is intended to be on a science target"
-2,"SKY","the fiber is intended to be on blank sky, and used for sky subtraction"
-3,"FLUXSTD","the fiber is intended to be on a flux standard, and used for flux calibration"
-4,"UNASSIGNED","the fiber is not targeted on anything in particular"
-5,"ENGINEERING","the fiber is an engineering fiber"
-6,"SUNSS_IMAGING","the fiber goes to the SuNSS imaging leg"
-7,"SUNSS_DIFFUSE","the fiber goes to the SuNSS diffuse leg"
