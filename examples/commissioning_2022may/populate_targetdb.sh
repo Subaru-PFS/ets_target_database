@@ -1,4 +1,6 @@
-#!/bin/sh
+#!/bin/bash
+
+set -euxo pipefail
 
 PY_SCRIPT="targetdb_api_utils.py"
 
