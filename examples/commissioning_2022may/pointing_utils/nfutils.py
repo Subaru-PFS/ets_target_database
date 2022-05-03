@@ -257,7 +257,7 @@ def run_netflow(
     return res
 
 
-def gen_assignment(
+def fiber_allocation(
     df_targets,
     df_fluxstds,
     df_sky,

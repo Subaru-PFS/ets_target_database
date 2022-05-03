@@ -54,6 +54,7 @@ import pointing_utils.nfutils as nfutils
 def get_arguments():
     parser = argparse.ArgumentParser()
 
+    # telescope configurations
     parser.add_argument(
         "--ra",
         type=float,
@@ -79,19 +80,35 @@ def get_arguments():
         help="planned time of observation in UTC (default: 2022-05-20T15:00:00Z)",
     )
     parser.add_argument(
-        "--lim_target_mag",
+        "--telescope_elevation",
         type=float,
-        default="19.",
-        help="magnitude of the faintest targets (obsolete) (default:19)",
+        default=60.0,
+        help="Telescope elevation in degree (default: 60)",
     )
 
+    # configuration file
+    parser.add_argument(
+        "--conf",
+        type=str,
+        default="config.toml",
+        help="Config file for the script to run. Must be a .toml file (default: config.toml)",
+    )
+
+    # output directories
     parser.add_argument(
         "--design_dir",
         type=str,
         default=".",
         help="directory for storing pfsDesign files (default: .)",
     )
+    parser.add_argument(
+        "--cobra_coach_dir",
+        type=str,
+        default=".",
+        help="path for temporary cobraCoach files (default: .)",
+    )
 
+    # guide stars
     parser.add_argument(
         "--guidestar_mag_max",
         type=float,
@@ -111,26 +128,7 @@ def get_arguments():
         help="radius of guide star candidate vicinity (default: 1/3600)",
     )
 
-    parser.add_argument(
-        "--cobra_coach_dir",
-        type=str,
-        default=".",
-        help="path for temporary cobraCoach files (default: .)",
-    )
-
-    parser.add_argument(
-        "--cobra_coach_module_version",
-        type=str,
-        default="final_20210920_mm",
-        help="version of the bench decription file (default: final_20210920_mm)",
-    )
-
-    parser.add_argument(
-        "--conf",
-        type=str,
-        default="config.toml",
-        help="Config file for the script to run. Must be a .toml file (default: config.toml)",
-    )
+    # science targets
     parser.add_argument(
         "--target_mag_max",
         type=float,
@@ -149,17 +147,46 @@ def get_arguments():
         default="g",
         help="Photometric band (grizyj of PS1) to apply magnitude cuts (default: g)",
     )
+
+    # flux standards
+    parser.add_argument(
+        "--fluxstd_mag_max",
+        type=float,
+        default=19.0,
+        help="Maximum (faintest) magnitude for stars in fibers (default: 19.)",
+    )
+    parser.add_argument(
+        "--fluxstd_mag_min",
+        type=float,
+        default=14.0,
+        help="Minimum (brightest) magnitude for stars in fibers (default: 14.0)",
+    )
+    parser.add_argument(
+        "--fluxstd_mag_filter",
+        type=str,
+        default="g",
+        help="Photometric band (grizyj of PS1) to apply magnitude cuts (default: g)",
+    )
+    parser.add_argument(
+        "--good_fluxstd",
+        action="store_true",
+        help="Select fluxstd stars with prob_f_star>0.5, flags_dist=False, and flags_ebv=False (default: False)",
+    )
     parser.add_argument(
         "--fluxstd_min_prob_f_star",
         type=float,
-        default=0.0,
-        help="Minimum acceptable prob_f_star (default: 0)",
+        default=0.5,
+        help="Minimum acceptable prob_f_star (default: 0.5)",
     )
     parser.add_argument(
-        "--telescope_elevation",
-        type=float,
-        default=60.0,
-        help="Telescope elevation in degree (default: 60)",
+        "--fluxstd_flags_dist",
+        action="store_true",
+        help="Select fluxstd stars with flags_dist=False (default: False)",
+    )
+    parser.add_argument(
+        "--fluxstd_flags_ebv",
+        action="store_true",
+        help="Select fluxstd stars with flags_ebv=False (default: False)",
     )
     parser.add_argument(
         "--n_fluxstd",
@@ -167,24 +194,34 @@ def get_arguments():
         default=50,
         help="Number of FLUXSTD stars to be allocated. (default: 50)",
     )
+
+    # sky fibers
     parser.add_argument(
         "--n_sky",
         type=int,
         default=0,
         help="Number of SKY fibers to be allocated. (default: 0)",
     )
+
+    # instrument parameter files
     parser.add_argument(
         "--pfs_instdata_dir",
         type=str,
         default="/Users/monodera/Dropbox/NAOJ/PFS/Subaru-PFS/pfs_instdata/",
         help="Location of pfs_instdata (default: /Users/monodera/Dropbox/NAOJ/PFS/Subaru-PFS/pfs_instdata/)",
     )
+    parser.add_argument(
+        "--cobra_coach_module_version",
+        type=str,
+        default="final_20210920_mm",
+        help="version of the bench decription file (default: final_20210920_mm)",
+    )
 
     args = parser.parse_args()
 
+    # NOTE: astropy.time.Time.now() uses datetime.utcnow()
     if args.observation_time.lower() == "now":
         print("converting to the current time")
-        # NOTE: astropy.time.Time.now() uses datetime.utcnow()
         args.observation_time = Time.now().iso
 
     return args
@@ -212,11 +249,18 @@ def main():
         except:
             pass
 
-    df_targets = dbutils.gen_list_from_targetdb(
-        args.ra, args.dec, conf=conf, tablename="target"
-    )
-    df_fluxstds = dbutils.gen_list_from_targetdb(
-        args.ra, args.dec, conf=conf, tablename="fluxstd", good_fluxstd=True
+    df_targets = dbutils.generate_targets_from_targetdb(args.ra, args.dec, conf=conf)
+    df_fluxstds = dbutils.generate_fluxstds_from_targetdb(
+        args.ra,
+        args.dec,
+        conf=conf,
+        good_fluxstd=args.good_fluxstd,
+        flags_dist=args.fluxstd_flags_dist,
+        flags_ebv=args.fluxstd_flags_ebv,
+        mag_min=args.fluxstd_mag_min,
+        mag_max=args.fluxstd_mag_max,
+        mag_filter=args.fluxstd_mag_filter,
+        min_prob_f_star=args.fluxstd_min_prob_f_star,
     )
     df_sky = pd.DataFrame()
 
@@ -230,7 +274,7 @@ def main():
     # )
 
     # vis, tp, tel, tgt, classdict = gen_assignment(args, df_targets, df_fluxstds)
-    vis, tp, tel, tgt, tgt_class_dict = nfutils.gen_assignment(
+    vis, tp, tel, tgt, tgt_class_dict = nfutils.fiber_allocation(
         df_targets,
         df_fluxstds,
         df_sky,
