@@ -82,7 +82,7 @@ def get_arguments():
     parser.add_argument(
         "--telescope_elevation",
         type=float,
-        default=60.0,
+        default=None,
         help="Telescope elevation in degree (default: 60)",
     )
 
@@ -324,6 +324,13 @@ def main():
     print(
         f"pfsDesign file {design.filename} is created in the {args.design_dir} directory."
     )
+    print(
+        "Number of SCIENCE fibers: {:}".format(len(np.where(design.targetType == 1)[0]))
+    )
+    print(
+        "Number of FLUXSTD fibers: {:}".format(len(np.where(design.targetType == 3)[0]))
+    )
+    print("Number of SKY fibers: {:}".format(len(np.where(design.targetType == 2)[0])))
 
 
 if __name__ == "__main__":

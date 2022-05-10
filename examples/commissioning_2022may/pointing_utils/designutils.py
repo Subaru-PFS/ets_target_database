@@ -11,7 +11,10 @@ import pfs.datamodel
 import psycopg2
 import psycopg2.extras
 import toml
+from astroplan import FixedTarget
+from astroplan import Observer
 from astropy import units as u
+from astropy.coordinates import SkyCoord
 from astropy.table import Table
 from astropy.time import Time
 from ets_shuffle import query_utils
@@ -123,7 +126,7 @@ def generate_guidestars_from_gaiadb(
     dec,
     pa,
     observation_time,
-    telescope_elevation,
+    telescope_elevation=None,
     conf=None,
     guidestar_mag_max=19.0,
     guidestar_neighbor_mag_min=21.0,
@@ -137,9 +140,17 @@ def generate_guidestars_from_gaiadb(
     # Get ra, dec and position angle from input arguments
     ra_tel_deg, dec_tel_deg, pa_deg = ra, dec, pa
 
-    # this should come from the pfsDesign as well, but is not yet in there
-    # (DAMD-101)
-    # obs_time = observation_time  # utc
+    # Get telescope elevation from the observing time, target, and pointing
+    pointing_center = FixedTarget(SkyCoord(ra * u.deg, dec * u.deg, frame="icrs"))
+    observing_site = Observer.at_site("subaru")
+    if telescope_elevation is None:
+        telescope_elevation = observing_site.altaz(
+            observation_time,
+            pointing_center,
+        ).alt.value
+        print(
+            f"Telescope elevation is set to {telescope_elevation} degrees from the pointing center ({ra}, {dec}), and observing time {observation_time}"
+        )
 
     # guidestar_mag_max = guidestar_mag_max
     # guidestar_neighbor_mag_min = guidestar_neighbor_mag_min
@@ -314,7 +325,7 @@ def generate_guidestars_from_gaiadb(
         targets["agid"],  # AG camera ID
         targets["agpix_x"],  # AG x pixel coordinate
         targets["agpix_y"],  # AG y pixel coordinate
-        telescope_elevation,  # telescope elevation, don't know how to obtain,
+        telescope_elevation,
         gaiadb_input_catalog_id,  # numerical ID assigned to the GAIA catalogue
     )
 
