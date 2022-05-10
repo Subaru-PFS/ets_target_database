@@ -74,7 +74,7 @@ def getBench(
     calibrationProduct.L2[zeroLinkLengths] = np.median(
         calibrationProduct.L2[~zeroLinkLengths]
     )
-    print("Cobras with zero link lenghts: %i" % np.sum(zeroLinkLengths))
+    print("Cobras with zero link lengths: %i" % np.sum(zeroLinkLengths))
 
     # Use the median value link lengths in those cobras with too long link lengths
     tooLongLinkLengths = np.logical_or(
@@ -86,7 +86,7 @@ def getBench(
     calibrationProduct.L2[tooLongLinkLengths] = np.median(
         calibrationProduct.L2[~tooLongLinkLengths]
     )
-    print("Cobras with too long link lenghts: %i" % np.sum(tooLongLinkLengths))
+    print("Cobras with too long link lengths: %i" % np.sum(tooLongLinkLengths))
 
     calibrationFileName = os.path.join(
         os.environ["PFS_INSTDATA_DIR"], "data/pfi/dot", "black_dots_mm.csv"
@@ -276,9 +276,17 @@ def fiber_allocation(
     targets += register_objects(df_fluxstds, target_class="cal")
     targets += register_objects(df_sky, target_class="sky")
 
-    cobra_coach, bench = getBench(
-        pfs_instdata_dir, cobra_coach_dir, cobra_coach_module_version
+    # cobra_coach, bench = getBench(
+    #     pfs_instdata_dir, cobra_coach_dir, cobra_coach_module_version
+    # )
+
+    os.environ["PFS_INSTDATA_DIR"] = pfs_instdata_dir
+    cobra_coach = CobraCoach(
+        "fpga", loadModel=False, trajectoryMode=True, rootDir=cobra_coach_dir
     )
+    cobra_coach.loadModel(version="ALL", moduleVersion=cobra_coach_module_version)
+
+    bench = Bench(layout="full")
 
     telescopes = [nf.Telescope(ra, dec, pa, observation_time)]
 
@@ -291,13 +299,13 @@ def fiber_allocation(
     # scientific targets with priority 1.
     class_dict = {
         "sci_P1": {
-            "nonObservationCost": 100,
-            "partialObservationCost": 1000,
+            "nonObservationCost": 10,
+            "partialObservationCost": 100,
             "calib": False,
         },
         "cal": {
             "numRequired": n_fluxstd,
-            "nonObservationCost": 1e5,
+            "nonObservationCost": 1e6,
             "calib": True,
         },
         "sky": {
