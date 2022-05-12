@@ -5,12 +5,16 @@ import datetime
 
 import pandas as pd
 import toml
+from logzero import logger
 from targetdb import targetdb
 
 
 def main(conf, split_size=None):
 
+    logger.info(f"Load config file {conf}.")
     config = toml.load(conf)
+
+    logger.info(f"Connect to the database.")
     db = targetdb.TargetDB(**dict(config["targetdb"]))
     db.connect()
 
@@ -23,6 +27,7 @@ def main(conf, split_size=None):
 
         print(i, offset)
 
+        logger.info(f"Fetch {split_size} objects from the {offset}-th object.")
         df_fluxstd = db.fetch_query(
             f"""SELECT fluxstd_id, filter_g, filter_r, filter_i, filter_z, filter_y, updated_at
             FROM fluxstd
@@ -33,6 +38,7 @@ def main(conf, split_size=None):
         print(df_fluxstd)
 
         if df_fluxstd.empty:
+            logger.info(f"All objects has been fetched. Exit.")
             break
 
         df_fluxstd["filter_g"] = "g_ps1"
@@ -44,10 +50,14 @@ def main(conf, split_size=None):
         utcnow = datetime.datetime.utcnow()
         df_fluxstd["updated_at"] = utcnow
 
+        logger.info(
+            f"Update the fluxstd table with filter names with the timestamp of {utcnow}"
+        )
         db.update("fluxstd", df_fluxstd)
 
         i += 1
 
+    logger.info(f"Close the database.")
     db.close()
 
 
