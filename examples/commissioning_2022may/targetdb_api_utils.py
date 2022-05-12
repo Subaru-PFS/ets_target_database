@@ -11,6 +11,7 @@ import sys
 # import astropy.units as u
 # import numpy as np
 import pandas as pd
+import toml
 
 # from astropy.coordinates import SkyCoord
 # from astropy.coordinates import search_around_sky
@@ -127,9 +128,10 @@ def get_arguments():
 
 def connect_db(conf=None):
 
-    config = configparser.ConfigParser()
-    config.read(conf)
-    db = targetdb.TargetDB(**dict(config["dbinfo"]))
+    # config = configparser.ConfigParser()
+    # config.read(conf)
+    config = toml.load(conf)
+    db = targetdb.TargetDB(**dict(config["targetdb"]))
     db.connect()
 
     return db

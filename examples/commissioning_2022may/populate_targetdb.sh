@@ -5,9 +5,9 @@ set -euxo pipefail
 PY_SCRIPT="targetdb_api_utils.py"
 
 if [ $HOSTNAME == "pfsa-usr01-gb.subaru.nao.ac.jp" ]; then
-    DB_CONF_FILE="../../../database_configs/targetdb_config_pfsa-db01-gb_commissioning_2022may.ini"
+    DB_CONF_FILE="../../../database_configs/config_pfsa-db01-gb_commissioning_2022may.toml"
 else
-    DB_CONF_FILE="../../../database_configs/targetdb_config.ini"
+    DB_CONF_FILE="../../../database_configs/config_local.toml"
 fi
 
 STARDATA_DIR="../../../external_data/commissioning_2022may/fluxstd_ishigaki/feather/"

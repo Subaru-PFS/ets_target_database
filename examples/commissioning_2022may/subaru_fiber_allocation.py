@@ -37,6 +37,7 @@ from ics.cobraOps.cobraConstants import NULL_TARGET_ID
 from ics.cobraOps.cobraConstants import NULL_TARGET_POSITION
 from ics.cobraOps.CollisionSimulator2 import CollisionSimulator2
 from ics.cobraOps.TargetGroup import TargetGroup
+from logzero import logger
 from pfs.utils.coordinates.CoordTransp import CoordinateTransform as ctrans
 from pfs.utils.coordinates.CoordTransp import ag_pfimm_to_pixel
 from pfs.utils.pfsDesignUtils import makePfsDesign
@@ -83,7 +84,7 @@ def get_arguments():
         "--telescope_elevation",
         type=float,
         default=None,
-        help="Telescope elevation in degree (default: 60)",
+        help="Telescope elevation in degree (default: None to set automatically from (ra, dec, observation_time))",
     )
 
     # configuration file
@@ -221,7 +222,7 @@ def get_arguments():
 
     # NOTE: astropy.time.Time.now() uses datetime.utcnow()
     if args.observation_time.lower() == "now":
-        print("converting to the current time")
+        logger.info("Observation time is set to the current time.")
         args.observation_time = Time.now().iso
 
     return args
@@ -321,16 +322,18 @@ def main():
 
     design.write(dirName=args.design_dir, fileName=design.filename)
 
-    print(
+    logger.info(
         f"pfsDesign file {design.filename} is created in the {args.design_dir} directory."
     )
-    print(
+    logger.info(
         "Number of SCIENCE fibers: {:}".format(len(np.where(design.targetType == 1)[0]))
     )
-    print(
+    logger.info(
         "Number of FLUXSTD fibers: {:}".format(len(np.where(design.targetType == 3)[0]))
     )
-    print("Number of SKY fibers: {:}".format(len(np.where(design.targetType == 2)[0])))
+    logger.info(
+        "Number of SKY fibers: {:}".format(len(np.where(design.targetType == 2)[0]))
+    )
 
 
 if __name__ == "__main__":

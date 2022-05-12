@@ -151,6 +151,7 @@ class target(Base):
         patch,
         target_type_id,
         input_catalog_id,
+        #
         fiber_mag_g,
         fiber_mag_r,
         fiber_mag_i,

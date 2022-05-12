@@ -81,6 +81,13 @@ class fluxstd(Base):
     psf_flux_y = Column(Float, comment="y-band PSF flux (nJy)")
     psf_flux_j = Column(Float, comment="J band PSF flux (nJy)")
 
+    filter_g = Column(String, comment="g-band filter (g_hsc, g_ps1, g_sdss, etc.)")
+    filter_r = Column(String, comment="r-band filter (r_hsc, r_ps1, r_sdss, etc.)")
+    filter_i = Column(String, comment="i-band filter (i_hsc, i_ps1, i_sdss, etc.)")
+    filter_z = Column(String, comment="z-band filter (z_hsc, z_ps1, z_sdss, etc.)")
+    filter_y = Column(String, comment="y-band filter (y_hsc, y_ps1, y_sdss, etc.)")
+    filter_j = Column(String, comment="j-band filter (j_mko, etc.)")
+
     prob_f_star = Column(Float, comment="Probability of being an F-type star")
     flags_dist = Column(
         Boolean,
@@ -130,6 +137,12 @@ class fluxstd(Base):
         psf_flux_z,
         psf_flux_y,
         psf_flux_j,
+        filter_g,
+        filter_r,
+        filter_i,
+        filter_z,
+        filter_y,
+        filter_j,
         prob_f_star,
         flags_dist,
         flags_ebv,
@@ -163,6 +176,12 @@ class fluxstd(Base):
         self.psf_flux_z = psf_flux_z
         self.psf_flux_y = psf_flux_y
         self.psf_flux_j = psf_flux_j
+        self.filter_g = filter_g
+        self.filter_r = filter_r
+        self.filter_i = filter_i
+        self.filter_z = filter_z
+        self.filter_y = filter_y
+        self.filter_j = filter_j
         self.prob_f_star = prob_f_star
         self.flags_dist = flags_dist
         self.flags_ebv = flags_ebv
