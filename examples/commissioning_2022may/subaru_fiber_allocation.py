@@ -214,8 +214,8 @@ def get_arguments():
     parser.add_argument(
         "--cobra_coach_module_version",
         type=str,
-        default="final_20210920_mm",
-        help="version of the bench decription file (default: final_20210920_mm)",
+        default=None,
+        help="version of the bench description file (default: None)",
     )
 
     args = parser.parse_args()
@@ -334,6 +334,7 @@ def main():
     logger.info(
         "Number of SKY fibers: {:}".format(len(np.where(design.targetType == 2)[0]))
     )
+    logger.info("Number of AG stars: {:}".format(len(gudestars.objId)))
 
 
 if __name__ == "__main__":

@@ -2,6 +2,7 @@ import argparse
 import os
 import tempfile
 import time
+from re import I
 
 import ets_fiber_assigner.netflow as nf
 import matplotlib.path as mppath
@@ -29,6 +30,7 @@ from ics.cobraOps.CollisionSimulator2 import CollisionSimulator2
 from ics.cobraOps.TargetGroup import TargetGroup
 from pfs.utils.coordinates.CoordTransp import CoordinateTransform as ctrans
 from pfs.utils.coordinates.CoordTransp import ag_pfimm_to_pixel
+from pfs.utils.fiberids import FiberIds
 from pfs.utils.pfsDesignUtils import makePfsDesign
 from procedures.moduleTest.cobraCoach import CobraCoach
 from targetdb import targetdb
@@ -47,6 +49,7 @@ def generate_pfs_design(
     tgt_class_dict,
     n_fiber=2394,
 ):
+    # n_fiber = len(FiberIds().scienceFiberId)
     # NOTE: fiberID starts with 1 (apparently; TBC).
     fiber_id = np.arange(n_fiber, dtype=int) + 1
 
@@ -59,9 +62,34 @@ def generate_pfs_design(
     obj_id = np.full(n_fiber, -1, dtype=np.int64)
     target_type = np.full(n_fiber, 4, dtype=int)  # filled as unassigned number
 
-    total_flux = [np.array([np.nan, np.nan, np.nan])] * n_fiber
-    psf_flux = [np.array([np.nan, np.nan, np.nan])] * n_fiber
-    filter_names = [["none", "none", "none"]] * n_fiber
+    filter_band_names = ["g", "r", "i"]
+    flux_default_values = np.full(len(filter_band_names), np.nan)
+    filter_default_values = ["none" for _ in filter_band_names]
+
+    # print(flux_default_values)
+    # print(filter_default_values)
+
+    dict_of_flux_lists = {
+        "fiber_flux": [flux_default_values for _ in range(n_fiber)],
+        "total_flux": [flux_default_values for _ in range(n_fiber)],
+        "psf_flux": [flux_default_values for _ in range(n_fiber)],
+        "filter_names": [filter_default_values for _ in range(n_fiber)],
+    }
+    # dict_of_flux_lists = {
+    #     "fiber_flux": [np.array([np.nan, np.nan, np.nan])] * n_fiber,
+    #     "total_flux": [np.array([np.nan, np.nan, np.nan])] * n_fiber,
+    #     "psf_flux": [np.array([np.nan, np.nan, np.nan])] * n_fiber,
+    #     "fiber_flux_err": [np.array([np.nan, np.nan, np.nan])] * n_fiber,
+    #     "total_flux_err": [np.array([np.nan, np.nan, np.nan])] * n_fiber,
+    #     "psf_flux_err": [np.array([np.nan, np.nan, np.nan])] * n_fiber,
+    #     "filter_names": [["none", "none", "none"]] * n_fiber,
+    # }
+
+    # print(dict_of_flux_lists)
+
+    # total_flux = [np.array([np.nan, np.nan, np.nan])] * n_fiber
+    # psf_flux = [np.array([np.nan, np.nan, np.nan])] * n_fiber
+    # filter_names = [["none", "none", "none"]] * n_fiber
 
     for tidx, cidx in vis.items():
 
@@ -86,12 +114,49 @@ def generate_pfs_design(
 
         if np.any(idx_target):
             cat_id[i_fiber] = df_targets["input_catalog_id"][idx_target].values[0]
+            # dict_of_flux_lists["total_flux"][i_fiber] = [
+            #     np.nan for _ in filter_band_names
+            # ]
+            dict_of_flux_lists["psf_flux"][i_fiber] = np.array(
+                [
+                    df_targets[f"psf_flux_{band}"][idx_target].values[0]
+                    if df_targets[f"psf_flux_{band}"][idx_target].values[0] is not None
+                    else np.nan
+                    for band in filter_band_names
+                ]
+            )
+            dict_of_flux_lists["filter_names"][i_fiber] = [
+                df_targets[f"filter_{band}"][idx_target].values[0]
+                if df_targets[f"filter_{band}"][idx_target].values[0] is not None
+                else "none"
+                for band in filter_band_names
+            ]
             # total_flux[i_fiber] = df_targets["totalFlux"][idx_target][0]
             # filter_names[i_fiber] = df_targets["filterNames"][idx_target][0].tolist()
         if np.any(idx_fluxstd):
             cat_id[i_fiber] = df_fluxstds["input_catalog_id"][idx_fluxstd].values[0]
+            # dict_of_flux_lists["total_flux"][i_fiber] = [
+            #     np.nan for band in filter_band_names
+            # ]
+            dict_of_flux_lists["psf_flux"][i_fiber] = np.array(
+                [
+                    df_fluxstds[f"psf_flux_{band}"][idx_fluxstd].values[0]
+                    if df_fluxstds[f"psf_flux_{band}"][idx_fluxstd].values[0]
+                    is not None
+                    else np.nan
+                    for band in filter_band_names
+                ]
+            )
+            dict_of_flux_lists["filter_names"][i_fiber] = [
+                df_fluxstds[f"filter_{band}"][idx_fluxstd].values[0]
+                if df_fluxstds[f"filter_{band}"][idx_fluxstd].values[0] is not None
+                else "none"
+                for band in filter_band_names
+            ]
             # psf_flux[i_fiber] = df_fluxstds["psfFlux"][idx_fluxstd][0]
             # filter_names[i_fiber] = df_fluxstds["filterNames"][idx_fluxstd][0].tolist()
+
+    # print(dict_of_flux_lists)
 
     pfs_design = makePfsDesign(
         pfi_nominal,
@@ -107,13 +172,15 @@ def generate_pfs_design(
         objId=obj_id,
         targetType=target_type,
         # fiberStatus=FiberStatus.GOOD,
-        # fiberFlux=np.NaN,
-        psfFlux=psf_flux,
-        totalFlux=total_flux,
+        # fiberFlux=dict_of_flux_lists["fiber_flux"],
+        psfFlux=dict_of_flux_lists["psf_flux"],
+        # psfFlux=psf_flux,
+        # totalFlux=dict_of_flux_lists["total_flux"],
         # fiberFluxErr=np.NaN,
         # psfFluxErr=np.NaN,
         # totalFluxErr=np.NaN,
-        filterNames=filter_names,
+        filterNames=dict_of_flux_lists["filter_names"],
+        # filterNames=filter_names,
         # guideStars=None,
         # designName=None,
     )

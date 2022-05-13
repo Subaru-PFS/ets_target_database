@@ -284,6 +284,7 @@ def fiber_allocation(
     cobra_coach = CobraCoach(
         "fpga", loadModel=False, trajectoryMode=True, rootDir=cobra_coach_dir
     )
+    # cobra_coach.loadModel()
     cobra_coach.loadModel(version="ALL", moduleVersion=cobra_coach_module_version)
 
     bench = Bench(layout="full")
