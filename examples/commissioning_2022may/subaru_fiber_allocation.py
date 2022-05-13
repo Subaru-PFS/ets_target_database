@@ -71,8 +71,8 @@ def get_arguments():
     parser.add_argument(
         "--pa",
         type=float,
-        default=0.0,
-        help="Telescope position angle [degrees] (default: 0.0)",
+        default=-90.0,
+        help="Telescope position angle [degrees] (default: -90.0)",
     )
     parser.add_argument(
         "--observation_time",
@@ -334,7 +334,7 @@ def main():
     logger.info(
         "Number of SKY fibers: {:}".format(len(np.where(design.targetType == 2)[0]))
     )
-    logger.info("Number of AG stars: {:}".format(len(gudestars.objId)))
+    logger.info("Number of AG stars: {:}".format(len(guidestars.objId)))
 
 
 if __name__ == "__main__":
