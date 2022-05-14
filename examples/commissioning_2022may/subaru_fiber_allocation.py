@@ -6,54 +6,52 @@
 # All of them were at the HEAD of the respective master branches, with the
 # exception of "ets_fiber_assigner" (must be on branch "commissioning_demo").
 #
-# Also the "pulp" Python package (version 1.6!) is required to solve the fiber assignment
-# problem.
-#
 # Also, the environment variable PFS_INSTDATA_DIR must be set correctly.
 
 import argparse
 import os
-import tempfile
-import time
 
-# import astropy
-import ets_fiber_assigner.netflow as nf
-import matplotlib.path as mppath
 import numpy as np
 import pandas as pd
-import pfs.datamodel
-import psycopg2
-import psycopg2.extras
 import toml
-from astropy import units as u
-from astropy.table import Table
 from astropy.time import Time
-from ets_shuffle import query_utils
-from ets_shuffle.convenience import flag_close_pairs
-from ets_shuffle.convenience import guidecam_geometry
-from ets_shuffle.convenience import update_coords_for_proper_motion
-from ics.cobraOps.Bench import Bench
-from ics.cobraOps.BlackDotsCalibrationProduct import BlackDotsCalibrationProduct
-from ics.cobraOps.cobraConstants import NULL_TARGET_ID
-from ics.cobraOps.cobraConstants import NULL_TARGET_POSITION
-from ics.cobraOps.CollisionSimulator2 import CollisionSimulator2
-from ics.cobraOps.TargetGroup import TargetGroup
+from astropy.utils import iers
 from logzero import logger
-from pfs.utils.coordinates.CoordTransp import CoordinateTransform as ctrans
-from pfs.utils.coordinates.CoordTransp import ag_pfimm_to_pixel
-from pfs.utils.pfsDesignUtils import makePfsDesign
-from procedures.moduleTest.cobraCoach import CobraCoach
-from targetdb import targetdb
 
 import pointing_utils.dbutils as dbutils
 import pointing_utils.designutils as designutils
 import pointing_utils.nfutils as nfutils
 
+# import ets_fiber_assigner.netflow as nf
+# import matplotlib.path as mppath
+# import pfs.datamodel
+# import psycopg2
+# import psycopg2.extras
+# import tempfile
+# import time
+# from astropy import units as u
+# from astropy.table import Table
 # from pointing_utils import gen_list_from_gaiadb
 # from pointing_utils import gen_list_from_targetdb
+# from ets_shuffle import query_utils
+# from ets_shuffle.convenience import flag_close_pairs
+# from ets_shuffle.convenience import guidecam_geometry
+# from ets_shuffle.convenience import update_coords_for_proper_motion
+# from ics.cobraOps.Bench import Bench
+# from ics.cobraOps.BlackDotsCalibrationProduct import BlackDotsCalibrationProduct
+# from ics.cobraOps.cobraConstants import NULL_TARGET_ID
+# from ics.cobraOps.cobraConstants import NULL_TARGET_POSITION
+# from ics.cobraOps.CollisionSimulator2 import CollisionSimulator2
+# from ics.cobraOps.TargetGroup import TargetGroup
+# from pfs.utils.coordinates.CoordTransp import CoordinateTransform as ctrans
+# from pfs.utils.coordinates.CoordTransp import ag_pfimm_to_pixel
+# from pfs.utils.pfsDesignUtils import makePfsDesign
+# from procedures.moduleTest.cobraCoach import CobraCoach
+# from targetdb import targetdb
 
 
-# astropy.utils.iers.conf.iers_degraded_accuracy = "warn"
+iers.conf.auto_download = True
+# iers.conf.iers_degraded_accuracy = "warn"
 
 
 def get_arguments():

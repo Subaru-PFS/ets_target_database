@@ -190,6 +190,9 @@ def generate_targets_from_targetdb(
         print("Time spent for querying: {:f}".format(t_end - t_begin))
         df = pd.concat([df, df_tmp], ignore_index=True)
 
+    df.loc[df["pmra"].isna(), "pmra"] = 0.0
+    df.loc[df["pmdec"].isna(), "pmdec"] = 0.0
+    df.loc[df["parallax"].isna(), "parallax"] = 1.0e-7
     print(df)
 
     db.close()
@@ -257,6 +260,9 @@ def generate_fluxstds_from_targetdb(
         print("Time spent for querying: {:f}".format(t_end - t_begin))
         df = pd.concat([df, df_tmp], ignore_index=True)
 
+    df.loc[df["pmra"].isna(), "pmra"] = 0.0
+    df.loc[df["pmdec"].isna(), "pmdec"] = 0.0
+    df.loc[df["parallax"].isna(), "parallax"] = 1.0e-7
     print(df)
 
     db.close()
