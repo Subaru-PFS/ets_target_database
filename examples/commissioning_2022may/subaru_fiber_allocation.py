@@ -16,6 +16,7 @@ import os
 import tempfile
 import time
 
+# import astropy
 import ets_fiber_assigner.netflow as nf
 import matplotlib.path as mppath
 import numpy as np
@@ -52,6 +53,9 @@ import pointing_utils.nfutils as nfutils
 # from pointing_utils import gen_list_from_targetdb
 
 
+# astropy.utils.iers.conf.iers_degraded_accuracy = "warn"
+
+
 def get_arguments():
     parser = argparse.ArgumentParser()
 
@@ -85,6 +89,12 @@ def get_arguments():
         type=float,
         default=None,
         help="Telescope elevation in degree (default: None to set automatically from (ra, dec, observation_time))",
+    )
+    parser.add_argument(
+        "--arms",
+        type=str,
+        default="br",
+        help="Spectrograph arms to expose, such as 'brn' and 'bmn' (default: 'br')",
     )
 
     # configuration file
@@ -250,7 +260,9 @@ def main():
         except:
             pass
 
-    df_targets = dbutils.generate_targets_from_targetdb(args.ra, args.dec, conf=conf)
+    df_targets = dbutils.generate_targets_from_targetdb(
+        args.ra, args.dec, conf=conf, arms=args.arms
+    )
     df_fluxstds = dbutils.generate_fluxstds_from_targetdb(
         args.ra,
         args.dec,
@@ -301,6 +313,7 @@ def main():
         tel,
         tgt,
         tgt_class_dict,
+        arms=args.arms,
         # tbl_targets,
         # tbl_fluxstds,
     )

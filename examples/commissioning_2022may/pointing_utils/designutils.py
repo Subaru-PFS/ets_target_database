@@ -47,6 +47,7 @@ def generate_pfs_design(
     tel,
     tgt,
     tgt_class_dict,
+    arms="br",
     n_fiber=2394,
 ):
     # n_fiber = len(FiberIds().scienceFiberId)
@@ -165,7 +166,7 @@ def generate_pfs_design(
         raBoresight=tel._ra,
         decBoresight=tel._dec,
         posAng=tel._posang,
-        # arms="br",
+        arms=arms,
         # tract=1,
         # patch="1,1",
         catId=cat_id,
@@ -284,26 +285,28 @@ def generate_guidestars_from_gaiadb(
     # # FIXME: run similar query, but without the PM requirement, to get a list of
     # # potentially too-bright neighbours
 
-    # adjust for proper motion
+    # # adjust for proper motion
     epoch = Time(observation_time).jyear
-    res[racol], res[deccol] = update_coords_for_proper_motion(
-        res[racol],
-        res[deccol],
-        res[coldict["pmra"]],
-        res[coldict["pmdec"]],
-        gaiadb_epoch,  # Gaia DR2 uses 2015.5
-        epoch,
-    )
+    # res[racol], res[deccol] = update_coords_for_proper_motion(
+    #     res[racol],
+    #     res[deccol],
+    #     res[coldict["pmra"]],
+    #     res[coldict["pmdec"]],
+    #     gaiadb_epoch,  # Gaia DR2 uses 2015.5
+    #     epoch,
+    # )
 
     # compute PFI coordinates
     tmp = np.array([res[racol], res[deccol]])
     tmp = ctrans(
         xyin=tmp,
-        za=0.0,
+        # za=0.0,
         mode="sky_pfi",
-        inr=0.0,
+        # inr=0.0,
         pa=pa_deg,
-        cent=np.array([ra_tel_deg, dec_tel_deg]),
+        cent=np.array([ra_tel_deg, dec_tel_deg]).reshape((2, 1)),
+        pm=np.stack([res[coldict["pmra"]], res[coldict["pmdec"]]], axis=0),
+        par=res[coldict["parallax"]],
         time=observation_time,
     )
 
@@ -381,6 +384,12 @@ def generate_guidestars_from_gaiadb(
     guidestars = pfs.datamodel.guideStars.GuideStars(
         targets[coldict["id"]],
         np.full(ntgt, "J{:.1f}".format(epoch)),  # convert float epoch to string
+        # FIXME: the ra/dec values below are _not_ corrected for proper motion
+        #        any more! If corrected values are required, we might need
+        #        a new mode "sky_skycorrected" (or similar)
+        #        for pfs.utils.CoordinateTransform.
+        #        On the other hand, since we store catalog and object ID here,
+        #        most other columns are redundant anyway.
         targets[coldict["ra"]],
         targets[coldict["dec"]],
         targets[coldict["pmra"]],

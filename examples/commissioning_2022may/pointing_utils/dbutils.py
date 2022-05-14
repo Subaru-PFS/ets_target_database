@@ -136,6 +136,7 @@ def generate_targets_from_targetdb(
     ra,
     dec,
     conf=None,
+    arms="br",
     tablename="target",
     fp_radius_degree=260.0 * 10.2 / 3600,  # "Radius" of PFS FoV in degree (?)
     fp_fudge_factor=1.5,  # fudge factor for search widths
@@ -161,6 +162,11 @@ def generate_targets_from_targetdb(
 
     if height is not None:
         dw = height / 2.0
+
+    if "m" in arms:
+        extra_where = "AND is_medium_resolution IS TRUE"
+    else:
+        extra_where = "AND is_medium_resolution IS FALSE"
 
     qlist = generate_query_list(
         ra,

@@ -104,9 +104,13 @@ def getBench(
     return cobraCoach, bench
 
 
-def register_objects(df, target_class=None):
+def register_objects(df, target_class=None, force_priority=None):
 
     if target_class == "sci":
+        if force_priority is not None:
+            priority = force_priority
+        else:
+            priority = int(df["priority"][i])
         # print(df["priority"])
         res = [
             nf.ScienceTarget(
@@ -114,7 +118,7 @@ def register_objects(df, target_class=None):
                 df["ra"][i],
                 df["dec"][i],
                 df["effective_exptime"][i],
-                int(df["priority"][i]),
+                priority,
                 target_class,
             )
             for i in range(df.index.size)
@@ -272,7 +276,7 @@ def fiber_allocation(
     cobra_coach_dir,
     cobra_coach_module_version,
 ):
-    targets = register_objects(df_targets, target_class="sci")
+    targets = register_objects(df_targets, target_class="sci", force_priority=1)
     targets += register_objects(df_fluxstds, target_class="cal")
     targets += register_objects(df_sky, target_class="sky")
 
@@ -290,8 +294,12 @@ def fiber_allocation(
     bench = Bench(layout="full")
 
     telescopes = [nf.Telescope(ra, dec, pa, observation_time)]
+    print("test:", observation_time)
+    print("test:", telescopes[0]._time)
 
     # get focal plane positions for all targets and all visits
+    # for i in range(len(targets)):
+    # print(targets[i].pmra, targets[i].pmdec, targets[i].parallax)
     target_fppos = [tele.get_fp_positions(targets) for tele in telescopes]
 
     # create the dictionary containing the costs and constraints for all classes
