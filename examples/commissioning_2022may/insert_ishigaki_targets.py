@@ -112,7 +112,7 @@ def main(conf, infile, dry_run=False):
     db = targetdb.TargetDB(**dict(config["targetdb"]))
     db.connect()
 
-    # db = insert_simple(db, table="input_catalog", df=df_input_catalog, fetch_table=True)
+    db = insert_simple(db, table="input_catalog", df=df_input_catalog, fetch_table=True)
     # db.update("input_catalog", df_input_catalog)
     # exit()
 
