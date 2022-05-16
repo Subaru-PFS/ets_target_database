@@ -5,12 +5,14 @@ import os
 
 import ets_fiber_assigner.netflow as nf
 import numpy as np
+from ics.cobraCharmer.pfiDesign import PFIDesign
 from ics.cobraOps.Bench import Bench
 from ics.cobraOps.BlackDotsCalibrationProduct import BlackDotsCalibrationProduct
 from ics.cobraOps.cobraConstants import NULL_TARGET_ID
 from ics.cobraOps.cobraConstants import NULL_TARGET_POSITION
 from ics.cobraOps.CollisionSimulator2 import CollisionSimulator2
 from ics.cobraOps.TargetGroup import TargetGroup
+from pfs.utils.fiberids import FiberIds
 from procedures.moduleTest.cobraCoach import CobraCoach
 
 # import argparse
@@ -163,6 +165,9 @@ def run_netflow(
     instrumentRegionPenalty=None,
 ):
 
+    # print(bench.cobras.status)
+    # exit()
+
     # We penalize targets near the edge of a patrol region slightly to reduce
     # the chance of endpoint collisions with unallocated Cobras
     # (see note below).
@@ -275,6 +280,7 @@ def fiber_allocation(
     pfs_instdata_dir,
     cobra_coach_dir,
     cobra_coach_module_version,
+    sm,
 ):
     targets = register_objects(df_targets, target_class="sci", force_priority=1)
     targets += register_objects(df_fluxstds, target_class="cal")
@@ -288,14 +294,40 @@ def fiber_allocation(
     cobra_coach = CobraCoach(
         "fpga", loadModel=False, trajectoryMode=True, rootDir=cobra_coach_dir
     )
-    # cobra_coach.loadModel()
+
     cobra_coach.loadModel(version="ALL", moduleVersion=cobra_coach_module_version)
 
+    calibration_product = cobra_coach.calibModel
+
+    # load Bench with the default setting
     bench = Bench(layout="full")
 
+    # copy values into calibration_product using the default Bench object
+    calibration_product.status = bench.cobras.status.copy()
+    calibration_product.tht0 = bench.cobras.tht0.copy()
+    calibration_product.tht1 = bench.cobras.tht1.copy()
+    calibration_product.phiIn = bench.cobras.phiIn.copy()
+    calibration_product.phiOut = bench.cobras.phiOut.copy()
+    calibration_product.L1 = bench.cobras.L1.copy()
+    calibration_product.L2 = bench.cobras.L2.copy()
+
+    # Limit spectral modules
+    gfm = FiberIds()  # 2604
+    cobra_ids_use = np.array([], dtype=np.uint16)
+    for sm_use in sm:
+        cobra_ids_use = np.append(cobra_ids_use, gfm.cobrasForSpectrograph(sm_use))
+
+    # print(cobra_ids_use)
+
+    # set Bad Cobra status for unused spectral modules
+    for cobra_id in range(calibration_product.nCobras):
+        if cobra_id not in cobra_ids_use:
+            calibration_product.status[cobra_id] = ~PFIDesign.COBRA_OK_MASK
+
+    # load Bench with the updated calibration products
+    bench = Bench(layout="full", calibrationProduct=calibration_product)
+
     telescopes = [nf.Telescope(ra, dec, pa, observation_time)]
-    print("test:", observation_time)
-    print("test:", telescopes[0]._time)
 
     # get focal plane positions for all targets and all visits
     # for i in range(len(targets)):

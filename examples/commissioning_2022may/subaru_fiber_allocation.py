@@ -1,12 +1,13 @@
-# Script for commissioning runs 09/2021
-
+#!/usr/bin/env python3
+#
 # Necessary preparations for running:
 #
 # This script depends on several other modules from https://github.com/Subaru-PFS
 # All of them were at the HEAD of the respective master branches, with the
-# exception of "ets_fiber_assigner" (must be on branch "commissioning_demo").
+# exception of "ets_fiber_assigner" and "pfs_utils" (must be on branch "tickets/INSTRM-1582").
 #
 # Also, the environment variable PFS_INSTDATA_DIR must be set correctly.
+#
 
 import argparse
 import os
@@ -50,6 +51,8 @@ import pointing_utils.nfutils as nfutils
 # from targetdb import targetdb
 
 
+# The following line seems to be needed to avoid IERS errors,
+# though the default config is already `auto_download=True`.
 iers.conf.auto_download = True
 # iers.conf.iers_degraded_accuracy = "warn"
 
@@ -225,6 +228,13 @@ def get_arguments():
         default=None,
         help="version of the bench description file (default: None)",
     )
+    parser.add_argument(
+        "--sm",
+        nargs="+",
+        type=int,
+        default=[1, 2, 3, 4],
+        help="Spectral Modules(1 to 4) to be used (default: 1 2 3 4)",
+    )
 
     args = parser.parse_args()
 
@@ -299,6 +309,7 @@ def main():
         args.pfs_instdata_dir,
         args.cobra_coach_dir,
         args.cobra_coach_module_version,
+        args.sm,
     )
     # print(vis, tp, tel, tgt, tgt_classdict)
 

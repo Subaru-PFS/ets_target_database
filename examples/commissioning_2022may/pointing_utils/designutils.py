@@ -52,7 +52,7 @@ def generate_pfs_design(
 ):
     # n_fiber = len(FiberIds().scienceFiberId)
     # NOTE: fiberID starts with 1 (apparently; TBC).
-    fiber_id = np.arange(n_fiber, dtype=int) + 1
+    # fiber_id = np.arange(n_fiber, dtype=int) + 1
 
     idx_array = np.arange(n_fiber)
 
@@ -92,9 +92,20 @@ def generate_pfs_design(
     # psf_flux = [np.array([np.nan, np.nan, np.nan])] * n_fiber
     # filter_names = [["none", "none", "none"]] * n_fiber
 
+    gfm = FiberIds()  # 2604
+    cobra_ids = gfm.cobraId
+    scifiber_ids = gfm.scienceFiberId
+
     for tidx, cidx in vis.items():
 
-        idx_fiber = fiber_id == (cidx + 1)
+        # print(cidx)
+
+        idx_fiber = (
+            cobra_ids[np.logical_and(scifiber_ids >= 0, scifiber_ids <= n_fiber)]
+            == cidx + 1
+        )
+
+        # idx_fiber = fiber_id == (cidx + 1)
         i_fiber = idx_array[idx_fiber][0]
 
         ra[idx_fiber] = tgt[tidx].ra
