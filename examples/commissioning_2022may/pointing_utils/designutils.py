@@ -50,6 +50,7 @@ def generate_pfs_design(
     arms="br",
     n_fiber=2394,
     df_raster=None,
+    is_no_target=False,
 ):
     # n_fiber = len(FiberIds().scienceFiberId)
     # NOTE: fiberID starts with 1 (apparently; TBC).
@@ -93,78 +94,81 @@ def generate_pfs_design(
     # psf_flux = [np.array([np.nan, np.nan, np.nan])] * n_fiber
     # filter_names = [["none", "none", "none"]] * n_fiber
 
-    gfm = FiberIds()  # 2604
-    cobra_ids = gfm.cobraId
-    scifiber_ids = gfm.scienceFiberId
+    if not is_no_target:
 
-    for tidx, cidx in vis.items():
+        gfm = FiberIds()  # 2604
+        cobra_ids = gfm.cobraId
+        scifiber_ids = gfm.scienceFiberId
 
-        # print(cidx)
+        for tidx, cidx in vis.items():
 
-        idx_fiber = (
-            cobra_ids[np.logical_and(scifiber_ids >= 0, scifiber_ids <= n_fiber)]
-            == cidx + 1
-        )
+            # print(cidx)
 
-        i_fiber = idx_array[idx_fiber][0]
+            idx_fiber = (
+                cobra_ids[np.logical_and(scifiber_ids >= 0, scifiber_ids <= n_fiber)]
+                == cidx + 1
+            )
 
-        ra[idx_fiber] = tgt[tidx].ra
-        dec[idx_fiber] = tgt[tidx].dec
-        # netflow's Target class convert object IDs to string.
-        obj_id[idx_fiber] = np.int64(tgt[tidx].ID)
-        pfi_nominal[idx_fiber] = [tp[tidx].real, tp[tidx].imag]
-        target_type[idx_fiber] = tgt_class_dict[tgt[tidx].targetclass]
+            i_fiber = idx_array[idx_fiber][0]
 
-        idx_target = np.logical_and(
-            df_targets["obj_id"] == np.int64(tgt[tidx].ID),
-            df_targets["target_type_id"] == tgt_class_dict[tgt[tidx].targetclass],
-        )
-        idx_fluxstd = np.logical_and(
-            df_fluxstds["obj_id"] == np.int64(tgt[tidx].ID),
-            df_fluxstds["target_type_id"] == tgt_class_dict[tgt[tidx].targetclass],
-        )
+            ra[idx_fiber] = tgt[tidx].ra
+            dec[idx_fiber] = tgt[tidx].dec
+            # netflow's Target class convert object IDs to string.
+            obj_id[idx_fiber] = np.int64(tgt[tidx].ID)
+            pfi_nominal[idx_fiber] = [tp[tidx].real, tp[tidx].imag]
+            target_type[idx_fiber] = tgt_class_dict[tgt[tidx].targetclass]
 
-        if np.any(idx_target):
-            cat_id[i_fiber] = df_targets["input_catalog_id"][idx_target].values[0]
-            # dict_of_flux_lists["total_flux"][i_fiber] = [
-            #     np.nan for _ in filter_band_names
-            # ]
-            dict_of_flux_lists["psf_flux"][i_fiber] = np.array(
-                [
-                    df_targets[f"psf_flux_{band}"][idx_target].values[0]
-                    if df_targets[f"psf_flux_{band}"][idx_target].values[0] is not None
-                    else np.nan
+            idx_target = np.logical_and(
+                df_targets["obj_id"] == np.int64(tgt[tidx].ID),
+                df_targets["target_type_id"] == tgt_class_dict[tgt[tidx].targetclass],
+            )
+            idx_fluxstd = np.logical_and(
+                df_fluxstds["obj_id"] == np.int64(tgt[tidx].ID),
+                df_fluxstds["target_type_id"] == tgt_class_dict[tgt[tidx].targetclass],
+            )
+
+            if np.any(idx_target):
+                cat_id[i_fiber] = df_targets["input_catalog_id"][idx_target].values[0]
+                # dict_of_flux_lists["total_flux"][i_fiber] = [
+                #     np.nan for _ in filter_band_names
+                # ]
+                dict_of_flux_lists["psf_flux"][i_fiber] = np.array(
+                    [
+                        df_targets[f"psf_flux_{band}"][idx_target].values[0]
+                        if df_targets[f"psf_flux_{band}"][idx_target].values[0]
+                        is not None
+                        else np.nan
+                        for band in filter_band_names
+                    ]
+                )
+                dict_of_flux_lists["filter_names"][i_fiber] = [
+                    df_targets[f"filter_{band}"][idx_target].values[0]
+                    if df_targets[f"filter_{band}"][idx_target].values[0] is not None
+                    else "none"
                     for band in filter_band_names
                 ]
-            )
-            dict_of_flux_lists["filter_names"][i_fiber] = [
-                df_targets[f"filter_{band}"][idx_target].values[0]
-                if df_targets[f"filter_{band}"][idx_target].values[0] is not None
-                else "none"
-                for band in filter_band_names
-            ]
-            # total_flux[i_fiber] = df_targets["totalFlux"][idx_target][0]
-            # filter_names[i_fiber] = df_targets["filterNames"][idx_target][0].tolist()
-        if np.any(idx_fluxstd):
-            cat_id[i_fiber] = df_fluxstds["input_catalog_id"][idx_fluxstd].values[0]
-            # dict_of_flux_lists["total_flux"][i_fiber] = [
-            #     np.nan for band in filter_band_names
-            # ]
-            dict_of_flux_lists["psf_flux"][i_fiber] = np.array(
-                [
-                    df_fluxstds[f"psf_flux_{band}"][idx_fluxstd].values[0]
-                    if df_fluxstds[f"psf_flux_{band}"][idx_fluxstd].values[0]
-                    is not None
-                    else np.nan
+                # total_flux[i_fiber] = df_targets["totalFlux"][idx_target][0]
+                # filter_names[i_fiber] = df_targets["filterNames"][idx_target][0].tolist()
+            if np.any(idx_fluxstd):
+                cat_id[i_fiber] = df_fluxstds["input_catalog_id"][idx_fluxstd].values[0]
+                # dict_of_flux_lists["total_flux"][i_fiber] = [
+                #     np.nan for band in filter_band_names
+                # ]
+                dict_of_flux_lists["psf_flux"][i_fiber] = np.array(
+                    [
+                        df_fluxstds[f"psf_flux_{band}"][idx_fluxstd].values[0]
+                        if df_fluxstds[f"psf_flux_{band}"][idx_fluxstd].values[0]
+                        is not None
+                        else np.nan
+                        for band in filter_band_names
+                    ]
+                )
+                dict_of_flux_lists["filter_names"][i_fiber] = [
+                    df_fluxstds[f"filter_{band}"][idx_fluxstd].values[0]
+                    if df_fluxstds[f"filter_{band}"][idx_fluxstd].values[0] is not None
+                    else "none"
                     for band in filter_band_names
                 ]
-            )
-            dict_of_flux_lists["filter_names"][i_fiber] = [
-                df_fluxstds[f"filter_{band}"][idx_fluxstd].values[0]
-                if df_fluxstds[f"filter_{band}"][idx_fluxstd].values[0] is not None
-                else "none"
-                for band in filter_band_names
-            ]
             # psf_flux[i_fiber] = df_fluxstds["psfFlux"][idx_fluxstd][0]
             # filter_names[i_fiber] = df_fluxstds["filterNames"][idx_fluxstd][0].tolist()
 

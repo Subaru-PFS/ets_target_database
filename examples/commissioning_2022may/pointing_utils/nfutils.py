@@ -295,9 +295,12 @@ def fiber_allocation(
     force_exptime=None,
 ):
 
-    targets = register_objects(
-        df_targets, target_class="sci", force_exptime=force_exptime
-    )
+    targets = []
+
+    if not df_targets.empty:
+        targets += register_objects(
+            df_targets, target_class="sci", force_exptime=force_exptime
+        )
 
     # print(len(targets))
 
@@ -309,8 +312,10 @@ def fiber_allocation(
 
     # print(len(targets))
 
-    targets += register_objects(df_fluxstds, target_class="cal")
-    targets += register_objects(df_sky, target_class="sky")
+    if not df_fluxstds.empty:
+        targets += register_objects(df_fluxstds, target_class="cal")
+    if not df_sky.empty:
+        targets += register_objects(df_sky, target_class="sky")
 
     # exit()
 
@@ -354,13 +359,6 @@ def fiber_allocation(
 
     # load Bench with the updated calibration products
     bench = Bench(layout="full", calibrationProduct=calibration_product)
-
-    telescopes = [nf.Telescope(ra, dec, pa, observation_time)]
-
-    # get focal plane positions for all targets and all visits
-    # for i in range(len(targets)):
-    # print(targets[i].pmra, targets[i].pmdec, targets[i].parallax)
-    target_fppos = [tele.get_fp_positions(targets) for tele in telescopes]
 
     # create the dictionary containing the costs and constraints for all classes
     # of targets
@@ -409,6 +407,18 @@ def fiber_allocation(
     for i in range(1):
         forbidden_pairs.append([])
 
+    telescopes = [nf.Telescope(ra, dec, pa, observation_time)]
+
+    if len(targets) == 0:
+        is_no_target = True
+        return None, None, telescopes[0], None, None, is_no_target
+    else:
+        is_no_target = False
+        # get focal plane positions for all targets and all visits
+        # for i in range(len(targets)):
+        # print(targets[i].pmra, targets[i].pmdec, targets[i].parallax)
+        target_fppos = [tele.get_fp_positions(targets) for tele in telescopes]
+
     res = run_netflow(
         cobra_coach,
         bench,
@@ -432,4 +442,11 @@ def fiber_allocation(
         instrumentRegionPenalty=None,
     )
 
-    return res[0], target_fppos[0], telescopes[0], targets, target_class_dict
+    return (
+        res[0],
+        target_fppos[0],
+        telescopes[0],
+        targets,
+        target_class_dict,
+        is_no_target,
+    )

@@ -342,7 +342,7 @@ def main():
 
     # exit()
 
-    vis, tp, tel, tgt, tgt_class_dict = nfutils.fiber_allocation(
+    vis, tp, tel, tgt, tgt_class_dict, is_no_target = nfutils.fiber_allocation(
         df_targets,
         df_fluxstds,
         df_sky,
@@ -363,6 +363,8 @@ def main():
     # print(vis, tp, tel, tgt, tgt_classdict)
     # print(vis.items())
 
+    print(is_no_target)
+
     design = designutils.generate_pfs_design(
         df_targets,
         df_fluxstds,
@@ -373,9 +375,10 @@ def main():
         tgt,
         tgt_class_dict,
         arms=args.arms,
-        df_raster=df_raster
+        df_raster=df_raster,
         # tbl_targets,
         # tbl_fluxstds,
+        is_no_target=is_no_target,
     )
     guidestars = designutils.generate_guidestars_from_gaiadb(
         args.ra,
