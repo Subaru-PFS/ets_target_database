@@ -106,25 +106,35 @@ def getBench(
     return cobraCoach, bench
 
 
-def register_objects(df, target_class=None, force_priority=None):
+def register_objects(df, target_class=None, force_priority=None, force_exptime=None):
 
     if target_class == "sci":
-        if force_priority is not None:
-            priority = force_priority
-        else:
-            priority = int(df["priority"][i])
-        # print(df["priority"])
-        res = [
-            nf.ScienceTarget(
-                df["obj_id"][i],
-                df["ra"][i],
-                df["dec"][i],
-                df["effective_exptime"][i],
-                priority,
-                target_class,
+
+        res = []
+
+        for i in range(df.index.size):
+
+            if force_priority is not None:
+                priority = force_priority
+            else:
+                priority = int(df["priority"][i])
+
+            if force_exptime is not None:
+                exptime = force_exptime
+            else:
+                exptime = df["effective_exptime"][i]
+
+            res.append(
+                nf.ScienceTarget(
+                    df["obj_id"][i],
+                    df["ra"][i],
+                    df["dec"][i],
+                    exptime,
+                    priority,
+                    target_class,
+                )
             )
-            for i in range(df.index.size)
-        ]
+
     elif target_class == "cal" or target_class == "sky":
         res = [
             nf.CalibTarget(
@@ -281,10 +291,28 @@ def fiber_allocation(
     cobra_coach_dir,
     cobra_coach_module_version,
     sm,
+    df_raster=None,
+    force_exptime=None,
 ):
-    targets = register_objects(df_targets, target_class="sci", force_priority=1)
+
+    targets = register_objects(
+        df_targets, target_class="sci", force_exptime=force_exptime
+    )
+
+    # print(len(targets))
+
+    if df_raster is not None:
+        print("Registering stars for raster scan test.")
+        targets += register_objects(
+            df_raster, target_class="sci", force_exptime=force_exptime
+        )
+
+    # print(len(targets))
+
     targets += register_objects(df_fluxstds, target_class="cal")
     targets += register_objects(df_sky, target_class="sky")
+
+    # exit()
 
     # cobra_coach, bench = getBench(
     #     pfs_instdata_dir, cobra_coach_dir, cobra_coach_module_version
@@ -340,29 +368,41 @@ def fiber_allocation(
     # scientific targets with priority 1.
     class_dict = {
         "sci_P1": {
-            "nonObservationCost": 10,
+            "nonObservationCost": 10000,
+            "partialObservationCost": 100,
+            "calib": False,
+        },
+        "sci_P9999": {  # raster scan
+            "nonObservationCost": 1,
             "partialObservationCost": 100,
             "calib": False,
         },
         "cal": {
             "numRequired": n_fluxstd,
-            "nonObservationCost": 1e6,
+            "nonObservationCost": 1e7,
             "calib": True,
         },
         "sky": {
             "numRequired": n_sky,
-            "nonObservationCost": 1e6,
+            "nonObservationCost": 1e7,
             "calib": True,
         },
     }
-    target_class_dict = {"sci_P1": 1, "sky": 2, "cal": 3}
+    target_class_dict = {"sci_P1": 1, "sci_P9999": 1, "sky": 2, "cal": 3}
 
-    if math.isclose(
-        df_targets["effective_exptime"].min(), df_targets["effective_exptime"].max()
-    ):
-        exptime = df_targets["effective_exptime"][0]
+    if force_exptime is not None:
+        exptime = force_exptime
     else:
-        raise ValueError("Exposure time is not identical for all objects.")
+        exptime = df_targets["effective_exptime"][0]
+
+    # exit()
+
+    # if math.isclose(
+    #     df_targets["effective_exptime"].min(), df_targets["effective_exptime"].max()
+    # ):
+    #     exptime = df_targets["effective_exptime"][0]
+    # else:
+    #     raise ValueError("Exposure time is not identical for all objects.")
 
     already_observed = {}
     forbidden_pairs = []

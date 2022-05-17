@@ -97,6 +97,12 @@ def get_arguments():
         default="br",
         help="Spectrograph arms to expose, such as 'brn' and 'bmn' (default: 'br')",
     )
+    parser.add_argument(
+        "--exptime",
+        type=float,
+        default=None,
+        help="Override the exptime (seconds) obtained from the database (default: None)",
+    )
 
     # configuration file
     parser.add_argument(
@@ -207,6 +213,30 @@ def get_arguments():
         help="Number of FLUXSTD stars to be allocated. (default: 50)",
     )
 
+    # raster scan stars from gaiaDB
+    parser.add_argument(
+        "--raster_scan",
+        action="store_true",
+        help="Search stars for raster scan test (default: False)",
+    )
+    parser.add_argument(
+        "--raster_mag_max",
+        type=float,
+        default=20.0,
+        help="maximum magnitude in Gaia G for raster scan stars (default: 20.)",
+    )
+    parser.add_argument(
+        "--raster_mag_min",
+        type=float,
+        default=12.0,
+        help="minimum magnitude in Gaia G for raster scan stars (default: 12)",
+    )
+    parser.add_argument(
+        "--raster_propid",
+        default="S22A-EN16",
+        help="Proposal-ID for raster scan stars (default: S22A-EN16)",
+    )
+
     # sky fibers
     parser.add_argument(
         "--n_sky",
@@ -240,8 +270,10 @@ def get_arguments():
 
     # NOTE: astropy.time.Time.now() uses datetime.utcnow()
     if args.observation_time.lower() == "now":
-        logger.info("Observation time is set to the current time.")
         args.observation_time = Time.now().iso
+        logger.info(
+            f"Observation time is set to the current UTC {args.observation_time}."
+        )
 
     return args
 
@@ -269,7 +301,7 @@ def main():
             pass
 
     df_targets = dbutils.generate_targets_from_targetdb(
-        args.ra, args.dec, conf=conf, arms=args.arms
+        args.ra, args.dec, conf=conf, arms=args.arms, force_priority=1
     )
     df_fluxstds = dbutils.generate_fluxstds_from_targetdb(
         args.ra,
@@ -285,16 +317,31 @@ def main():
     )
     df_sky = pd.DataFrame()
 
-    # no need for the 2022 May commissioing (hopefully)
-    # listname_gaia_targets, tbl_gaia_targets = gen_list_from_gaiadb(
-    #     args.ra,
-    #     args.dec,
-    #     dbconf=args.gaiadb_conf,
-    #     mag_min=args.target_mag_min,
-    #     mag_max=args.target_mag_max,
-    # )
+    if args.raster_scan:
+        df_raster = dbutils.generate_targets_from_gaiadb(
+            args.ra,
+            args.dec,
+            conf=conf,
+            band_select="phot_g_mean_mag",
+            mag_min=args.raster_mag_min,
+            mag_max=args.raster_mag_max,
+            good_astrometry=True,
+        )
+        df_raster = dbutils.fixcols_gaiadb_to_targetdb(
+            df_raster,
+            proposal_id=args.raster_propid,
+            target_type_id=1,  # SCIENCE
+            input_catalog_id=2,  # Gaia DR2
+            exptime=60.0,
+            priority=9999,
+        )
+    else:
+        df_raster = None
 
-    # vis, tp, tel, tgt, classdict = gen_assignment(args, df_targets, df_fluxstds)
+    print(df_raster)
+
+    # exit()
+
     vis, tp, tel, tgt, tgt_class_dict = nfutils.fiber_allocation(
         df_targets,
         df_fluxstds,
@@ -310,8 +357,11 @@ def main():
         args.cobra_coach_dir,
         args.cobra_coach_module_version,
         args.sm,
+        df_raster=df_raster,
+        force_exptime=args.exptime,
     )
     # print(vis, tp, tel, tgt, tgt_classdict)
+    # print(vis.items())
 
     design = designutils.generate_pfs_design(
         df_targets,
@@ -323,6 +373,7 @@ def main():
         tgt,
         tgt_class_dict,
         arms=args.arms,
+        df_raster=df_raster
         # tbl_targets,
         # tbl_fluxstds,
     )

@@ -146,6 +146,7 @@ def generate_targets_from_targetdb(
     mag_min=None,
     mag_max=None,
     mag_filter=None,
+    force_priority=None,
 ):
 
     db = connect_targetdb(conf)
@@ -194,6 +195,9 @@ def generate_targets_from_targetdb(
     df.loc[df["pmdec"].isna(), "pmdec"] = 0.0
     df.loc[df["parallax"].isna(), "parallax"] = 1.0e-7
     print(df)
+
+    if force_priority is not None:
+        df["priority"] = force_priority
 
     db.close()
 
@@ -270,7 +274,10 @@ def generate_fluxstds_from_targetdb(
     return df
 
 
-def gen_list_from_gaiadb(
+# def generate_targets_from_gaiadb(args.ra, args.dec, conf=conf)
+
+
+def generate_targets_from_gaiadb(
     ra,
     dec,
     conf=None,
@@ -280,6 +287,7 @@ def gen_list_from_gaiadb(
     band_select="phot_g_mean_mag",
     mag_min=0.0,
     mag_max=99.0,
+    good_astrometry=False,
 ):
 
     conn = connect_subaru_gaiadb(conf)
@@ -288,11 +296,22 @@ def gen_list_from_gaiadb(
     if search_radius is None:
         search_radius = fp_radius_degree * fp_fudge_factor
 
-    query_string = f"""SELECT source_id,ref_epoch,ra,dec,pmra,pmdec,phot_g_mean_mag,phot_bp_mean_mag,phot_rp_mean_mag
+    # Query for raster scan stars:
+    # astrometric_excess_noise_sig (D) < 2
+    # 12 <= phot_g_mean_mag <=20
+
+    query_string = f"""SELECT
+    source_id,ref_epoch,ra,dec,pmra,pmdec,parallax,
+    phot_g_mean_mag,phot_bp_mean_mag,phot_rp_mean_mag
     FROM gaia
     WHERE q3c_radial_query(ra, dec, {ra}, {dec}, {search_radius})
-    AND {band_select} BETWEEN {mag_min} AND {mag_max};
+    AND {band_select} BETWEEN {mag_min} AND {mag_max}
     """
+
+    if good_astrometry:
+        query_string += "AND astrometric_excess_noise_sig < 2.0"
+
+    query_string += ";"
 
     cur.execute(query_string)
 
@@ -305,6 +324,7 @@ def gen_list_from_gaiadb(
             "dec",
             "pmra",
             "pmdec",
+            "parallax",
             "phot_g_mean_mag",
             "phot_bp_mean_mag",
             "phot_rp_mean_mag",
@@ -317,3 +337,23 @@ def gen_list_from_gaiadb(
     print(df_res)
 
     return df_res
+
+
+def fixcols_gaiadb_to_targetdb(
+    df,
+    proposal_id=None,
+    target_type_id=None,
+    input_catalog_id=None,
+    exptime=900.0,
+    priority=1,
+):
+
+    df.rename(columns={"source_id": "obj_id", "ref_epoch": "epoch"}, inplace=True)
+    df["epoch"] = df["epoch"].apply(lambda x: f"J{x:.1f}")
+    df["proposal_id"] = proposal_id
+    df["target_type_id"] = target_type_id
+    df["input_catalog_id"] = input_catalog_id
+    df["effective_exptime"] = exptime
+    df["priority"] = priority
+
+    return df

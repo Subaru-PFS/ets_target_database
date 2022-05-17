@@ -49,6 +49,7 @@ def generate_pfs_design(
     tgt_class_dict,
     arms="br",
     n_fiber=2394,
+    df_raster=None,
 ):
     # n_fiber = len(FiberIds().scienceFiberId)
     # NOTE: fiberID starts with 1 (apparently; TBC).
@@ -105,7 +106,6 @@ def generate_pfs_design(
             == cidx + 1
         )
 
-        # idx_fiber = fiber_id == (cidx + 1)
         i_fiber = idx_array[idx_fiber][0]
 
         ra[idx_fiber] = tgt[tidx].ra
