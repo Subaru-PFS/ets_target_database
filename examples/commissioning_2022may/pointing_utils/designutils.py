@@ -294,11 +294,15 @@ def generate_guidestars_from_gaiadb(
     query_string = f"""SELECT source_id,ra,dec,parallax,pmra,pmdec,phot_g_mean_mag,bp_rp
     FROM gaia
     WHERE q3c_radial_query(ra, dec, {ra_tel_deg}, {dec_tel_deg}, {search_radius})
-    AND {coldict['pmra']} IS NOT NULL AND {coldict['pmdec']} IS NOT NULL
+    AND {coldict['pmra']} IS NOT NULL
+    AND {coldict['pmdec']} IS NOT NULL
+    AND {coldict['parallax']} IS NOT NULL
+    AND {coldict['parallax']} >= 0
+    AND astrometric_excess_noise_sig < 2.0
     AND {coldict['mag']} BETWEEN {0.0} AND {guidestar_neighbor_mag_min}
     ;
     """
-
+    print(query_string)
     cur.execute(query_string)
 
     df_res = pd.DataFrame(

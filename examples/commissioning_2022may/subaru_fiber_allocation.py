@@ -335,7 +335,7 @@ def main():
     # print(vis, tp, tel, tgt, tgt_classdict)
     # print(vis.items())
 
-    print(is_no_target)
+    # print(is_no_target)
 
     design = designutils.generate_pfs_design(
         df_targets,
