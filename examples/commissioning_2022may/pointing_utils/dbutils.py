@@ -313,6 +313,8 @@ def generate_targets_from_gaiadb(
 
     query_string += ";"
 
+    print(query_string)
+
     cur.execute(query_string)
 
     df_res = pd.DataFrame(
@@ -349,11 +351,27 @@ def fixcols_gaiadb_to_targetdb(
 ):
 
     df.rename(columns={"source_id": "obj_id", "ref_epoch": "epoch"}, inplace=True)
+
     df["epoch"] = df["epoch"].apply(lambda x: f"J{x:.1f}")
     df["proposal_id"] = proposal_id
     df["target_type_id"] = target_type_id
     df["input_catalog_id"] = input_catalog_id
     df["effective_exptime"] = exptime
     df["priority"] = priority
+
+    tb = Table([])
+
+    # ZPs are taken from Weiler (2018, A&A, 617, A138)
+    tb["g_mag_ab"] = (df["phot_g_mean_mag"].to_numpy() + (25.7455 - 25.6409)) * u.ABmag
+    tb["bp_mag_ab"] = (
+        df["phot_bp_mean_mag"].to_numpy() + (25.3603 - 25.3423)
+    ) * u.ABmag
+    tb["rp_mag_ab"] = (
+        df["phot_rp_mean_mag"].to_numpy() + (25.1185 - 24.7600)
+    ) * u.ABmag
+
+    df["g_flux_njy"] = tb["g_mag_ab"].to("nJy").value
+    df["bp_flux_njy"] = tb["bp_mag_ab"].to("nJy").value
+    df["rp_flux_njy"] = tb["rp_mag_ab"].to("nJy").value
 
     return df

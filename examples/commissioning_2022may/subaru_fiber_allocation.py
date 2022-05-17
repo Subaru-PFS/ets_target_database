@@ -23,34 +23,6 @@ import pointing_utils.dbutils as dbutils
 import pointing_utils.designutils as designutils
 import pointing_utils.nfutils as nfutils
 
-# import ets_fiber_assigner.netflow as nf
-# import matplotlib.path as mppath
-# import pfs.datamodel
-# import psycopg2
-# import psycopg2.extras
-# import tempfile
-# import time
-# from astropy import units as u
-# from astropy.table import Table
-# from pointing_utils import gen_list_from_gaiadb
-# from pointing_utils import gen_list_from_targetdb
-# from ets_shuffle import query_utils
-# from ets_shuffle.convenience import flag_close_pairs
-# from ets_shuffle.convenience import guidecam_geometry
-# from ets_shuffle.convenience import update_coords_for_proper_motion
-# from ics.cobraOps.Bench import Bench
-# from ics.cobraOps.BlackDotsCalibrationProduct import BlackDotsCalibrationProduct
-# from ics.cobraOps.cobraConstants import NULL_TARGET_ID
-# from ics.cobraOps.cobraConstants import NULL_TARGET_POSITION
-# from ics.cobraOps.CollisionSimulator2 import CollisionSimulator2
-# from ics.cobraOps.TargetGroup import TargetGroup
-# from pfs.utils.coordinates.CoordTransp import CoordinateTransform as ctrans
-# from pfs.utils.coordinates.CoordTransp import ag_pfimm_to_pixel
-# from pfs.utils.pfsDesignUtils import makePfsDesign
-# from procedures.moduleTest.cobraCoach import CobraCoach
-# from targetdb import targetdb
-
-
 # The following line seems to be needed to avoid IERS errors,
 # though the default config is already `auto_download=True`.
 iers.conf.auto_download = True
@@ -376,8 +348,6 @@ def main():
         tgt_class_dict,
         arms=args.arms,
         df_raster=df_raster,
-        # tbl_targets,
-        # tbl_fluxstds,
         is_no_target=is_no_target,
     )
     guidestars = designutils.generate_guidestars_from_gaiadb(

@@ -52,6 +52,8 @@ def generate_pfs_design(
     df_raster=None,
     is_no_target=False,
 ):
+    is_raster = df_raster is not None
+
     # n_fiber = len(FiberIds().scienceFiberId)
     # NOTE: fiberID starts with 1 (apparently; TBC).
     # fiber_id = np.arange(n_fiber, dtype=int) + 1
@@ -171,6 +173,29 @@ def generate_pfs_design(
                 ]
             # psf_flux[i_fiber] = df_fluxstds["psfFlux"][idx_fluxstd][0]
             # filter_names[i_fiber] = df_fluxstds["filterNames"][idx_fluxstd][0].tolist()
+
+            if is_raster:
+                idx_raster = np.logical_and(
+                    df_raster["obj_id"] == np.int64(tgt[tidx].ID),
+                    df_raster["target_type_id"]
+                    == tgt_class_dict[tgt[tidx].targetclass],
+                )
+                if np.any(idx_raster):
+                    cat_id[i_fiber] = df_raster["input_catalog_id"][idx_raster].values[
+                        0
+                    ]
+                    dict_of_flux_lists["psf_flux"][i_fiber] = np.array(
+                        [
+                            df_raster["g_flux_njy"][idx_raster].values[0],
+                            df_raster["bp_flux_njy"][idx_raster].values[0],
+                            df_raster["rp_flux_njy"][idx_raster].values[0],
+                        ]
+                    )
+                    dict_of_flux_lists["filter_names"][i_fiber] = [
+                        "g_gaia",
+                        "bp_gaia",
+                        "rp_gaia",
+                    ]
 
     # print(dict_of_flux_lists)
 
