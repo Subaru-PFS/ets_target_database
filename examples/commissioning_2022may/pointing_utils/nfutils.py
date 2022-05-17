@@ -297,10 +297,13 @@ def fiber_allocation(
 
     targets = []
 
+    min_exptime, max_exptime_targets, max_exptime_raster = 10.0, 0.0, 0.0
+
     if not df_targets.empty:
         targets += register_objects(
             df_targets, target_class="sci", force_exptime=force_exptime
         )
+        max_exptime_targets = df_targets["effective_exptime"].max()
 
     # print(len(targets))
 
@@ -309,6 +312,7 @@ def fiber_allocation(
         targets += register_objects(
             df_raster, target_class="sci", force_exptime=force_exptime
         )
+        max_exptime_raster = df_raster["effective_exptime"].max()
 
     # print(len(targets))
 
@@ -391,8 +395,9 @@ def fiber_allocation(
     if force_exptime is not None:
         exptime = force_exptime
     else:
-        exptime = df_targets["effective_exptime"][0]
+        exptime = max([min_exptime, max_exptime_targets, max_exptime_raster])
 
+    # print(exptime)
     # exit()
 
     # if math.isclose(
@@ -415,8 +420,6 @@ def fiber_allocation(
     else:
         is_no_target = False
         # get focal plane positions for all targets and all visits
-        # for i in range(len(targets)):
-        # print(targets[i].pmra, targets[i].pmdec, targets[i].parallax)
         target_fppos = [tele.get_fp_positions(targets) for tele in telescopes]
 
     res = run_netflow(
