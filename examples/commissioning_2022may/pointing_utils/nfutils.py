@@ -362,7 +362,10 @@ def fiber_allocation(
             calibration_product.status[cobra_id] = ~PFIDesign.COBRA_OK_MASK
 
     # load Bench with the updated calibration products
-    bench = Bench(layout="full", calibrationProduct=calibration_product)
+    bench = Bench(
+        layout="calibration",
+        calibrationProduct=calibration_product,
+    )
 
     # create the dictionary containing the costs and constraints for all classes
     # of targets
