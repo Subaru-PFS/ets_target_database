@@ -203,9 +203,30 @@ def check_calibstars(
     if not is_matched:
         logger.warning("No match found in the pfsDesign.")
 
+    # create plot if the flag is True
+    if plotfile is not None:
+        # stylesheet="seaborn-colorblind"
+        # stylesheet = "tableau-colorblind10"
+        logger.info(f"Plot is created as {plotfile}")
+        plot_pfi_design(
+            pfs_design,
+            plotfile=plotfile,
+            fiber_id_matched=fiber_id_matched,
+            obj_id_matched=obj_id_matched,
+        )
+    else:
+        logger.info("No plot is created")
+
     # calculate a distance to the nearest neighbor cobra in a given spectrograph
     # FIXME: this is very inefficient search, I guess.
     if sm is not None:
+
+        for i_matched, fiber_id in enumerate(fiber_id_matched):
+            if sm_matched[i_matched] == sm:
+                logger.info(
+                    f"🎉 Congratulations! The investigated object is already in SM{sm[0]}."
+                )
+                return is_matched
 
         hdu_design = fits.open(pfs_design)
 
@@ -260,12 +281,6 @@ def check_calibstars(
 
         for i_matched, fiber_id in enumerate(fiber_id_matched):
 
-            if sm_matched[i_matched] == sm:
-                logger.info(
-                    f"Congratulations! The investigated object is already in SM{sm[0]}."
-                )
-                continue
-
             idx_fiber = tb_design["fiberId"] == fiber_id
             x_alloc, y_alloc = tb_design["pfiNominal"][idx_fiber].value[0]
             d_cobras2 = np.power(x_cobras - x_alloc, 2) + np.power(
@@ -313,20 +328,6 @@ def check_calibstars(
                 pa: {hdu_design[0].header['POSANG']}
                 """
             )
-
-    # create plot if the flag is True
-    if plotfile is not None:
-        # stylesheet="seaborn-colorblind"
-        # stylesheet = "tableau-colorblind10"
-        logger.info(f"Plot is created as {plotfile}")
-        plot_pfi_design(
-            pfs_design,
-            plotfile=plotfile,
-            fiber_id_matched=fiber_id_matched,
-            obj_id_matched=obj_id_matched,
-        )
-    else:
-        logger.info("No plot is created")
 
     return is_matched
 
