@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 
 import argparse
+import os
 
+import matplotlib.pyplot as plt
 import numpy as np
 import toml
 from astropy.table import Table
@@ -42,13 +44,91 @@ def load_ref_catalog(infile, db):
     return dfref
 
 
-def load_design(pfs_design, db):
+def load_design(pfs_design):
     logger.info(f"Load the pfsDesign file ({pfs_design})")
     tb = Table.read(pfs_design, hdu=1)
     return tb
 
 
-def check_calibstars(pfs_design, conf=None, ref=None):
+def plot_pfi_design(
+    pfs_design,
+    # tb_design,
+    plotfile="test_pfi_design.pdf",
+    fiber_id_matched=None,
+    obj_id_matched=None,
+    gfm=FiberIds(),
+    stylesheet="tableau-colorblind10",
+    xmin=-250,
+    xmax=250,
+    ymin=-250,
+    ymax=250,
+):
+    # NOTE: the result is an astropy.Table object
+    tb_design = load_design(pfs_design)
+
+    x_alloc = np.full(len(gfm.fiberId), np.nan)
+    y_alloc = np.full(len(gfm.fiberId), np.nan)
+
+    for i in range(x_alloc.size):
+        idx_fiber = tb_design["fiberId"] == gfm.fiberId[i]
+        if np.any(idx_fiber):
+            x_alloc[i], y_alloc[i] = tb_design["pfiNominal"][idx_fiber][0]
+
+    with plt.style.context(stylesheet):
+        fig, ax = plt.subplots(figsize=(8, 8))
+        ax.set_aspect("equal", "box")
+
+        for i_sm in range(4):
+            idx_sm = gfm.spectrographId == (i_sm + 1)
+            ax.scatter(
+                gfm.x[idx_sm],
+                gfm.y[idx_sm],
+                s=5 ** 2,
+                c="none",
+                marker="o",
+                edgecolors=f"C{i_sm}",
+                linewidth=0.1,
+                label=f"SM{i_sm +1} (gfm)",
+            )
+
+        for i_sm in range(4):
+            idx_sm = gfm.spectrographId == (i_sm + 1)
+            ax.scatter(
+                x_alloc[idx_sm],
+                y_alloc[idx_sm],
+                s=5 ** 2,
+                c=f"C{i_sm}",
+                marker="o",
+                edgecolors="none",
+                label=f"SM{i_sm +1} (design)",
+            )
+
+        for i_match in range(len(fiber_id_matched)):
+            idx_matched = tb_design["fiberId"] == fiber_id_matched[i_match]
+            ax.scatter(
+                [tb_design["pfiNominal"][idx_matched][0][0]],
+                [tb_design["pfiNominal"][idx_matched][0][1]],
+                s=7.5 ** 2,
+                c="orangered",
+                marker="o",
+                alpha=0.75,
+                label=f"obj_id: {obj_id_matched[i_match]}",
+            )
+
+        ax.set_xlim(xmin, xmax)
+        ax.set_ylim(ymin, ymax)
+
+        ax.set_xlabel("X (PFI mm)")
+        ax.set_ylabel("Y (PFI mm)")
+
+        ax.legend(bbox_to_anchor=(1, 1), loc="upper left", frameon=False)
+
+        ax.set_title(f"{os.path.basename(pfs_design)}")
+
+        plt.savefig(plotfile, bbox_inches="tight")
+
+
+def check_calibstars(pfs_design, plotfile, conf=None, ref=None, make_plot=True):
 
     config = toml.load(conf)
 
@@ -60,7 +140,7 @@ def check_calibstars(pfs_design, conf=None, ref=None):
     df_ref = load_ref_catalog(ref, db)
 
     # NOTE: the result is an astropy.Table object
-    tb_design = load_design(pfs_design, db)
+    tb_design = load_design(pfs_design)
 
     logger.info("Load the grand fiber map")
     gfm = FiberIds()  # 2604
@@ -68,11 +148,16 @@ def check_calibstars(pfs_design, conf=None, ref=None):
     logger.info("Check reference objects in pfsDesign")
     is_matched = False
 
+    fiber_id_matched = []
+    obj_id_matched = []
+
     for i in range(df_ref.index.size):
         idx_match = tb_design["objId"] == df_ref["obj_id"][i]
         if np.any(idx_match):
             is_matched = True
             fiber_id = tb_design["fiberId"][idx_match].value[0]
+            fiber_id_matched.append(fiber_id)
+            obj_id_matched.append(tb_design["objId"][idx_match].value[0])
             logger.info(
                 f"""Match in the catalog found!
                 obj_id (ref): {df_ref['obj_id'][i]}
@@ -92,6 +177,19 @@ def check_calibstars(pfs_design, conf=None, ref=None):
     if not is_matched:
         logger.warning("No match found in the pfsDesign.")
 
+    if plotfile is not None:
+        # stylesheet="seaborn-colorblind"
+        # stylesheet = "tableau-colorblind10"
+        logger.info(f"Plot is created as {plotfile}")
+        plot_pfi_design(
+            pfs_design,
+            plotfile=plotfile,
+            fiber_id_matched=fiber_id_matched,
+            obj_id_matched=obj_id_matched,
+        )
+    else:
+        logger.info("No plot is created")
+
     return is_matched
 
 
@@ -101,6 +199,12 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "pfs_design", type=str, help="pfsDesign file with the full path."
+    )
+    parser.add_argument(
+        "--plotfile",
+        type=str,
+        default=None,
+        help="Output filename with the full path for a PFI plot (default: None)",
     )
     parser.add_argument(
         "--conf",
@@ -117,4 +221,4 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    is_matched = check_calibstars(args.pfs_design, args.conf, args.ref)
+    is_matched = check_calibstars(args.pfs_design, args.plotfile, args.conf, args.ref)
