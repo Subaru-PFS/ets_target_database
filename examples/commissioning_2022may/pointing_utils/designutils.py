@@ -51,6 +51,7 @@ def generate_pfs_design(
     n_fiber=2394,
     df_raster=None,
     is_no_target=False,
+    design_name=None,
 ):
     is_raster = df_raster is not None
 
@@ -223,7 +224,7 @@ def generate_pfs_design(
         filterNames=dict_of_flux_lists["filter_names"],
         # filterNames=filter_names,
         # guideStars=None,
-        # designName=None,
+        designName=design_name,
     )
 
     return pfs_design

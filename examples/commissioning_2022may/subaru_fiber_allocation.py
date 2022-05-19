@@ -75,6 +75,12 @@ def get_arguments():
         default=None,
         help="Override the exptime (seconds) obtained from the database (default: None)",
     )
+    parser.add_argument(
+        "--design_name",
+        type=str,
+        default=None,
+        help="Human-readable design name (default: None)",
+    )
 
     # configuration file
     parser.add_argument(
@@ -349,6 +355,7 @@ def main():
         arms=args.arms,
         df_raster=df_raster,
         is_no_target=is_no_target,
+        design_name=args.design_name,
     )
     guidestars = designutils.generate_guidestars_from_gaiadb(
         args.ra,
