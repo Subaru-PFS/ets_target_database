@@ -59,9 +59,9 @@ def load_ref_catalog(infile, db):
     return dfref
 
 
-def load_design(pfs_design):
+def load_design(pfs_design, hdu=1):
     logger.info(f"Load the pfsDesign file ({pfs_design})")
-    tb = Table.read(pfs_design, hdu=1)
+    tb = Table.read(pfs_design, hdu=hdu)
     return tb
 
 
@@ -73,10 +73,10 @@ def plot_pfi_design(
     obj_id_matched=None,
     gfm=FiberIds(),
     stylesheet="tableau-colorblind10",
-    xmin=-250,
-    xmax=250,
-    ymin=-250,
-    ymax=250,
+    xmin=-300,
+    xmax=300,
+    ymin=-300,
+    ymax=300,
 ):
     # NOTE: the result is an astropy.Table object
     tb_design = load_design(pfs_design)
@@ -88,6 +88,20 @@ def plot_pfi_design(
         idx_fiber = tb_design["fiberId"] == gfm.fiberId[i]
         if np.any(idx_fiber):
             x_alloc[i], y_alloc[i] = tb_design["pfiNominal"][idx_fiber][0]
+
+    hdu_design = fits.open(pfs_design)
+
+    radec_guide = np.array(
+        [[r, d] for r, d in zip(hdu_design[3].data["ra"], hdu_design[3].data["dec"])]
+    )
+    xyout_guide = CoordinateTransform(
+        radec_guide.T,
+        "sky_pfi",
+        pa=hdu_design[0].header["POSANG"],
+        cent=np.array(
+            [hdu_design[0].header["RA"], hdu_design[0].header["DEC"]],
+        ).reshape((2, 1)),
+    )
 
     with plt.style.context(stylesheet):
         fig, ax = plt.subplots(figsize=(8, 8))
@@ -130,6 +144,18 @@ def plot_pfi_design(
                 label=f"obj_id: {obj_id_matched[i_match]}",
             )
 
+        ax.scatter(
+            xyout_guide[0],
+            xyout_guide[1],
+            s=10 ** 2,
+            c="orange",
+            marker="*",
+            edgecolors="0.2",
+            alpha=0.75,
+            linewidth=0.25,
+            label=f"guide stars",
+        )
+
         ax.set_xlim(xmin, xmax)
         ax.set_ylim(ymin, ymax)
 
@@ -140,7 +166,7 @@ def plot_pfi_design(
 
         ax.set_title(f"{os.path.basename(pfs_design)}")
 
-        plt.savefig(plotfile, bbox_inches="tight")
+        plt.savefig(plotfile, bbox_inches="tight", dpi=350)
 
 
 def check_calibstars(
