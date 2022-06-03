@@ -83,6 +83,25 @@
 | created_at           | DATETIME | False         | False           | Creation time [YYYY-MM-DDThh:mm:ss] (UTC or HST?) |
 | updated_at           | DATETIME | False         | False           | Update time [YYYY-MM-DDThh:mm:ss] (UTC or HST?)   |
 
+## sky
+
+| name             | type     | primary_key   | autoincrement   | comment                                                       |
+|:-----------------|:---------|:--------------|:----------------|:--------------------------------------------------------------|
+| sky_id           | BIGINT   | True          | True            | Unique identifier for each sky position                       |
+| obj_id           | BIGINT   | False         | False           | Object ID in the sky catalog                                  |
+| obj_id_orig      | VARCHAR  | False         | False           | Original object ID in the sky catalog                         |
+| ra               | FLOAT    | False         | False           | RA (ICRS, degree)                                             |
+| dec              | FLOAT    | False         | False           | Dec (ICRS, degree)                                            |
+| epoch            | VARCHAR  | False         | False           | Epoch (e.g., J2000.0, J2015.5, etc.)                          |
+| tract            | INTEGER  | False         | False           | Tract from HSC-SSP                                            |
+| patch            | INTEGER  | False         | False           | Patch from HSC-SSP                                            |
+| target_type_id   | INTEGER  | False         | False           | target_type_id from the target_type table (must be 2 for SKY) |
+| input_catalog_id | INTEGER  | False         | False           | input_catalog_id from the input_catalog table                 |
+| mag_thresh       | FLOAT    | False         | False           | Sky intensity threshold in mag/arcsec^2 (only for HSC-SSP).   |
+| version          | VARCHAR  | False         | False           | Version string of the sky position                            |
+| created_at       | DATETIME | False         | False           |                                                               |
+| updated_at       | DATETIME | False         | False           |                                                               |
+
 ## target
 
 | name                   | type     | primary_key   | autoincrement   | comment                                                                                               |
@@ -93,6 +112,9 @@
 | ra                     | FLOAT    | False         | False           | RA (ICRS, degree)                                                                                     |
 | dec                    | FLOAT    | False         | False           | Dec (ICRS, degree)                                                                                    |
 | epoch                  | VARCHAR  | False         | False           | Epoch (default: J2000.0)                                                                              |
+| parallax               | FLOAT    | False         | False           | Parallax (mas)                                                                                        |
+| pmra                   | FLOAT    | False         | False           | Proper motion in right ascension direction (mas/yr)                                                   |
+| pmdec                  | FLOAT    | False         | False           | Proper motion in declination direction (mas/yr)                                                       |
 | tract                  | INTEGER  | False         | False           | same definition as HSC-SSP?; can be derived from the coordinate                                       |
 | patch                  | INTEGER  | False         | False           | same definition as HSC-SSP?; can be derived from the coordinate; Note that it's defined as an integer |
 | target_type_id         | INTEGER  | False         | False           |                                                                                                       |

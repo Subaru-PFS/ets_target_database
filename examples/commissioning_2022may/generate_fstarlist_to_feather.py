@@ -1,7 +1,9 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import os
+import socket
 
+import numpy as np
 import pandas as pd
 
 
@@ -10,9 +12,10 @@ def main(
     out_prefix,
     outdir=".",
     nline=None,
-    proposal_id=None,
     catalog_name=None,
     version=None,
+    brightest_mags=None,
+    faintest_mags=None,
 ):
 
     # df = pd.read_csv(csv, comment="#")
@@ -38,7 +41,6 @@ def main(
     df.rename(columns=column_mapper, inplace=True)
     print(df)
 
-    df["proposal_id"] = [proposal_id] * n_target
     df["target_type_name"] = ["FLUXSTD"] * n_target
     df["input_catalog_name"] = [catalog_name] * n_target
     df["version"] = [version] * n_target
@@ -51,10 +53,23 @@ def main(
 
     print(df)
 
+    is_good = np.ones(n_target)
+    for band in ["g", "r", "i", "z", "y"]:
+        is_good = is_good & df[f"psf_mag_{band}"].between(
+            brightest_mags[band], faintest_mags[band], inclusive="both"
+        )
+
+    df = df[is_good].copy()
+
+    n_target_magcut = len(df.index)
+
+    print(f"Number of objects before magnitude cut: {n_target}")
+    print(f"Number of objects after magnitude cut : {n_target_magcut}")
+
     i_out = 0
     index_begin = 0
 
-    while index_begin + nline < n_target:
+    while index_begin + nline < n_target_magcut:
 
         out_feather = os.path.join(
             outdir, "{:s}-{:08d}.feather".format(out_prefix, i_out)
@@ -75,12 +90,24 @@ def main(
 
 if __name__ == "__main__":
 
-    csv = "../../../../star_catalogs_ishigaki/commissioning_2022may/Fstar_v1.0_probfstar0.5.csv"
-    out_prefix = "target_fstars_v1.0_s22a-en16"
-    out_dir = "../../../../star_catalogs_ishigaki/commissioning_2022may/feather"
+    hostname = socket.gethostname()
+
+    if hostname == "pfsa-usr01-gb.subaru.nao.ac.jp":
+        csv = "Fstar_v1.0.csv"
+    else:
+        csv = "Fstar_v1.0_probfstar0.5.csv"
+
+    work_dir = "../../../external_data/commissioning_2022may/fluxstd_ishigaki/"
+    out_prefix = "fluxstd_v1.0"
+
+    csv = os.path.join(work_dir, csv)
+    out_dir = os.path.join(work_dir, "feather")
+
     catalog_name = "gaia_edr3"
-    proposal_id = "S22A-EN16"
     version = "1.0"
+
+    brightest_mags = {"g": 14.0, "r": 14.0, "i": 14.0, "z": 14.0, "y": 14.0}
+    faintest_mags = {"g": np.inf, "r": np.inf, "i": np.inf, "z": np.inf, "y": np.inf}
 
     nline = 1000000
 
@@ -89,7 +116,8 @@ if __name__ == "__main__":
         out_prefix,
         outdir=out_dir,
         nline=nline,
-        proposal_id=proposal_id,
         catalog_name=catalog_name,
         version=version,
+        brightest_mags=brightest_mags,
+        faintest_mags=faintest_mags,
     )

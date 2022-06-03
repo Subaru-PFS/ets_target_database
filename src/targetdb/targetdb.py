@@ -37,21 +37,35 @@ class TargetDB(object):
         self.session.close()
         # print('connection to {0} closed'.format(self.dbinfo))
 
-    def reset(self, full=True):
+    def reset_all(self, full=True):
         #
         # Order of the resetting tables is important
         #
         self.session.query(models.cluster).delete()
         self.session.query(models.target).delete()
         self.session.query(models.fluxstd).delete()
+        self.session.query(models.sky).delete()
         self.session.query(models.proposal).delete()
         self.session.query(models.input_catalog).delete()
         self.session.query(models.target_type).delete()
         self.session.query(models.proposal_category).delete()
         self.session.execute("ALTER SEQUENCE target_target_id_seq RESTART WITH 1")
         self.session.execute("ALTER SEQUENCE fluxstd_fluxstd_id_seq RESTART WITH 1")
+        self.session.execute("ALTER SEQUENCE sky_sky_id_seq RESTART WITH 1")
 
         self.session.commit()
+
+    def reset_target(self):
+        self.session.query(models.target).delete()
+        self.session.execute("ALTER SEQUENCE target_target_id_seq RESTART WITH 1")
+
+    def reset_fluxstd(self):
+        self.session.query(models.fluxstd).delete()
+        self.session.execute("ALTER SEQUENCE fluxstd_fluxstd_id_seq RESTART WITH 1")
+
+    def reset_sky(self):
+        self.session.query(models.sky).delete()
+        self.session.execute("ALTER SEQUENCE sky_sky_id_seq RESTART WITH 1")
 
     def rollback(self):
         self.session.rollback()

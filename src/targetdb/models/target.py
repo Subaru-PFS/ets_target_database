@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from sqlalchemy import BigInteger
 from sqlalchemy import Boolean
@@ -42,6 +42,16 @@ class target(Base):
     )
     epoch = Column(String, default="J2000.0", comment="Epoch (default: J2000.0)")
 
+    parallax = Column(Float, default=1e-7, comment="Parallax (mas)")
+    pmra = Column(
+        Float,
+        default=0.0,
+        comment="Proper motion in right ascension direction (mas/yr)",
+    )
+    pmdec = Column(
+        Float, default=0.0, comment="Proper motion in declination direction (mas/yr)"
+    )
+
     tract = Column(
         Integer,
         comment="same definition as HSC-SSP?; can be derived from the coordinate",
@@ -79,6 +89,13 @@ class target(Base):
     psf_flux_z = Column(Float, comment="z-band PSF flux (nJy)")
     psf_flux_y = Column(Float, comment="y-band PSF flux (nJy)")
     psf_flux_j = Column(Float, comment="J band PSF flux (nJy)")
+
+    filter_g = Column(String, comment="g-band filter (g_hsc, g_ps1, g_sdss, etc.)")
+    filter_r = Column(String, comment="r-band filter (r_hsc, r_ps1, r_sdss, etc.)")
+    filter_i = Column(String, comment="i-band filter (i_hsc, i_ps1, i_sdss, etc.)")
+    filter_z = Column(String, comment="z-band filter (z_hsc, z_ps1, z_sdss, etc.)")
+    filter_y = Column(String, comment="y-band filter (y_hsc, y_ps1, y_sdss, etc.)")
+    filter_j = Column(String, comment="j-band filter (j_mko, etc.)")
 
     priority = Column(
         Float,
@@ -134,6 +151,7 @@ class target(Base):
         patch,
         target_type_id,
         input_catalog_id,
+        #
         fiber_mag_g,
         fiber_mag_r,
         fiber_mag_i,
@@ -155,6 +173,12 @@ class target(Base):
         psf_flux_y,
         psf_flux_j,
         #
+        filter_g,
+        filter_r,
+        filter_i,
+        filter_z,
+        filter_y,
+        filter_j,
         #
         priority,
         effective_exptime,
@@ -199,6 +223,13 @@ class target(Base):
         self.psf_flux_z = psf_flux_z
         self.psf_flux_y = psf_flux_y
         self.psf_flux_j = psf_flux_j
+        #
+        self.filter_g = filter_g
+        self.filter_r = filter_r
+        self.filter_i = filter_i
+        self.filter_z = filter_z
+        self.filter_y = filter_y
+        self.filter_j = filter_j
         #
         self.priority = priority
         self.effective_exptime = effective_exptime

@@ -4,30 +4,43 @@ import argparse
 import configparser
 import datetime
 import os
+
+# import pprint
 import sys
 
-import astropy.units as u
-import numpy as np
+# import astropy.units as u
+# import numpy as np
 import pandas as pd
-from astropy.coordinates import SkyCoord
-from astropy.coordinates import search_around_sky
+import toml
+
+# from astropy.coordinates import SkyCoord
+# from astropy.coordinates import search_around_sky
+from astropy.table import Table
 from logzero import logger
-from targetdb import models
+
+# from targetdb import models
 from targetdb import targetdb
 
 
 def get_arguments():
     parser = argparse.ArgumentParser(description="Test targetDB API")
+
     parser.add_argument(
         "conf",
         type=str,
-        help="Config file for targetDB",
+        help="Config file for targetDB (required)",
     )
+
+    # Option to reset tables
     parser.add_argument(
         "--reset",
-        action="store_true",
-        help="Reset all tables in targetdb before playing with it. (Default: False)",
+        # action="store_true",
+        nargs="*",
+        metavar="all, target, fluxstd, sky",
+        help="Reset one or more tables in targetdb before playing with it. Possible values are 'all', 'target', 'fluxstd', 'sky' ",
     )
+
+    # Add skip flags to populate tables
     parser.add_argument(
         "--skip_proposal_category",
         action="store_true",
@@ -59,14 +72,53 @@ def get_arguments():
         help="Skip inserting test data into the fluxstd table (default: False)",
     )
     parser.add_argument(
+        "--skip_sky",
+        action="store_true",
+        help="Skip inserting test data into the sky table (default: False)",
+    )
+
+    # Specify input data when populating tables
+    parser.add_argument(
+        "--proposal_category",
+        default=None,
+        type=str,
+        help="Input CSV file for proposal categories (default: None)",
+    )
+    parser.add_argument(
+        "--proposal",
+        default=None,
+        type=str,
+        help="Input CSV file for proposals (default: None)",
+    )
+    parser.add_argument(
+        "--input_catalog",
+        default=None,
+        type=str,
+        help="Input CSV file for input catalogs (default: None)",
+    )
+    parser.add_argument(
+        "--target_type",
+        default=None,
+        type=str,
+        help="Input CSV file for target types (default: None)",
+    )
+    parser.add_argument(
         "--target",
         default=None,
+        type=str,
         help="Sample file for targets (default: None)",
     )
     parser.add_argument(
         "--fluxstd",
         default=None,
+        type=str,
         help="Sample file for fluxstds (default: None)",
+    )
+    parser.add_argument(
+        "--sky",
+        default=None,
+        type=str,
+        help="Sample file for sky (default: None)",
     )
 
     args = parser.parse_args()
@@ -76,13 +128,10 @@ def get_arguments():
 
 def connect_db(conf=None):
 
-    config = configparser.ConfigParser()
-    config.read(conf)
-
-    # print(dict(config["dbinfo"]))
-
-    db = targetdb.TargetDB(**dict(config["dbinfo"]))
-
+    # config = configparser.ConfigParser()
+    # config.read(conf)
+    config = toml.load(conf)
+    db = targetdb.TargetDB(**dict(config["targetdb"]))
     db.connect()
 
     return db
@@ -161,7 +210,7 @@ def insert_proposal(db, csv=None, fetch_table=False):
     return db
 
 
-def insert_target(db, infile=None, fetch_table=False):
+def insert_target(db, infile=None, fetch_table=False, proposal_id=None):
 
     _, ext = os.path.splitext(infile)
 
@@ -171,14 +220,30 @@ def insert_target(db, infile=None, fetch_table=False):
         df = pd.read_csv(infile)
     elif ext == ".feather":
         df = pd.read_feather(infile)
+    elif ext == ".fits":
+        tb = Table.read(infile)
+        df = tb.to_pandas()
+        # FITS binary table's string is in bytecode. It has to be converted to utf-8.
+        df["input_catalog"] = df["input_catalog"].apply(lambda x: x.decode())
+        df["epoch"] = df["epoch"].apply(lambda x: x.decode())
+    elif ext == ".ecsv":
+        tb = Table.read(infile, format="ascii.ecsv")
+        df = tb.to_pandas()
     else:
         logger.error("Filetype {:s} is not supported. Abort.".format(ext))
+
+    df.rename(
+        columns={"object_id": "obj_id", "input_catalog": "input_catalog_name"},
+        inplace=True,
+    )
 
     # copy dataframe (may not be needed)
     df_target_tmp = df.copy()
 
-    # add target_type_name as SCIENCE by default for openuse proposals
-    # df_target_tmp["target_type_name"] = ["SCIENCE"] * len(df_target_tmp.index)
+    if proposal_id is not None:
+        df_target_tmp["proposal_id"] = [proposal_id] * len(df_target_tmp.index)
+
+    df_target_tmp["target_type_name"] = ["SCIENCE"] * len(df_target_tmp.index)
 
     backref_tables = ["proposal", "input_catalog", "target_type"]
     backref_keys = ["proposal_id", "input_catalog_name", "target_type_name"]
@@ -232,24 +297,66 @@ def insert_fluxstd(db, infile=None, fetch_table=False):
     return db
 
 
+def insert_sky(db, infile=None, fetch_table=False):
+
+    _, ext = os.path.splitext(infile)
+
+    logger.info("Loading data from {:s}".format(infile))
+
+    if ext == ".csv":
+        df = pd.read_csv(infile)
+    elif ext == ".feather":
+        df = pd.read_feather(infile)
+    else:
+        logger.error("Filetype {:s} is not supported. Abort.".format(ext))
+
+    # copy dataframe (may not be needed)
+    df_tmp = df.copy()
+
+    backref_tables = ["input_catalog", "target_type"]
+    backref_keys = ["input_catalog_name", "target_type_name"]
+    backref_check_keys = ["input_catalog_id", "target_type_id"]
+
+    for i in range(len(backref_tables)):
+        df_tmp = join_backref_values(
+            df_tmp,
+            db=db,
+            table=backref_tables[i],
+            key=backref_keys[i],
+            check_key=backref_check_keys[i],
+        )
+
+    db = insert_simple(db, table="sky", df=df_tmp, fetch_table=fetch_table)
+
+    return db
+
+
 def main():
 
     args = get_arguments()
 
-    print(args)
+    logger.info(args)
 
     db = connect_db(args.conf)
 
     if args.reset:
         logger.info("Reset database tables.")
-        db.reset()
+        for reset_scope in args.reset:
+            if reset_scope == "all":
+                db.reset_all()
+            if reset_scope == "target":
+                db.reset_target()
+            if reset_scope == "fluxstd":
+                db.reset_fluxstd()
+            if reset_scope == "sky":
+                db.reset_sky()
 
     if not args.skip_proposal_category:
         logger.info("Inserting sample data into the proposal_category table")
         db = insert_simple(
             db,
             table="proposal_category",
-            csv="data/proposal_category.csv",
+            csv=args.proposal_category,
             fetch_table=True,
         )
 
@@ -257,7 +364,7 @@ def main():
         logger.info("Inserting sample data into the proposal table")
         db = insert_proposal(
             db,
-            csv="data/proposal.csv",
+            csv=args.proposal,
             fetch_table=True,
         )
 
@@ -266,7 +373,7 @@ def main():
         db = insert_simple(
             db,
             table="input_catalog",
-            csv="data/input_catalog.csv",
+            csv=args.input_catalog,
             fetch_table=True,
         )
 
@@ -275,23 +382,26 @@ def main():
         db = insert_simple(
             db,
             table="target_type",
-            csv="data/target_type.csv",
+            csv=args.target_type,
             fetch_table=True,
         )
 
     if not args.skip_target:
         logger.info("Inserting sample data into the target table")
-        db = insert_target(db, infile=args.target, fetch_table=False)
+        db = insert_target(
+            db, infile=args.target, fetch_table=False, proposal_id="S22A-EN16"
+        )
 
     if not args.skip_fluxstd:
         logger.info("Inserting sample data into the fluxstd table")
         db = insert_fluxstd(db, infile=args.fluxstd, fetch_table=False)
 
+    if not args.skip_sky:
+        logger.info("Inserting sample data into the sky table")
+        db = insert_sky(db, infile=args.sky, fetch_table=False)
+
     db.close()
 
 
 if __name__ == "__main__":
-    # conf = "targetdb_config.ini"
-    # reset = True
-    # reset = False
     main()

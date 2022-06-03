@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# set -euxo pipefail
+set -euxo pipefail
 
 ## create DB ##
 # CREATE DATABASE dbname;
@@ -31,6 +31,11 @@ cfg.parser() {
 }
 
 cfg.parser "../../../database_configs/targetdb_config.ini"
+
+if [ $HOSTNAME == "pfsa-usr01-gb.subaru.nao.ac.jp" ]; then
+    cfg.parser "../../../database_configs/targetdb_config_pfsa-db01-gb_commissioning_2022may.ini"
+fi
+
 cfg.section.dbinfo
 cfg.section.schemacrawler
 
@@ -59,6 +64,10 @@ echo ""
 echo "Creating schema:"
 pfs_targetdb_create_schema ${url} ${drop_all}
 echo ""
+
+if [ $HOSTNAME == "pfsa-usr01-gb.subaru.nao.ac.jp" ]; then
+    exit 0
+fi
 
 echo "Writing Markdown tables for the schema"
 pfs_targetdb_generate_mdtable ${schema_md}
