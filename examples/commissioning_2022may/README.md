@@ -1,3 +1,6 @@
+
+> **Note**
+> This README is somewhat obsolete, but still useful, I hope.
 ## Introduction
 
 The fiber allocation script `subaru_fiber_allocation_2021nov.py` is based on the script made by the MPA/MPE team. You should follow their [instruction](https://github.com/Subaru-PFS/ets_fiberalloc/blob/commissioning_demo_2/Commissioning.md) in the [`commissioning_demo_2` branch in the `ets_fiberalloc` repository](https://github.com/Subaru-PFS/ets_fiberalloc/blob/commissioning_demo_2/) about the basic idea.
