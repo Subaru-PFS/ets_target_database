@@ -243,7 +243,7 @@ def generate_guidestars_from_gaiadb(
     fp_radius_degree=260.0 * 10.2 / 3600,  # "Radius" of PFS FoV in degree (?)
     fp_fudge_factor=1.5,  # fudge factor for search widths
     search_radius=None,
-    gaiadb_epoch=2015.0,
+    # gaiadb_epoch=2015.0,
     gaiadb_input_catalog_id=2,
 ):
     # Get ra, dec and position angle from input arguments
@@ -283,6 +283,7 @@ def generate_guidestars_from_gaiadb(
         "parallax": "parallax",
         "pmra": "pmra",
         "pmdec": "pmdec",
+        "epoch": "ref_epoch",
         "mag": "phot_g_mean_mag",
         "color": "bp_rp",
     }
@@ -292,7 +293,7 @@ def generate_guidestars_from_gaiadb(
     conn = connect_subaru_gaiadb(conf)
     cur = conn.cursor()
 
-    query_string = f"""SELECT source_id,ra,dec,parallax,pmra,pmdec,phot_g_mean_mag,bp_rp
+    query_string = f"""SELECT source_id,ra,dec,parallax,pmra,pmdec,ref_epoch,phot_g_mean_mag,bp_rp
     FROM gaia
     WHERE q3c_radial_query(ra, dec, {ra_tel_deg}, {dec_tel_deg}, {search_radius})
     AND {coldict['pmra']} IS NOT NULL
@@ -315,12 +316,19 @@ def generate_guidestars_from_gaiadb(
             "parallax",
             "pmra",
             "pmdec",
+            "ref_epoch",
             "phot_g_mean_mag",
             "bp_rp",
         ],
     )
     cur.close()
     conn.close()
+
+    assert (
+        np.unique(df_res["ref_epoch"]).size == 1
+    ), "Non-unique epochs for sources from GaiaDB"
+
+    gaiadb_epoch = np.unique(df_res["ref_epoch"])[0]
 
     res = {}
     for col in df_res.columns:
@@ -388,7 +396,7 @@ def generate_guidestars_from_gaiadb(
             tdict[key] = val[flags]
 
         # eliminate all targets which are not really in the camera's FOV
-        flags = p.contains_points(tdict["xypos"])  # 1mm more
+        flags = p.contains_points(tdict["xypos"])  # exact size
 
         for key, val in tdict.items():
             tdict[key] = val[flags]
