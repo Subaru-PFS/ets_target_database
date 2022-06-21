@@ -337,6 +337,7 @@ def generate_targets_from_gaiadb(
     conn.close()
 
     print(df_res)
+    # df_res.to_csv('gaia.csv')
 
     return df_res
 
@@ -373,5 +374,8 @@ def fixcols_gaiadb_to_targetdb(
     df["g_flux_njy"] = tb["g_mag_ab"].to("nJy").value
     df["bp_flux_njy"] = tb["bp_mag_ab"].to("nJy").value
     df["rp_flux_njy"] = tb["rp_mag_ab"].to("nJy").value
+
+    df["priority"] = np.array(tb["g_mag_ab"].value, dtype=int)
+    df["priority"][tb["g_mag_ab"].value > 12] = 9999
 
     return df

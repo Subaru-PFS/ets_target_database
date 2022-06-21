@@ -372,8 +372,64 @@ def fiber_allocation(
     # For the purpose of this demonstration we assume that all targets are
     # scientific targets with priority 1.
     class_dict = {
+        # Priorities correspond to the magnitudes of bright stars (in most case for the 2022 June Engineering)
         "sci_P1": {
+            "nonObservationCost": 40000000000,
+            "partialObservationCost": 100,
+            "calib": False,
+        },
+        "sci_P2": {
+            "nonObservationCost": 20000000000,
+            "partialObservationCost": 100,
+            "calib": False,
+        },
+        "sci_P3": {
+            "nonObservationCost": 10000000000,
+            "partialObservationCost": 100,
+            "calib": False,
+        },
+        "sci_P4": {
+            "nonObservationCost": 1000000000,
+            "partialObservationCost": 100,
+            "calib": False,
+        },
+        "sci_P5": {
+            "nonObservationCost": 100000000,
+            "partialObservationCost": 100,
+            "calib": False,
+        },
+        "sci_P6": {
+            "nonObservationCost": 10000000,
+            "partialObservationCost": 100,
+            "calib": False,
+        },
+        "sci_P7": {
+            "nonObservationCost": 1000000,
+            "partialObservationCost": 100,
+            "calib": False,
+        },
+        "sci_P8": {
+            "nonObservationCost": 100000,
+            "partialObservationCost": 100,
+            "calib": False,
+        },
+        "sci_P9": {
             "nonObservationCost": 10000,
+            "partialObservationCost": 100,
+            "calib": False,
+        },
+        "sci_P10": {
+            "nonObservationCost": 1000,
+            "partialObservationCost": 100,
+            "calib": False,
+        },
+        "sci_P11": {
+            "nonObservationCost": 100,
+            "partialObservationCost": 100,
+            "calib": False,
+        },
+        "sci_P12": {
+            "nonObservationCost": 10,
             "partialObservationCost": 100,
             "calib": False,
         },
@@ -393,7 +449,11 @@ def fiber_allocation(
             "calib": True,
         },
     }
-    target_class_dict = {"sci_P1": 1, "sci_P9999": 1, "sky": 2, "cal": 3}
+    target_class_dict = {}
+    for i in range(1, 13, 1):
+        target_class_dict[f"sci_P{i}"] = 1
+    target_class_dict = {**target_class_dict, **dict(sci_P9999=1, sky=2, cal=3)}
+    # target_class_dict = {"sci_P1": 1, "sci_P9999": 1, "sky": 2, "cal": 3}
 
     if force_exptime is not None:
         exptime = force_exptime

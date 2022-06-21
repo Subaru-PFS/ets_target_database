@@ -106,6 +106,12 @@ def get_arguments():
 
     # guide stars
     parser.add_argument(
+        "--guidestar_mag_min",
+        type=float,
+        default=12.0,
+        help="minimum magnitude for guide star candidates (default: 12.)",
+    )
+    parser.add_argument(
         "--guidestar_mag_max",
         type=float,
         default=19.0,
@@ -303,7 +309,7 @@ def main():
             band_select="phot_g_mean_mag",
             mag_min=args.raster_mag_min,
             mag_max=args.raster_mag_max,
-            good_astrometry=True,
+            good_astrometry=False,  # select bright stars which may have large astrometric errors.
         )
         df_raster = dbutils.fixcols_gaiadb_to_targetdb(
             df_raster,
@@ -364,6 +370,7 @@ def main():
         args.observation_time,
         args.telescope_elevation,
         conf=conf,
+        guidestar_mag_min=args.guidestar_mag_min,
         guidestar_mag_max=args.guidestar_mag_max,
         guidestar_neighbor_mag_min=args.guidestar_neighbor_mag_min,
         guidestar_minsep_deg=args.guidestar_minsep_deg,

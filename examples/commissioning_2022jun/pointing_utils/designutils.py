@@ -237,6 +237,7 @@ def generate_guidestars_from_gaiadb(
     observation_time,
     telescope_elevation=None,
     conf=None,
+    guidestar_mag_min=12.0,
     guidestar_mag_max=19.0,
     guidestar_neighbor_mag_min=21.0,
     guidestar_minsep_deg=1.0 / 3600,
@@ -390,7 +391,9 @@ def generate_guidestars_from_gaiadb(
             tdict[key] = val[np.invert(flags)]
 
         # eliminate all targets which are not bright enough to be guide stars
-        flags = tdict["phot_g_mean_mag"] < guidestar_mag_max
+        flags = (tdict["phot_g_mean_mag"] > guidestar_mag_min) * (
+            tdict["phot_g_mean_mag"] < guidestar_mag_max
+        )
 
         for key, val in tdict.items():
             tdict[key] = val[flags]
