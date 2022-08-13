@@ -340,7 +340,7 @@ def generate_guidestars_from_gaiadb(
     # # potentially too-bright neighbours
 
     # # adjust for proper motion
-    epoch = Time(observation_time).jyear
+    # epoch = Time(observation_time).jyear
     # res[racol], res[deccol] = update_coords_for_proper_motion(
     #     res[racol],
     #     res[deccol],
