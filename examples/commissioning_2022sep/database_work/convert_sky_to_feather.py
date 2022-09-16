@@ -27,8 +27,8 @@ def main(work_dir, work_subdirs, catalog_names, out_dir, version):
 
         json_files = glob.glob(os.path.join(dir_path, "*.json*"))
 
-        # for i in range(len(json_files)):
-        for i in range(1):
+        for i in range(len(json_files)):
+            # for i in range(1):
 
             file_basename = os.path.basename(json_files[i])
 
@@ -48,7 +48,7 @@ def main(work_dir, work_subdirs, catalog_names, out_dir, version):
 
             n_obj = len(data["objid"])
 
-            if ("imgfile" in json_keys) and (imgfile is not None):
+            if ("imgfile" in json_keys) and (data["imgfile"] is not None):
                 logger.info(
                     "imgfile is found. trying to extract tract/patch information."
                 )
@@ -85,7 +85,7 @@ def main(work_dir, work_subdirs, catalog_names, out_dir, version):
                     "patch": patch,
                     "target_type_name": ["SKY"] * n_obj,
                     "input_catalog_name": [catalog_name] * n_obj,
-                    "mag_thresh": [data["magThresh"]] * n_obj,
+                    "mag_thresh": mag_thresh
                     "version": [version] * n_obj,
                 }
             )
