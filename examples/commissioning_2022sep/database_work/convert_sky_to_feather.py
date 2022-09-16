@@ -85,7 +85,7 @@ def main(work_dir, work_subdirs, catalog_names, out_dir, version):
                     "patch": patch,
                     "target_type_name": ["SKY"] * n_obj,
                     "input_catalog_name": [catalog_name] * n_obj,
-                    "mag_thresh": mag_thresh
+                    "mag_thresh": mag_thresh,
                     "version": [version] * n_obj,
                 }
             )
