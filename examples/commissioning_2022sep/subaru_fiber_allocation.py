@@ -249,6 +249,13 @@ def get_arguments():
         default=[1, 2, 3, 4],
         help="Spectral Modules(1 to 4) to be used (default: 1 2 3 4)",
     )
+    parser.add_argument(
+        "--dot_margin",
+        nargs="+",
+        type=float,
+        default=1.0,
+        help="Margin factor for dot avoidance (default: 1.0)",
+    )
 
     args = parser.parse_args()
 
@@ -346,6 +353,7 @@ def main():
         args.cobra_coach_dir,
         args.cobra_coach_module_version,
         args.sm,
+        args.dot_margin,
         df_raster=df_raster,
         force_exptime=args.exptime,
     )
