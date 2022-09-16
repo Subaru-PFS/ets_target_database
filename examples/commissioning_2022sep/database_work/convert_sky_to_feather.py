@@ -12,12 +12,12 @@ import pandas as pd
 from logzero import logger
 
 
-def my_err_cb(*args):
-    print("error callback args={}".format(args))
+def my_err_cb(json_file):
+    print("ERROR callback args={}".format(json_file))
 
 
-def my_cb(*args):
-    print("callback {}".format(args))
+def my_cb(json_file):
+    print("SUCCESS callback args={}".format(json_file))
 
 
 def convert_sky_json2feather_targetdb(
@@ -238,8 +238,8 @@ if __name__ == "__main__":
     work_subdirs = [
         "skypos_json",
         "ps1_json",
-        "skyobj_220915/Gaia",
         "skyobj_220915/PS1",
+        "skyobj_220915/Gaia",
     ]
     catalog_names = [
         "sky_hscssp_s21a_wide",
