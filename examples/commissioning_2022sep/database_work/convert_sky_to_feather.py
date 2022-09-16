@@ -7,6 +7,7 @@ import os
 
 import numpy as np
 import pandas as pd
+from logzero import logger
 
 
 def main(work_dir, work_subdirs, catalog_names, out_dir, version):
@@ -42,11 +43,36 @@ def main(work_dir, work_subdirs, catalog_names, out_dir, version):
 
             # keys in JSON
             # ['objid', 'ra', 'dec', 'magThresh', 'tract']
-            print(data.keys())
+            json_keys = data.keys()
+            print(json_keys)
 
             n_obj = len(data["objid"])
 
-            # patch = int(data["imgfile"][-8:-5].replace(",", "0"))
+            if ("imgfile" in json_keys) and (imgfile is not None):
+                logger.info(
+                    "imgfile is found. trying to extract tract/patch information."
+                )
+                tract = np.full(n_obj, int(data["imgfile"][-13:-9]), dtype=int)
+                patch = np.full(
+                    n_obj, int(data["imgfile"][-8:-5].replace(",", "0")), dtype=int
+                )
+            elif "tract" in json_keys:
+                logger.info(
+                    "Tract is found in the keys, while patch is not found. Use None for patch."
+                )
+                tract = np.full(n_obj, data["tract"])
+                patch = [None] * n_obj
+            else:
+                logger.warning(
+                    "Both tract and patch information are not found. Use None for them."
+                )
+                tract = [None] * n_obj
+                patch = [None] * n_obj
+
+            if type(data["magThresh"]) is list:
+                mag_thresh = data["magThresh"]
+            else:
+                mag_thresh = [data["magThresh"]] * n_obj
 
             df = pd.DataFrame(
                 {
@@ -55,8 +81,8 @@ def main(work_dir, work_subdirs, catalog_names, out_dir, version):
                     "ra": data["ra"],
                     "dec": data["dec"],
                     "epoch": ["J2000.0"] * n_obj,
-                    "tract": data["tract"],
-                    "patch": [None] * n_obj,
+                    "tract": tract,
+                    "patch": patch,
                     "target_type_name": ["SKY"] * n_obj,
                     "input_catalog_name": [catalog_name] * n_obj,
                     "mag_thresh": [data["magThresh"]] * n_obj,
