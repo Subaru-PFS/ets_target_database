@@ -34,10 +34,19 @@ EXTERNALDATA_DIR="../../../../external_data/commissioning_2022sep/"
 #     --skip_fluxstd \
 #     --skip_sky
 
-# Insert stars from Yamashita-san for the Sep 2022 Engineering run
-python ./insert_yamashita_stars.py ${DB_CONF_FILE} \
-    \
-    --infile "${EXTERNALDATA_DIR}/stars_yamashita/targets_S22B-EN16.ecsv" # --dry_run \
+python3 ./${PY_SCRIPT} ${DB_CONF_FILE} \
+    --skip_proposal_category \
+    --skip_proposal \
+    --input_catalog ${EXTERNALDATA_DIR}/misc/input_catalog.csv \
+    --skip_target_type \
+    --skip_target \
+    --skip_fluxstd \
+    --skip_sky
+
+# # Insert stars from Yamashita-san for the Sep 2022 Engineering run
+# python ./insert_yamashita_stars.py ${DB_CONF_FILE} \
+#     \
+#     --infile "${EXTERNALDATA_DIR}/stars_yamashita/targets_S22B-EN16.ecsv" # --dry_run \
 
 # # RESET_ALL=false
 
