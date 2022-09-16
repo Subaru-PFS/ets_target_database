@@ -322,6 +322,7 @@ def main():
             mag_min=args.raster_mag_min,
             mag_max=args.raster_mag_max,
             good_astrometry=False,  # select bright stars which may have large astrometric errors.
+            write_csv=True,
         )
         df_raster = dbutils.fixcols_gaiadb_to_targetdb(
             df_raster,

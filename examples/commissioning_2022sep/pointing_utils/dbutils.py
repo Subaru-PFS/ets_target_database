@@ -352,6 +352,7 @@ def generate_targets_from_gaiadb(
     mag_min=0.0,
     mag_max=99.0,
     good_astrometry=False,
+    write_csv=False,
 ):
 
     conn = connect_subaru_gaiadb(conf)
@@ -401,7 +402,8 @@ def generate_targets_from_gaiadb(
     conn.close()
 
     print(df_res)
-    # df_res.to_csv('gaia.csv')
+    if write_csv:
+        df_res.to_csv('gaia.csv')
 
     return df_res
 
