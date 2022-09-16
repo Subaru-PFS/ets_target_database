@@ -127,7 +127,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--infile",
         type=str,
-        default="../../../external_data/commissioning_2022sep/stars_yamashita/targets_S22B-EN16.ecsv",
+        default="../../../../external_data/commissioning_2022sep/stars_yamashita/targets_S22B-EN16.ecsv",
         help="Input file from Yamashita-san",
     )
 
