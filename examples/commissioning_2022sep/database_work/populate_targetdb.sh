@@ -24,7 +24,7 @@ DB_CONF_FILE="../../../../database_configs/config_pfsa-db01-gb_commissioning_202
 
 EXTERNALDATA_DIR="../../../../external_data/commissioning_2022sep/"
 
-# # populate tables other than fluxstd and target by resetting all tables
+# # populate the proposal table
 # python3 ./${PY_SCRIPT} ${DB_CONF_FILE} \
 #     --skip_proposal_category \
 #     --proposal ${EXTERNALDATA_DIR}/misc/proposal.csv \
@@ -34,19 +34,36 @@ EXTERNALDATA_DIR="../../../../external_data/commissioning_2022sep/"
 #     --skip_fluxstd \
 #     --skip_sky
 
-python3 ./${PY_SCRIPT} ${DB_CONF_FILE} \
-    --skip_proposal_category \
-    --skip_proposal \
-    --input_catalog ${EXTERNALDATA_DIR}/misc/input_catalog.csv \
-    --skip_target_type \
-    --skip_target \
-    --skip_fluxstd \
-    --skip_sky
+# # Populate input catalogs
+# python3 ./${PY_SCRIPT} ${DB_CONF_FILE} \
+#     --skip_proposal_category \
+#     --skip_proposal \
+#     --input_catalog ${EXTERNALDATA_DIR}/misc/input_catalog.csv \
+#     --skip_target_type \
+#     --skip_target \
+#     --skip_fluxstd \
+#     --skip_sky
 
 # # Insert stars from Yamashita-san for the Sep 2022 Engineering run
 # python ./insert_yamashita_stars.py ${DB_CONF_FILE} \
 #     \
 #     --infile "${EXTERNALDATA_DIR}/stars_yamashita/targets_S22B-EN16.ecsv" # --dry_run \
+
+# Populate the sky table
+SKYDATA_DIR="${EXTERNALDATA_DIR}/sky_murata/feather/"
+for sky in ${SKYDATA_DIR}/*.feather; do
+    if [ -f $sky ]; then
+        echo $sky
+        python ./${PY_SCRIPT} ${DB_CONF_FILE} \
+            --skip_proposal_category \
+            --skip_proposal \
+            --skip_input_catalog \
+            --skip_target_type \
+            --skip_target \
+            --skip_fluxstd \
+            --sky $sky
+    fi
+done
 
 # # RESET_ALL=false
 
