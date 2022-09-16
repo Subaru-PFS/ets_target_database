@@ -24,7 +24,7 @@ def main(work_dir, work_subdirs, catalog_names, out_dir, version):
     for subdir, catalog_name in zip(work_subdirs, catalog_names):
         dir_path = os.path.join(work_dir, subdir)
 
-        json_files = glob.glob(os.path.join(dir_path, "*.json.gz"))
+        json_files = glob.glob(os.path.join(dir_path, "*.json*"))
 
         # for i in range(len(json_files)):
         for i in range(1):
@@ -46,7 +46,6 @@ def main(work_dir, work_subdirs, catalog_names, out_dir, version):
 
             n_obj = len(data["objid"])
 
-            # tract = int(data["imgfile"][-13:-9])
             # patch = int(data["imgfile"][-8:-5].replace(",", "0"))
 
             df = pd.DataFrame(
@@ -71,7 +70,7 @@ def main(work_dir, work_subdirs, catalog_names, out_dir, version):
             )
             print(out_feather)
 
-            df.to_feather(out_feather)
+            # df.to_feather(out_feather)
 
             # i_out = 0
             # index_begin = 0
