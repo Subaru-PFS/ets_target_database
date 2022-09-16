@@ -367,7 +367,7 @@ def generate_targets_from_gaiadb(
     query_string = f"""SELECT
     source_id,ref_epoch,ra,dec,pmra,pmdec,parallax,
     phot_g_mean_mag,phot_bp_mean_mag,phot_rp_mean_mag
-    FROM gaia
+    FROM gaia3
     WHERE q3c_radial_query(ra, dec, {ra}, {dec}, {search_radius})
     AND {band_select} BETWEEN {mag_min} AND {mag_max}
     """

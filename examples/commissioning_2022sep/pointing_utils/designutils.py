@@ -295,7 +295,7 @@ def generate_guidestars_from_gaiadb(
     cur = conn.cursor()
 
     query_string = f"""SELECT source_id,ra,dec,parallax,pmra,pmdec,ref_epoch,phot_g_mean_mag,bp_rp
-    FROM gaia
+    FROM gaia3
     WHERE q3c_radial_query(ra, dec, {ra_tel_deg}, {dec_tel_deg}, {search_radius})
     AND {coldict['pmra']} IS NOT NULL
     AND {coldict['pmdec']} IS NOT NULL
