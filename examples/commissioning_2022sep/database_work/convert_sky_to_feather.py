@@ -12,6 +12,14 @@ import pandas as pd
 from logzero import logger
 
 
+def my_err_cb(*args):
+    print("error callback args={}".format(args))
+
+
+def my_cb(*args):
+    print("callback {}".format(args))
+
+
 def convert_sky_json2feather_targetdb(
     json_file, catalog_name, out_dir, version, dry_run=False
 ):
@@ -81,7 +89,13 @@ def convert_sky_json2feather_targetdb(
 
 
 def main(
-    work_dir, work_subdirs, catalog_names, out_dir, version, dry_run=False, processes=1
+    work_dir,
+    work_subdirs,
+    catalog_names,
+    out_dir,
+    version,
+    dry_run=False,
+    processes=1,
 ):
 
     for subdir, catalog_name in zip(work_subdirs, catalog_names):
@@ -89,14 +103,18 @@ def main(
 
         json_files = glob.glob(os.path.join(dir_path, "*.json*"))
 
-        with Pool(processes=processes) as pool:
-            pool.apply_async(
-                convert_sky_json2feather_targetdb,
-                args=(json_files, catalog_name, out_dir, version),
-                kwds=dict(dry_run=dry_run),
-            )
-            pool.close()
-            pool.join()
+        for i in range(len(json_files)):
+
+            with Pool(processes=processes) as pool:
+                pool.apply_async(
+                    convert_sky_json2feather_targetdb,
+                    args=(json_files[i], catalog_name, out_dir, version),
+                    kwds=dict(dry_run=dry_run),
+                    callback=my_cb,
+                    error_callback=my_err_cb,
+                )
+                pool.close()
+                pool.join()
 
             # for i in range(len(json_files)):
             # for i in range(1):
@@ -244,7 +262,7 @@ if __name__ == "__main__":
         out_dir,
         version,
         dry_run=args.dry_run,
-        parallel=args.processes,
+        processes=args.processes,
     )
 
     # main(
