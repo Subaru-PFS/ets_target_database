@@ -131,6 +131,21 @@ def generate_query_list(
 
         return qlist
 
+    if tablename == "sky":
+        for i in range(len(ra1)):
+            query_target = f"""SELECT * FROM {tablename}
+    WHERE ra >= {ra1[i]} AND ra < {ra2[i]}
+    AND dec >= {dec1} AND dec < {dec2}
+    """
+            if extra_where is not None:
+                query_target += extra_where
+
+            query_target += ";"
+
+            qlist.append(query_target)
+
+        return qlist
+
 
 def generate_targets_from_targetdb(
     ra,
@@ -274,7 +289,56 @@ def generate_fluxstds_from_targetdb(
     return df
 
 
-# def generate_targets_from_gaiadb(args.ra, args.dec, conf=conf)
+def generate_skyobjects_from_targetdb(
+    ra,
+    dec,
+    conf=None,
+    tablename="sky",
+    fp_radius_degree=260.0 * 10.2 / 3600,  # "Radius" of PFS FoV in degree (?)
+    fp_fudge_factor=1.5,  # fudge factor for search widths
+    width=None,
+    height=None,
+    extra_where=None,
+):
+    db = connect_targetdb(conf)
+
+    dw = fp_radius_degree * fp_fudge_factor
+
+    # consider the cosine term
+    cos_term = 1.0 / np.cos(dec * u.deg)
+
+    if width is None:
+        dw_ra = dw * cos_term
+    else:
+        dw_ra = width * cos_term / 2.0
+
+    if height is not None:
+        dw = height / 2.0
+
+    qlist = generate_query_list(ra, dec, dw_ra, dw, tablename, extra_where=extra_where)
+
+    df = pd.DataFrame()
+
+    for q in qlist:
+        print(q)
+        t_begin = time.time()
+        df_tmp = db.fetch_query(q)
+        t_end = time.time()
+        print("Time spent for querying: {:f}".format(t_end - t_begin))
+        df = pd.concat([df, df_tmp], ignore_index=True)
+
+    # df.loc[df["pmra"].isna(), "pmra"] = 0.0
+    # df.loc[df["pmdec"].isna(), "pmdec"] = 0.0
+    # df.loc[df["parallax"].isna(), "parallax"] = 1.0e-7
+    print(df)
+
+    # Replacing obj_id with sky_id as currently (obj_id, cat_id) pairs can be duplicated for sky.
+    # FIXME: need to create a scheme to assign unique (object_id, catalog_id) pairs for sky objects.
+    df.obj_id = df.sky_id
+
+    db.close()
+
+    return df
 
 
 def generate_targets_from_gaiadb(
