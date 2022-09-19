@@ -289,6 +289,7 @@ def generate_fluxstds_from_targetdb(
     return df
 
 
+# def generate_targets_from_gaiadb(args.ra, args.dec, conf=conf)
 def generate_skyobjects_from_targetdb(
     ra,
     dec,

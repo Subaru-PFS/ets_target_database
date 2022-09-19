@@ -341,132 +341,132 @@ def fiber_allocation(
 
     # exit()
 
- cobra_coach, bench = getBench(pfs_instdata_dir, cobra_coach_dir, cobra_coach_module_version, sm, black_dot_radius_margin=dot_margin)
+    cobra_coach, bench = getBench(pfs_instdata_dir, cobra_coach_dir, cobra_coach_module_version, sm, black_dot_radius_margin=dot_margin)
 
- # os.environ["PFS_INSTDATA_DIR"] = pfs_instdata_dir
- # cobra_coach = CobraCoach(
- #    "fpga", loadModel=False, trajectoryMode=True, rootDir=cobra_coach_dir
- # )
+    #os.environ["PFS_INSTDATA_DIR"] = pfs_instdata_dir
+    #cobra_coach = CobraCoach(
+    #    "fpga", loadModel=False, trajectoryMode=True, rootDir=cobra_coach_dir
+    #)
 
- # cobra_coach.loadModel(version="ALL", moduleVersion=cobra_coach_module_version)
+    #cobra_coach.loadModel(version="ALL", moduleVersion=cobra_coach_module_version)
 
- # calibration_product = cobra_coach.calibModel
+    #calibration_product = cobra_coach.calibModel
 
- # load Bench with the default setting
- # bench = Bench(layout="full")
+    # load Bench with the default setting
+    #bench = Bench(layout="full")
 
- # copy values into calibration_product using the default Bench object
- # calibration_product.status = bench.cobras.status.copy()
- # calibration_product.tht0 = bench.cobras.tht0.copy()
- # calibration_product.tht1 = bench.cobras.tht1.copy()
- # calibration_product.phiIn = bench.cobras.phiIn.copy()
- # calibration_product.phiOut = bench.cobras.phiOut.copy()
- # calibration_product.L1 = bench.cobras.L1.copy()
- # calibration_product.L2 = bench.cobras.L2.copy()
+    # copy values into calibration_product using the default Bench object
+    #calibration_product.status = bench.cobras.status.copy()
+    #calibration_product.tht0 = bench.cobras.tht0.copy()
+    #calibration_product.tht1 = bench.cobras.tht1.copy()
+    #calibration_product.phiIn = bench.cobras.phiIn.copy()
+    #calibration_product.phiOut = bench.cobras.phiOut.copy()
+    #calibration_product.L1 = bench.cobras.L1.copy()
+    #calibration_product.L2 = bench.cobras.L2.copy()
 
- # Limit spectral modules
- # gfm = FiberIds()  # 2604
- # cobra_ids_use = np.array([], dtype=np.uint16)
- # for sm_use in sm:
- #    cobra_ids_use = np.append(cobra_ids_use, gfm.cobrasForSpectrograph(sm_use))
+    # Limit spectral modules
+    #gfm = FiberIds()  # 2604
+    #cobra_ids_use = np.array([], dtype=np.uint16)
+    #for sm_use in sm:
+    #    cobra_ids_use = np.append(cobra_ids_use, gfm.cobrasForSpectrograph(sm_use))
 
- # print(cobra_ids_use)
+    ## print(cobra_ids_use)
 
- # set Bad Cobra status for unused spectral modules
- # for cobra_id in range(calibration_product.nCobras):
- #    if cobra_id not in cobra_ids_use:
- #        calibration_product.status[cobra_id] = ~PFIDesign.COBRA_OK_MASK
+    # set Bad Cobra status for unused spectral modules
+    #for cobra_id in range(calibration_product.nCobras):
+    #    if cobra_id not in cobra_ids_use:
+    #        calibration_product.status[cobra_id] = ~PFIDesign.COBRA_OK_MASK
 
- # load Bench with the updated calibration products
- # bench = Bench(
- #    layout="calibration",
- #    calibrationProduct=calibration_product,
- # )
+    # load Bench with the updated calibration products
+    #bench = Bench(
+    #    layout="calibration",
+    #    calibrationProduct=calibration_product,
+    #)
 
- # create the dictionary containing the costs and constraints for all classes
- # of targets
- # For the purpose of this demonstration we assume that all targets are
- # scientific targets with priority 1.
- class_dict = {
-      # Priorities correspond to the magnitudes of bright stars (in most case for the 2022 June Engineering)
-      "sci_P1": {
+    # create the dictionary containing the costs and constraints for all classes
+    # of targets
+    # For the purpose of this demonstration we assume that all targets are
+    # scientific targets with priority 1.
+    class_dict = {
+        # Priorities correspond to the magnitudes of bright stars (in most case for the 2022 June Engineering)
+        "sci_P1": {
             "nonObservationCost": 4e10,
             "partialObservationCost": 1e11,
             "calib": False,
         },
-       "sci_P2": {
+        "sci_P2": {
             "nonObservationCost": 2e10,
             "partialObservationCost": 1e11,
             "calib": False,
         },
-       "sci_P3": {
+        "sci_P3": {
             "nonObservationCost": 1e10,
             "partialObservationCost": 1e11,
             "calib": False,
         },
-       "sci_P4": {
+        "sci_P4": {
             "nonObservationCost": 1e9,
             "partialObservationCost": 1e11,
             "calib": False,
         },
-       "sci_P5": {
+        "sci_P5": {
             "nonObservationCost": 1e8,
             "partialObservationCost": 1e11,
             "calib": False,
         },
-       "sci_P6": {
+        "sci_P6": {
             "nonObservationCost": 1e7,
             "partialObservationCost": 1e11,
             "calib": False,
         },
-       "sci_P7": {
+        "sci_P7": {
             "nonObservationCost": 1e6,
             "partialObservationCost": 1e11,
             "calib": False,
         },
-       "sci_P8": {
+        "sci_P8": {
             "nonObservationCost": 1e5,
             "partialObservationCost": 1e11,
             "calib": False,
         },
-       "sci_P9": {
+        "sci_P9": {
             "nonObservationCost": 1e4,
             "partialObservationCost": 1e11,
             "calib": False,
         },
-       "sci_P10": {
+        "sci_P10": {
             "nonObservationCost": 1e3,
             "partialObservationCost": 1e11,
             "calib": False,
         },
-       "sci_P11": {
+        "sci_P11": {
             "nonObservationCost": 100,
             "partialObservationCost": 1e11,
             "calib": False,
         },
-       "sci_P12": {
+        "sci_P12": {
             "nonObservationCost": 10,
             "partialObservationCost": 1e11,
             "calib": False,
         },
-       "sci_P9999": {  # raster scan
+        "sci_P9999": {  # raster scan
             "nonObservationCost": 1,
             "partialObservationCost": 1e11,
             "calib": False,
         },
-       "cal": {
+        "cal": {
             "numRequired": n_fluxstd,
             "nonObservationCost": 1e12,
             "calib": True,
         },
-       "sky": {
+        "sky": {
             "numRequired": n_sky,
             "nonObservationCost": 1e12,
             "calib": True,
         },
-      }
-  target_class_dict = {}
-   for i in range(1, 13, 1):
+    }
+    target_class_dict = {}
+    for i in range(1, 13, 1):
         target_class_dict[f"sci_P{i}"] = 1
     target_class_dict = {**target_class_dict, **dict(sci_P9999=1, sky=2, cal=3)}
     # target_class_dict = {"sci_P1": 1, "sci_P9999": 1, "sky": 2, "cal": 3}
