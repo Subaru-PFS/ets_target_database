@@ -306,12 +306,13 @@ def main():
         mag_filter=args.fluxstd_mag_filter,
         min_prob_f_star=args.fluxstd_min_prob_f_star,
     )
-    df_sky = dbutils.generate_skyobjects_from_targetdb(
-        args.ra,
-        args.dec,
-        conf=conf,
-        # extra_where="LIMIT 1000",
-    )
+    df_sky = pd.DataFrame()
+    #df_sky = dbutils.generate_skyobjects_from_targetdb(
+    #    args.ra,
+    #    args.dec,
+    #    conf=conf,
+    #    # extra_where="LIMIT 1000",
+    #)
 
     if args.raster_scan:
         df_raster = dbutils.generate_targets_from_gaiadb(
