@@ -306,7 +306,17 @@ def main():
         mag_filter=args.fluxstd_mag_filter,
         min_prob_f_star=args.fluxstd_min_prob_f_star,
     )
-    df_sky = pd.DataFrame()
+
+    if args.n_sky==0:
+        df_sky = pd.DataFrame()
+    else:
+        #n_sky_target = (df_targets.size + df_fluxstds.size) * 2
+        n_sky_target = 30000 # this value can be tuned
+        df_sky = dbutils.generate_random_skyobjects(
+            args.ra, 
+            args.dec, 
+            n_sky_target,
+            )
     #df_sky = dbutils.generate_skyobjects_from_targetdb(
     #    args.ra,
     #    args.dec,

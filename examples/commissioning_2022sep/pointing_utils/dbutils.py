@@ -341,6 +341,32 @@ def generate_skyobjects_from_targetdb(
 
     return df
 
+def generate_random_skyobjects(
+    ra,
+    dec,
+    n_sky_target,
+):
+
+    dw = 0.75
+    cos_term = 1.0 / np.cos(dec * u.deg)
+    dw_ra = dw * cos_term
+    df = pd.DataFrame()
+    df['sky_id'] = np.arange(n_sky_target)
+    df['obj_id'] = np.arange(n_sky_target)
+    df['ra'] = np.random.uniform(ra-dw_ra, ra+dw_ra, n_sky_target)
+    df['dec'] = np.random.uniform(dec-dw, dec+dw, n_sky_target)
+    df['epoch'] = 'J2016.0'
+    df['tract'] = None
+    df['patch'] = None
+    df['target_type_id'] = None
+    df['input_catalog_id'] = None
+    df['mag_thresh'] = None
+    df['version'] = None
+    df['created_at'] = None
+    df['updated_at'] = None    
+
+    print(df)
+    return df
 
 def generate_targets_from_gaiadb(
     ra,
