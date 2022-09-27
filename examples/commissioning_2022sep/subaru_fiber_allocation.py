@@ -228,6 +228,16 @@ def get_arguments():
         default=0,
         help="Number of SKY fibers to be allocated. (default: 0)",
     )
+    parser.add_argument(
+        "--sky_random",
+        action="store_true",
+        help="Assign sky randomly (default: False)",
+    )
+    parser.add_argument(
+        "--reduce_sky_targets",
+        action="store_true",
+        help="Reduce the number of sky targets randomly (default: False)",
+    )
 
     # instrument parameter files
     parser.add_argument(
@@ -307,22 +317,34 @@ def main():
         min_prob_f_star=args.fluxstd_min_prob_f_star,
     )
 
-    if args.n_sky==0:
+    if args.n_sky == 0:
+        logger.info("No sky object will be sent to netflow")
         df_sky = pd.DataFrame()
-    else:
-        #n_sky_target = (df_targets.size + df_fluxstds.size) * 2
-        n_sky_target = 30000 # this value can be tuned
+    elif args.sky_random:
+        logger.info("Random sky objects will be generated.")
+        # n_sky_target = (df_targets.size + df_fluxstds.size) * 2
+        n_sky_target = 30000  # this value can be tuned
         df_sky = dbutils.generate_random_skyobjects(
-            args.ra, 
-            args.dec, 
+            args.ra,
+            args.dec,
             n_sky_target,
-            )
-    #df_sky = dbutils.generate_skyobjects_from_targetdb(
-    #    args.ra,
-    #    args.dec,
-    #    conf=conf,
-    #    # extra_where="LIMIT 1000",
-    #)
+        )
+    else:
+        logger.info("Sky objects will be generated using targetdb.")
+        df_sky = dbutils.generate_skyobjects_from_targetdb(args.ra, args.dec, conf=conf)
+        if args.reduce_sky_targets:
+            n_sky_target = 30000  # this value can be tuned
+            if len(df_sky) > n_sky_target:
+                df_sky = df_sky.sample(n_sky_target, ignore_index=True)
+        # df_sky = dbutils.generate_skyobjects_from_targetdb(
+        #    args.ra,
+        #    args.dec,
+        #    conf=conf,
+        #    # extra_where="LIMIT 1000",
+        # )
+
+    #print(df_sky)
+    # exit()
 
     if args.raster_scan:
         df_raster = dbutils.generate_targets_from_gaiadb(
@@ -346,7 +368,7 @@ def main():
     else:
         df_raster = None
 
-    print(df_raster)
+    #print(df_raster)
 
     # exit()
 
