@@ -228,6 +228,16 @@ def get_arguments():
         default=0,
         help="Number of SKY fibers to be allocated. (default: 0)",
     )
+    parser.add_argument(
+        "--sky_random",
+        action="store_true",
+        help="Assign sky randomly (default: False)",
+    )
+    parser.add_argument(
+        "--reduce_sky_targets",
+        action="store_true",
+        help="Reduce the number of sky targets randomly (default: False)",
+    )
 
     # instrument parameter files
     parser.add_argument(
@@ -248,6 +258,13 @@ def get_arguments():
         type=int,
         default=[1, 2, 3, 4],
         help="Spectral Modules(1 to 4) to be used (default: 1 2 3 4)",
+    )
+    parser.add_argument(
+        "--dot_margin",
+        nargs="+",
+        type=float,
+        default=1.0,
+        help="Margin factor for dot avoidance (default: 1.0)",
     )
 
     args = parser.parse_args()
@@ -299,12 +316,35 @@ def main():
         mag_filter=args.fluxstd_mag_filter,
         min_prob_f_star=args.fluxstd_min_prob_f_star,
     )
-    df_sky = dbutils.generate_skyobjects_from_targetdb(
-        args.ra,
-        args.dec,
-        conf=conf,
-        # extra_where="LIMIT 1000",
-    )
+
+    if args.n_sky == 0:
+        logger.info("No sky object will be sent to netflow")
+        df_sky = pd.DataFrame()
+    elif args.sky_random:
+        logger.info("Random sky objects will be generated.")
+        # n_sky_target = (df_targets.size + df_fluxstds.size) * 2
+        n_sky_target = 30000  # this value can be tuned
+        df_sky = dbutils.generate_random_skyobjects(
+            args.ra,
+            args.dec,
+            n_sky_target,
+        )
+    else:
+        logger.info("Sky objects will be generated using targetdb.")
+        df_sky = dbutils.generate_skyobjects_from_targetdb(args.ra, args.dec, conf=conf)
+        if args.reduce_sky_targets:
+            n_sky_target = 30000  # this value can be tuned
+            if len(df_sky) > n_sky_target:
+                df_sky = df_sky.sample(n_sky_target, ignore_index=True)
+        # df_sky = dbutils.generate_skyobjects_from_targetdb(
+        #    args.ra,
+        #    args.dec,
+        #    conf=conf,
+        #    # extra_where="LIMIT 1000",
+        # )
+
+    #print(df_sky)
+    # exit()
 
     if args.raster_scan:
         df_raster = dbutils.generate_targets_from_gaiadb(
@@ -315,6 +355,7 @@ def main():
             mag_min=args.raster_mag_min,
             mag_max=args.raster_mag_max,
             good_astrometry=False,  # select bright stars which may have large astrometric errors.
+            write_csv=True,
         )
         df_raster = dbutils.fixcols_gaiadb_to_targetdb(
             df_raster,
@@ -327,7 +368,7 @@ def main():
     else:
         df_raster = None
 
-    print(df_raster)
+    #print(df_raster)
 
     # exit()
 
@@ -346,6 +387,7 @@ def main():
         args.cobra_coach_dir,
         args.cobra_coach_module_version,
         args.sm,
+        args.dot_margin,
         df_raster=df_raster,
         force_exptime=args.exptime,
     )
