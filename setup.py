@@ -161,7 +161,7 @@ setup(
     #
     # For an analysis of "install_requires" vs pip's requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
-    install_requires=["sqlalchemy", "pandas", "tabulate"],  # Optional
+    install_requires=["sqlalchemy", "pandas", "tabulate", "toml"],  # Optional
     #
     #
     # List additional groups of dependencies here (e.g. development
@@ -204,6 +204,7 @@ setup(
             "pfs_targetdb_drop_database=targetdb.cli.pfs_targetdb_database_helpers:main_drop_database",
             "pfs_targetdb_create_schema=targetdb.cli.pfs_targetdb_create_schema:main",
             "pfs_targetdb_generate_mdtable=targetdb.cli.pfs_targetdb_generate_mdtable:main",
+            "pfs_targetdb_draw_diagram=targetdb.cli.pfs_targetdb_draw_diagram:main",
         ],
     },
     #
