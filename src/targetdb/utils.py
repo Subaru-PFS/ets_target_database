@@ -78,7 +78,7 @@ def draw_diagram(
 
     conf = read_conf(conf_file)
 
-    time_string = datetime.datetime.now().replace(microsecond=0).isoformat()
+    time_string = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
 
     outfile = os.path.join(sc_outdir, f"{sc_outprefix}-{time_string}.pdf")
 
