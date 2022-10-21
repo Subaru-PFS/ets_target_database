@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from sqlalchemy import BigInteger
 from sqlalchemy import Boolean
@@ -13,9 +13,9 @@ from sqlalchemy import String
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import relation
 
+# from . import proposal
 from . import Base
 from . import input_catalog
-from . import proposal
 from . import target_type
 
 
@@ -74,12 +74,26 @@ class fluxstd(Base):
     psf_mag_y = Column(Float, comment="y-band PSF magnitude (AB mag)")
     psf_mag_j = Column(Float, comment="J band PSF magnitude (AB mag)")
 
+    psf_mag_error_g = Column(Float, comment="Error in g-band PSF magnitude (AB mag)")
+    psf_mag_error_r = Column(Float, comment="Error in r-band PSF magnitude (AB mag)")
+    psf_mag_error_i = Column(Float, comment="Error in i-band PSF magnitude (AB mag)")
+    psf_mag_error_z = Column(Float, comment="Error in z-band PSF magnitude (AB mag)")
+    psf_mag_error_y = Column(Float, comment="Error in y-band PSF magnitude (AB mag)")
+    psf_mag_error_j = Column(Float, comment="Error in J band PSF magnitude (AB mag)")
+
     psf_flux_g = Column(Float, comment="g-band PSF flux (nJy)")
     psf_flux_r = Column(Float, comment="r-band PSF flux (nJy)")
     psf_flux_i = Column(Float, comment="i-band PSF flux (nJy)")
     psf_flux_z = Column(Float, comment="z-band PSF flux (nJy)")
     psf_flux_y = Column(Float, comment="y-band PSF flux (nJy)")
     psf_flux_j = Column(Float, comment="J band PSF flux (nJy)")
+
+    psf_flux_error_g = Column(Float, comment="Error in g-band PSF flux (nJy)")
+    psf_flux_error_r = Column(Float, comment="Error in r-band PSF flux (nJy)")
+    psf_flux_error_i = Column(Float, comment="Error in i-band PSF flux (nJy)")
+    psf_flux_error_z = Column(Float, comment="Error in z-band PSF flux (nJy)")
+    psf_flux_error_y = Column(Float, comment="Error in y-band PSF flux (nJy)")
+    psf_flux_error_j = Column(Float, comment="Error in J band PSF flux (nJy)")
 
     filter_g = Column(String, comment="g-band filter (g_hsc, g_ps1, g_sdss, etc.)")
     filter_r = Column(String, comment="r-band filter (r_hsc, r_ps1, r_sdss, etc.)")
@@ -131,12 +145,24 @@ class fluxstd(Base):
         psf_mag_z,
         psf_mag_y,
         psf_mag_j,
+        psf_mag_error_g,
+        psf_mag_error_r,
+        psf_mag_error_i,
+        psf_mag_error_z,
+        psf_mag_error_y,
+        psf_mag_error_j,
         psf_flux_g,
         psf_flux_r,
         psf_flux_i,
         psf_flux_z,
         psf_flux_y,
         psf_flux_j,
+        psf_flux_error_g,
+        psf_flux_error_r,
+        psf_flux_error_i,
+        psf_flux_error_z,
+        psf_flux_error_y,
+        psf_flux_error_j,
         filter_g,
         filter_r,
         filter_i,
@@ -170,12 +196,24 @@ class fluxstd(Base):
         self.psf_mag_z = psf_mag_z
         self.psf_mag_y = psf_mag_y
         self.psf_mag_j = psf_mag_j
+        self.psf_mag_error_g = psf_mag_error_g
+        self.psf_mag_error_r = psf_mag_error_r
+        self.psf_mag_error_i = psf_mag_error_i
+        self.psf_mag_error_z = psf_mag_error_z
+        self.psf_mag_error_y = psf_mag_error_y
+        self.psf_mag_error_j = psf_mag_error_j
         self.psf_flux_g = psf_flux_g
         self.psf_flux_r = psf_flux_r
         self.psf_flux_i = psf_flux_i
         self.psf_flux_z = psf_flux_z
         self.psf_flux_y = psf_flux_y
         self.psf_flux_j = psf_flux_j
+        self.psf_flux_error_g = psf_flux_error_g
+        self.psf_flux_error_r = psf_flux_error_r
+        self.psf_flux_error_i = psf_flux_error_i
+        self.psf_flux_error_z = psf_flux_error_z
+        self.psf_flux_error_y = psf_flux_error_y
+        self.psf_flux_error_j = psf_flux_error_j
         self.filter_g = filter_g
         self.filter_r = filter_r
         self.filter_i = filter_i
