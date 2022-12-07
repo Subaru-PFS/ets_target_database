@@ -32,6 +32,7 @@ class target(Base):
 
     ob_code = Column(
         String,
+        nullable=False,
         comment="Identifer for a combination of a target, observing mode, and exposure time in a program.",
     )
 
