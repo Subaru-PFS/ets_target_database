@@ -141,3 +141,4 @@ cython_debug/
 # added by M. Onodera
 
 .DS_Store
+.vscode
