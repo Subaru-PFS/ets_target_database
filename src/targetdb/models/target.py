@@ -30,6 +30,11 @@ class target(Base):
 
     proposal_id = Column(String, ForeignKey("proposal.proposal_id"))
 
+    ob_code = Column(
+        String,
+        comment="Identifer for a combination of a target, observing mode, and exposure time in a program.",
+    )
+
     obj_id = Column(
         BigInteger,
         comment="Object ID as specified by the observer at Phase 2 (can be same as the input_catalog_object_id)",
@@ -157,6 +162,7 @@ class target(Base):
     def __init__(
         self,
         proposal_id,
+        ob_code,
         obj_id,
         ra,
         dec,
@@ -222,6 +228,7 @@ class target(Base):
         updated_at,
     ):
         self.proposal_id = proposal_id
+        self.ob_code = ob_code
         self.obj_id = obj_id
         self.ra = ra
         self.dec = dec
