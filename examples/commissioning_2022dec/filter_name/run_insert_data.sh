@@ -1,0 +1,1 @@
+python ./insert_filter_name.py /work/monodera/Subaru-PFS/database_configs/config_pfsa-db01-gb_commissioning_2022nov.toml --infile /work/monodera/Subaru-PFS/external_data/commissioning_2022dec/filter_name/filter_name.csv
