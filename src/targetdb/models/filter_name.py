@@ -13,10 +13,9 @@ from sqlalchemy import UniqueConstraint
 
 # from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import backref
-from sqlalchemy.orm import relation
+from sqlalchemy.orm import relationship
 
 from . import Base
-from . import proposal_category
 
 
 class filter_name(Base):
@@ -33,11 +32,13 @@ class filter_name(Base):
     )
     filter_name_description = Column(
         String,
-        comment="Descriptino of the filter",
+        comment="Description of the filter",
     )
 
     created_at = Column(DateTime, comment="Creation time [YYYY-MM-DDThh:mm:ss] (UTC)")
     updated_at = Column(DateTime, comment="Update time [YYYY-MM-DDThh:mm:ss] (UTC)")
+
+    # filter_names = relationship("target", back_populates="filter_names")
 
     def __init__(
         self,

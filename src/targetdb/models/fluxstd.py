@@ -12,9 +12,11 @@ from sqlalchemy import String
 # from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import relation
+from sqlalchemy.orm import relationship
 
 # from . import proposal
 from . import Base
+from . import filter_name
 from . import input_catalog
 from . import target_type
 
@@ -95,12 +97,43 @@ class fluxstd(Base):
     psf_flux_error_y = Column(Float, comment="Error in y-band PSF flux (nJy)")
     psf_flux_error_j = Column(Float, comment="Error in J band PSF flux (nJy)")
 
-    filter_g = Column(String, comment="g-band filter (g_hsc, g_ps1, g_sdss, etc.)")
-    filter_r = Column(String, comment="r-band filter (r_hsc, r_ps1, r_sdss, etc.)")
-    filter_i = Column(String, comment="i-band filter (i_hsc, i_ps1, i_sdss, etc.)")
-    filter_z = Column(String, comment="z-band filter (z_hsc, z_ps1, z_sdss, etc.)")
-    filter_y = Column(String, comment="y-band filter (y_hsc, y_ps1, y_sdss, etc.)")
-    filter_j = Column(String, comment="j-band filter (j_mko, etc.)")
+    # filter_g = Column(String, comment="g-band filter (g_hsc, g_ps1, g_sdss, etc.)")
+    # filter_r = Column(String, comment="r-band filter (r_hsc, r_ps1, r_sdss, etc.)")
+    # filter_i = Column(String, comment="i-band filter (i_hsc, i_ps1, i_sdss, etc.)")
+    # filter_z = Column(String, comment="z-band filter (z_hsc, z_ps1, z_sdss, etc.)")
+    # filter_y = Column(String, comment="y-band filter (y_hsc, y_ps1, y_sdss, etc.)")
+    # filter_j = Column(String, comment="j-band filter (j_mko, etc.)")
+
+    filter_g = Column(
+        String,
+        ForeignKey("filter_name.filter_name"),
+        comment="g-band filter (g_hsc, g_ps1, g_sdss, etc.)",
+    )
+    filter_r = Column(
+        String,
+        ForeignKey("filter_name.filter_name"),
+        comment="r-band filter (r_hsc, r_ps1, r_sdss, etc.)",
+    )
+    filter_i = Column(
+        String,
+        ForeignKey("filter_name.filter_name"),
+        comment="i-band filter (i_hsc, i_ps1, i_sdss, etc.)",
+    )
+    filter_z = Column(
+        String,
+        ForeignKey("filter_name.filter_name"),
+        comment="z-band filter (z_hsc, z_ps1, z_sdss, etc.)",
+    )
+    filter_y = Column(
+        String,
+        ForeignKey("filter_name.filter_name"),
+        comment="y-band filter (y_hsc, y_ps1, y_sdss, etc.)",
+    )
+    filter_j = Column(
+        String,
+        ForeignKey("filter_name.filter_name"),
+        comment="j-band filter (j_mko, etc.)",
+    )
 
     prob_f_star = Column(Float, comment="Probability of being an F-type star")
     flags_dist = Column(
@@ -122,6 +155,15 @@ class fluxstd(Base):
     # relations to other tables
     target_types = relation(target_type, backref=backref("fluxstd"))
     input_catalogs = relation(input_catalog, backref=backref("fluxstd"))
+
+    # tried to make a relationship to filter_name table
+    # ref: https://docs.sqlalchemy.org/en/14/orm/join_conditions.html
+    filter_g_rels = relationship(filter_name, foreign_keys=[filter_g])
+    filter_r_rels = relationship(filter_name, foreign_keys=[filter_r])
+    filter_i_rels = relationship(filter_name, foreign_keys=[filter_i])
+    filter_z_rels = relationship(filter_name, foreign_keys=[filter_z])
+    filter_y_rels = relationship(filter_name, foreign_keys=[filter_y])
+    filter_g_rels = relationship(filter_name, foreign_keys=[filter_j])
 
     def __init__(
         self,
