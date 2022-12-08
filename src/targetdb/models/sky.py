@@ -31,6 +31,7 @@ class sky(Base):
     # Note: int/int64 for other tables.
     obj_id = Column(
         BigInteger,
+        nullable=False,
         comment="Object ID in the sky catalog",
     )
     obj_id_orig = Column(
@@ -38,9 +39,11 @@ class sky(Base):
         comment="Original object ID in the sky catalog",
     )
 
-    ra = Column(Float, comment="RA (ICRS, degree)")
-    dec = Column(Float, comment="Dec (ICRS, degree)")
-    epoch = Column(String, comment="Epoch (e.g., J2000.0, J2015.5, etc.)")
+    ra = Column(Float, nullable=False, comment="RA (ICRS, degree)")
+    dec = Column(Float, nullable=False, comment="Dec (ICRS, degree)")
+    epoch = Column(
+        String, default="J2000.0", comment="Epoch (e.g., J2000.0, J2015.5, etc.)"
+    )
 
     tract = Column(
         Integer,
@@ -54,12 +57,14 @@ class sky(Base):
     target_type_id = Column(
         Integer,
         ForeignKey("target_type.target_type_id"),
+        default=2,
         comment="target_type_id from the target_type table (must be 2 for SKY)",
     )
 
     input_catalog_id = Column(
         Integer,
         ForeignKey("input_catalog.input_catalog_id"),
+        nullable=False,
         comment="input_catalog_id from the input_catalog table",
     )
 
@@ -75,7 +80,9 @@ class sky(Base):
     # )
 
     # version string
-    version = Column(String, comment="Version string of the sky position")
+    version = Column(
+        String, nullable=False, comment="Version string of the sky position"
+    )
 
     # timestamp
     created_at = Column(DateTime)
