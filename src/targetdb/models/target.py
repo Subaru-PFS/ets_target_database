@@ -52,7 +52,7 @@ class target(Base):
     )
     epoch = Column(String, default="J2000.0", comment="Epoch (default: J2000.0)")
 
-    parallax = Column(Float, default=1e-7, comment="Parallax (mas)")
+    parallax = Column(Float, default=1.0e-7, comment="Parallax (mas)")
     pmra = Column(
         Float,
         default=0.0,
