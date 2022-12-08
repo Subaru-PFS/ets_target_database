@@ -34,18 +34,27 @@ class fluxstd(Base):
 
     obj_id = Column(
         BigInteger,
+        nullable=False,
         comment="Gaia EDR3 sourceid",
     )  # xxxx: need to understand more
 
-    ra = Column(Float, comment="RA (ICRS, degree)")
-    dec = Column(Float, comment="Dec (ICRS, degree)")
-    epoch = Column(String, comment="Epoch (e.g., J2000.0, J2015.5, etc.)")
+    ra = Column(Float, nullable=False, comment="RA (ICRS, degree)")
+    dec = Column(Float, nullable=False, comment="Dec (ICRS, degree)")
+    epoch = Column(
+        String, default="J2000.0", comment="Epoch (e.g., J2000.0, J2015.5, etc.)"
+    )
 
-    parallax = Column(Float, comment="Parallax (mas)")
+    parallax = Column(Float, default=1.0e-7, comment="Parallax (mas)")
     parallax_error = Column(Float, comment="Standard error of parallax (mas)")
-    pmra = Column(Float, comment="Proper motion in right ascension direction (mas/yr)")
+    pmra = Column(
+        Float,
+        default=0.0,
+        comment="Proper motion in right ascension direction (mas/yr)",
+    )
     pmra_error = Column(Float, comment="Standard error of pmra (mas/yr)")
-    pmdec = Column(Float, comment="Proper motion in declination direction (mas/yr)")
+    pmdec = Column(
+        Float, default=0.0, comment="Proper motion in declination direction (mas/yr)"
+    )
     pmdec_error = Column(Float, comment="Standard error of pmdec (mas/yr)")
 
     tract = Column(
@@ -60,12 +69,14 @@ class fluxstd(Base):
     target_type_id = Column(
         Integer,
         ForeignKey("target_type.target_type_id"),
+        default=3,
         comment="target_type_id from the target_type table (must be 3 for FLUXSTD)",
     )
 
     input_catalog_id = Column(
         Integer,
         ForeignKey("input_catalog.input_catalog_id"),
+        nullable=False,
         comment="input_catalog_id from the input_catalog table",
     )
 
@@ -146,7 +157,9 @@ class fluxstd(Base):
     )
 
     # version string
-    version = Column(String, comment="Version string of the F-star selection")
+    version = Column(
+        String, nullable=False, comment="Version string of the F-star selection"
+    )
 
     # timestamp
     created_at = Column(DateTime)

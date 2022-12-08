@@ -42,7 +42,7 @@ class target_type(Base):
     )
     target_type_name = Column(
         String,
-        # unique=True,
+        nullable=False,
         comment="Name for the target type.",
     )
     target_type_description = Column(String, comment="Description of the target type")

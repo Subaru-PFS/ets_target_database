@@ -40,17 +40,19 @@ class target(Base):
 
     obj_id = Column(
         BigInteger,
+        nullable=False,
         comment="Object ID as specified by the observer at Phase 2 (can be same as the input_catalog_object_id)",
     )  # xxxx: need to understand more
 
-    ra = Column(Float, comment="RA (ICRS, degree)")
+    ra = Column(Float, nullable=False, comment="RA (ICRS, degree)")
     dec = Column(
         Float,
+        nullable=False,
         comment="Dec (ICRS, degree)",
     )
     epoch = Column(String, default="J2000.0", comment="Epoch (default: J2000.0)")
 
-    parallax = Column(Float, default=1e-7, comment="Parallax (mas)")
+    parallax = Column(Float, default=1.0e-7, comment="Parallax (mas)")
     pmra = Column(
         Float,
         default=0.0,
@@ -69,11 +71,17 @@ class target(Base):
         comment="same definition as HSC-SSP?; can be derived from the coordinate; Note that it's defined as an integer",
     )  # xxxx: needed?
 
-    target_type_id = Column(Integer, ForeignKey("target_type.target_type_id"))
+    target_type_id = Column(
+        Integer,
+        ForeignKey("target_type.target_type_id"),
+        default=1,
+        comment="target type ID (default: 1 = SCIENCE)",
+    )
 
     input_catalog_id = Column(
         Integer,
         ForeignKey("input_catalog.input_catalog_id"),
+        nullable=False,
         comment="Input catalog ID from the input_catalog table",
     )
 
@@ -152,6 +160,7 @@ class target(Base):
 
     priority = Column(
         Float,
+        default=1.0,
         comment="Priority of the target specified by the observer within the proposal",
     )
     effective_exptime = Column(Float, comment="Requested effective exposure time (s)")
