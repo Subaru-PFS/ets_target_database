@@ -1,17 +1,11 @@
 #!/usr/bin/env python
 
-from sqlalchemy import BigInteger
-from sqlalchemy import Boolean
-from sqlalchemy import Column
-from sqlalchemy import DateTime
-from sqlalchemy import Float
-from sqlalchemy import ForeignKey
-from sqlalchemy import Integer
-from sqlalchemy import String
-
-# from sqlalchemy.exc import OperationalError
-from sqlalchemy.orm import backref
-from sqlalchemy.orm import relation
+from sqlalchemy import (
+    Column,
+    DateTime,
+    Integer,
+    String,
+)
 
 from . import Base
 

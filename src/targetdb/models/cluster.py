@@ -1,20 +1,17 @@
 #!/usr/bin/env python
 
-from sqlalchemy import BigInteger
-from sqlalchemy import Boolean
-from sqlalchemy import Column
-from sqlalchemy import DateTime
-from sqlalchemy import Float
-from sqlalchemy import ForeignKey
-from sqlalchemy import Integer
-from sqlalchemy import String
-from sqlalchemy import UniqueConstraint
-from sqlalchemy.orm import backref
-from sqlalchemy.orm import relation
+from sqlalchemy import (
+    BigInteger,
+    Column,
+    DateTime,
+    Float,
+    ForeignKey,
+    Integer,
+    UniqueConstraint,
+)
+from sqlalchemy.orm import backref, relationship
 
-from . import Base
-from . import input_catalog
-from . import target
+from . import Base, input_catalog, target
 
 
 class cluster(Base):
@@ -59,8 +56,8 @@ class cluster(Base):
     created_at = Column(DateTime, comment="UTC")
     updated_at = Column(DateTime, comment="UTC")
 
-    targets = relation(target, backref=backref("cluster"))
-    input_catalogs = relation(input_catalog, backref=backref("cluster"))
+    targets = relationship(target, backref=backref("cluster"))
+    input_catalogs = relationship(input_catalog, backref=backref("cluster"))
 
     def __init__(
         self,

@@ -1,19 +1,17 @@
 #!/usr/bin/env python
 
-from sqlalchemy import BigInteger
-from sqlalchemy import Boolean
-from sqlalchemy import Column
-from sqlalchemy import DateTime
-from sqlalchemy import Float
-from sqlalchemy import ForeignKey
-from sqlalchemy import Integer
-from sqlalchemy import String
-from sqlalchemy.orm import backref
-from sqlalchemy.orm import relation
+from sqlalchemy import (
+    BigInteger,
+    Column,
+    DateTime,
+    Float,
+    ForeignKey,
+    Integer,
+    String,
+)
+from sqlalchemy.orm import backref, relationship
 
-from . import Base
-from . import input_catalog
-from . import target_type
+from . import Base, input_catalog, target_type
 
 
 class sky(Base):
@@ -89,8 +87,8 @@ class sky(Base):
     updated_at = Column(DateTime)
 
     # relations to other tables
-    target_types = relation(target_type, backref=backref("sky"))
-    input_catalogs = relation(input_catalog, backref=backref("sky"))
+    target_types = relationship(target_type, backref=backref("sky"))
+    input_catalogs = relationship(input_catalog, backref=backref("sky"))
 
     def __init__(
         self,

@@ -1,24 +1,21 @@
 #!/usr/bin/env python3
 
-from sqlalchemy import BigInteger
-from sqlalchemy import Boolean
-from sqlalchemy import Column
-from sqlalchemy import DateTime
-from sqlalchemy import Float
-from sqlalchemy import ForeignKey
-from sqlalchemy import Integer
-from sqlalchemy import String
+from sqlalchemy import (
+    BigInteger,
+    Boolean,
+    Column,
+    DateTime,
+    Float,
+    ForeignKey,
+    Integer,
+    String,
+)
 
 # from sqlalchemy.exc import OperationalError
-from sqlalchemy.orm import backref
-from sqlalchemy.orm import relation
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import backref, relationship
 
 # from . import proposal
-from . import Base
-from . import filter_name
-from . import input_catalog
-from . import target_type
+from . import Base, filter_name, input_catalog, target_type
 
 
 class fluxstd(Base):
@@ -166,8 +163,8 @@ class fluxstd(Base):
     updated_at = Column(DateTime)
 
     # relations to other tables
-    target_types = relation(target_type, backref=backref("fluxstd"))
-    input_catalogs = relation(input_catalog, backref=backref("fluxstd"))
+    target_types = relationship(target_type, backref=backref("fluxstd"))
+    input_catalogs = relationship(input_catalog, backref=backref("fluxstd"))
 
     # tried to make a relationship to filter_name table
     # ref: https://docs.sqlalchemy.org/en/14/orm/join_conditions.html
