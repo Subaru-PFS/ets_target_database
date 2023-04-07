@@ -1,22 +1,18 @@
 #!/usr/bin/env python3
 
-from sqlalchemy import BigInteger
-from sqlalchemy import Boolean
-from sqlalchemy import Column
-from sqlalchemy import DateTime
-from sqlalchemy import Float
-from sqlalchemy import ForeignKey
-from sqlalchemy import Integer
-from sqlalchemy import String
-from sqlalchemy.orm import backref
-from sqlalchemy.orm import relation
-from sqlalchemy.orm import relationship
+from sqlalchemy import (
+    BigInteger,
+    Boolean,
+    Column,
+    DateTime,
+    Float,
+    ForeignKey,
+    Integer,
+    String,
+)
+from sqlalchemy.orm import backref, relationship
 
-from . import Base
-from . import filter_name
-from . import input_catalog
-from . import proposal
-from . import target_type
+from . import Base, filter_name, input_catalog, proposal, target_type
 
 
 class target(Base):
@@ -198,9 +194,9 @@ class target(Base):
     updated_at = Column(DateTime)
 
     # unique_objects = relation(unique_object, backref=backref("target"))
-    proposals = relation(proposal, backref=backref("target"))
-    target_types = relation(target_type, backref=backref("target"))
-    input_catalogs = relation(input_catalog, backref=backref("target"))
+    proposals = relationship(proposal, backref=backref("target"))
+    target_types = relationship(target_type, backref=backref("target"))
+    input_catalogs = relationship(input_catalog, backref=backref("target"))
 
     # tried to make a relationship to filter_name table
     # ref: https://docs.sqlalchemy.org/en/14/orm/join_conditions.html

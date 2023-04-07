@@ -1,22 +1,16 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
-# from sqlalchemy import ForeignKeyConstraint
-from sqlalchemy import BigInteger
-from sqlalchemy import Boolean
-from sqlalchemy import Column
-from sqlalchemy import DateTime
-from sqlalchemy import Float
-from sqlalchemy import ForeignKey
-from sqlalchemy import Integer
-from sqlalchemy import String
-from sqlalchemy import UniqueConstraint
+from sqlalchemy import (
+    Column,
+    DateTime,
+    Float,
+    ForeignKey,
+    Integer,
+    String,
+)
+from sqlalchemy.orm import backref, relationship
 
-# from sqlalchemy.exc import OperationalError
-from sqlalchemy.orm import backref
-from sqlalchemy.orm import relation
-
-from . import Base
-from . import proposal_category
+from . import Base, proposal_category
 
 
 class proposal(Base):
@@ -56,7 +50,7 @@ class proposal(Base):
         DateTime, comment="Update time [YYYY-MM-DDThh:mm:ss] (UTC or HST?)"
     )
 
-    proposal_categories = relation(proposal_category, backref=backref("proposal"))
+    proposal_categories = relationship(proposal_category, backref=backref("proposal"))
 
     def __init__(
         self,

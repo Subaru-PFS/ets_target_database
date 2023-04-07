@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
-from sqlalchemy.ext.declarative import declarative_base
+# from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base
 
 Base = declarative_base()
 
@@ -13,4 +14,16 @@ from .proposal import proposal  # isort:skip
 from .sky import sky  # isort:skip
 from .fluxstd import fluxstd  # isort:skip
 from .target import target  # isort:skip
-from .cluster import cluster  # isort:skip
+
+# from .cluster import cluster  # isort:skip
+
+__all__ = [
+    "filter_name",
+    "proposal_category",
+    "input_catalog",
+    "target_type",
+    "proposal",
+    "sky",
+    "fluxstd",
+    "target",
+]
