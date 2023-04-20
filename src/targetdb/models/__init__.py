@@ -15,9 +15,10 @@ from .sky import sky  # isort:skip
 from .fluxstd import fluxstd  # isort:skip
 from .target import target  # isort:skip
 
-# from .cluster import cluster  # isort:skip
+from .cluster import cluster  # isort:skip
 
 __all__ = [
+    "Base",
     "filter_name",
     "proposal_category",
     "input_catalog",
@@ -26,4 +27,5 @@ __all__ = [
     "sky",
     "fluxstd",
     "target",
+    "cluster",
 ]

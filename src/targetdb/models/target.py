@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import sqlalchemy as sa
 from sqlalchemy import (
     BigInteger,
     Boolean,
@@ -7,8 +8,10 @@ from sqlalchemy import (
     DateTime,
     Float,
     ForeignKey,
+    Index,
     Integer,
     String,
+    UniqueConstraint,
 )
 from sqlalchemy.orm import backref, relationship
 
@@ -17,6 +20,14 @@ from . import Base, filter_name, input_catalog, proposal, target_type
 
 class target(Base):
     __tablename__ = "target"
+    __table_args__ = (
+        UniqueConstraint("proposal_id", "ob_code", name="uq_proposal_id_ob_code"),
+        {},
+    )
+    # # add q3c index
+    # q3c_index = Index(
+    #     "target_q3c_ang2ipix_idx", sa.text('q3c_ang2ipix(ra, "dec")'), unique=False
+    # )
 
     target_id = Column(
         BigInteger,
