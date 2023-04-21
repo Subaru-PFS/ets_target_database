@@ -9,6 +9,7 @@ from sqlalchemy import (
     ForeignKey,
     Integer,
     String,
+    UniqueConstraint,
 )
 
 # from sqlalchemy.exc import OperationalError
@@ -20,6 +21,15 @@ from . import Base, filter_name, input_catalog, target_type
 
 class fluxstd(Base):
     __tablename__ = "fluxstd"
+    __table_args__ = (
+        UniqueConstraint(
+            "obj_id",
+            "input_catalog_id",
+            "version",
+            name="uq_obj_id_input_catalog_id_version",
+        ),
+        {},
+    )
 
     fluxstd_id = Column(
         BigInteger,
