@@ -186,7 +186,10 @@ class fluxstd(Base):
 
     # version string
     version = Column(
-        String, nullable=False, comment="Version string of the F-star selection"
+        String,
+        nullable=False,
+        index=True,
+        comment="Version string of the F-star selection",
     )
 
     # timestamp
