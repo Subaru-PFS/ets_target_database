@@ -163,6 +163,27 @@ class fluxstd(Base):
         comment="E(B-V) uncertainty flag, True if E(B-V) uncertainty is greater than 20%",
     )
 
+    # stellar parameters
+    teff_brutus = Column(Float, comment="Effective temperature from Brutus code [K]")
+    teff_brutus_low = Column(
+        Float,
+        comment="Lower confidence level (16%) of effective temperature from Brutus code [K]",
+    )
+    teff_brutus_high = Column(
+        Float,
+        comment="Upper confidence level (84%) of effective temperature from Brutus code [K]",
+    )
+
+    logg_brutus = Column(Float, comment="Surface gravity from Brutus code [log cgs]")
+    logg_brutus_low = Column(
+        Float,
+        comment="Lower confidence level (16%) of surface gravity from Brutus code [log cgs]",
+    )
+    logg_brutus_high = Column(
+        Float,
+        comment="Upper confidence level (84%) of surface gravity from Brutus code [log cgs]",
+    )
+
     # version string
     version = Column(
         String, nullable=False, comment="Version string of the F-star selection"
@@ -234,6 +255,12 @@ class fluxstd(Base):
         prob_f_star,
         flags_dist,
         flags_ebv,
+        teff_brutus,
+        teff_brutus_low,
+        teff_brutus_high,
+        logg_brutus,
+        logg_brutus_low,
+        logg_brutus_high,
         version,
         created_at,
         updated_at,
@@ -286,5 +313,11 @@ class fluxstd(Base):
         self.flags_dist = flags_dist
         self.flags_ebv = flags_ebv
         self.version = version
+        self.teff_brutus = teff_brutus
+        self.teff_brutus_low = teff_brutus_low
+        self.teff_brutus_high = teff_brutus_high
+        self.logg_brutus = logg_brutus
+        self.logg_brutus_low = logg_brutus_low
+        self.logg_brutus_high = logg_brutus_high
         self.created_at = created_at
         self.updated_at = updated_at
