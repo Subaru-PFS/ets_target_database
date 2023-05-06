@@ -8,6 +8,7 @@ from sqlalchemy import (
     ForeignKey,
     Integer,
     String,
+    UniqueConstraint,
 )
 from sqlalchemy.orm import backref, relationship
 
@@ -16,6 +17,15 @@ from . import Base, input_catalog, target_type
 
 class sky(Base):
     __tablename__ = "sky"
+    # __table_args__ = (
+    #     UniqueConstraint(
+    #         "obj_id",
+    #         "input_catalog_id",
+    #         "version",
+    #         name="uq_sky_obj_id_input_catalog_id_version",
+    #     ),
+    #     {},
+    # )
 
     sky_id = Column(
         BigInteger,
@@ -63,6 +73,7 @@ class sky(Base):
         Integer,
         ForeignKey("input_catalog.input_catalog_id"),
         nullable=False,
+        index=True,
         comment="input_catalog_id from the input_catalog table",
     )
 
@@ -79,7 +90,7 @@ class sky(Base):
 
     # version string
     version = Column(
-        String, nullable=False, comment="Version string of the sky position"
+        String, nullable=False, index=True, comment="Version string of the sky position"
     )
 
     # timestamp
