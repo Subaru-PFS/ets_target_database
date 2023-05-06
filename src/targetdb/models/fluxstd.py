@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import sqlalchemy
 from sqlalchemy import (
     BigInteger,
     Boolean,
@@ -7,6 +8,7 @@ from sqlalchemy import (
     DateTime,
     Float,
     ForeignKey,
+    Index,
     Integer,
     String,
     UniqueConstraint,
@@ -28,6 +30,7 @@ class fluxstd(Base):
             "version",
             name="uq_obj_id_input_catalog_id_version",
         ),
+        Index("fluxstd_q3c_ang2ipix_idx", sqlalchemy.text("q3c_ang2ipix(ra, dec)")),
         {},
     )
 

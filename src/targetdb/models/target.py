@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import sqlalchemy as sa
+import sqlalchemy
 from sqlalchemy import (
     BigInteger,
     Boolean,
@@ -22,12 +22,9 @@ class target(Base):
     __tablename__ = "target"
     __table_args__ = (
         UniqueConstraint("proposal_id", "ob_code", name="uq_proposal_id_ob_code"),
+        Index("target_q3c_ang2ipix_idx", sqlalchemy.text("q3c_ang2ipix(ra, dec)")),
         {},
     )
-    # # add q3c index
-    # q3c_index = Index(
-    #     "target_q3c_ang2ipix_idx", sa.text('q3c_ang2ipix(ra, "dec")'), unique=False
-    # )
 
     target_id = Column(
         BigInteger,

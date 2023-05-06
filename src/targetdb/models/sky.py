@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 
+import sqlalchemy
 from sqlalchemy import (
     BigInteger,
     Column,
     DateTime,
     Float,
     ForeignKey,
+    Index,
     Integer,
     String,
     UniqueConstraint,
@@ -26,6 +28,13 @@ class sky(Base):
     #     ),
     #     {},
     # )
+    __table_args__ = (
+        Index(
+            "sky_q3c_ang2ipix_idx",
+            sqlalchemy.text("q3c_ang2ipix(ra, dec)"),
+        ),
+        {},
+    )
 
     sky_id = Column(
         BigInteger,
