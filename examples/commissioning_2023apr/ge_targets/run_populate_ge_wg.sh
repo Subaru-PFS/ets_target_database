@@ -20,12 +20,17 @@ DRYRUN=""
 #     --skip_fluxstd \
 #     --skip_sky
 
-python ./append_ge_wg_targets_2023apr.py \
-    ${CONFFILE} ${DRYRUN} \
-    --infile ${DATADIR}/ge_run11_wg_cos.csv \
-    --input_catalog "hscssp_pdr3_dud"
+#python ./append_ge_wg_targets_2023apr.py \
+#    ${CONFFILE} ${DRYRUN} \
+#    --infile ${DATADIR}/ge_run11_wg_cos.csv \
+#    --input_catalog "hscssp_pdr3_dud"
 
-python ./append_ge_wg_targets_2023apr.py \
+#python ./append_ge_wg_targets_2023apr.py \
+#    ${CONFFILE} ${DRYRUN} \
+#    --infile ${DATADIR}/ge_run11_wg_en1.csv \
+#    --input_catalog "hscssp_pdr3_dud"
+
+python ./append_ge_wg_targets_additional_2023apr.py \
     ${CONFFILE} ${DRYRUN} \
-    --infile ${DATADIR}/ge_run11_wg_en1.csv \
+    --infile ${DATADIR}/RQG_y_brightest.cat \
     --input_catalog "hscssp_pdr3_dud"
