@@ -18,11 +18,11 @@
 # -- Project information -----------------------------------------------------
 
 project = "PFS Target Database (targetDB)"
-copyright = "2022, Masato Onodera"
+copyright = "2023, Masato Onodera"
 author = "Masato Onodera"
 
 # The full version, including alpha/beta/rc tags
-release = "2021"
+release = ""
 
 
 # -- General configuration ---------------------------------------------------
@@ -32,12 +32,17 @@ release = "2021"
 # ones.
 extensions = [
     "myst_parser",
+    "sphinx_markdown_tables",
 ]
 
-ource_suffix = {
+source_suffix = {
     ".rst": "restructuredtext",
     # '.txt': 'restructuredtext',
     ".md": "markdown",
+}
+
+source_parsers = {
+    ".md": "recommonmark.parser.CommonMarkParser",
 }
 
 # Add any paths that contain templates here, relative to this directory.
@@ -54,7 +59,8 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "alabaster"
+# html_theme = "alabaster"
+html_theme = "sphinx_material"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -63,5 +69,6 @@ html_static_path = ["_static"]
 
 
 html_theme_options = {
+    "color_primary": "deep-purple"
     # "page_width": "100%",
 }

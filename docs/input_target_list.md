@@ -6,70 +6,70 @@
 
 The following information is required for each _proposal_.
 
-| name          | datatype | description                    | required | default |
-|---------------|----------|--------------------------------|----------|---------|
-| `proposal_id` | str      | Proposal ID (e.g., S22A-QN001) | *        |         |
+| name          | type | description                    | required | default |
+|---------------|------|--------------------------------|----------|---------|
+| `proposal_id` | str  | Proposal ID (e.g., S22A-QN001) | *        |         |
 
 
 ### Target-related information
 
 The following information is required for each _target_.
 
-| name                     | datatype | description                                                                | required | default |
-|--------------------------|----------|----------------------------------------------------------------------------|----------|---------|
-| `ob_code`                | str      | OB code unique in a proposal                                               | *        |         |
-| `obj_id`                 | int64    | Object ID                                                                  | *        |         |
-| `ra`                     | float    | RA (ICRS, degree)                                                          | *        |         |
-| `dec`                    | float    | Dec (ICRS, degree)                                                         | *        |         |
-| `epoch`                  | str      | Epoch (e.g., J2000.0, J2016.0)                                             |          | J2000.0 |
-| `parallax`               | float    | Parallax (mas)                                                             |          | 1e-7    |
-| `pmra`                   | float    | Proper motion in right ascension (mas/yr) direction                        |          | 0.0     |
-| `pmdec`                  | float    | Proper motion in declination (mas/yr) direction                            |          | 0.0     |
-| `tract`                  | int      | Same definition as HSC-SSP                                                 |          | Null    |
-| `patch`                  | int      | Same definition as HSC-SSP                                                 |          | Null    |
-| `input_catalog`          | str      | Input catalog name (e.g., hscssp_pdr3_wide)                                |          | (TBD)   |
-| `priority`               | float    | Priority defined by the observer within the proposal                       | *        |         |
-| `effective_exptime `     | float    | Requested effective exposure time (s)                                      | *        |         |
-| `filter_g`               | str      | g-band filter                                                              |          | Null    |
-| `filter_r`               | str      | r-band filter                                                              |          | Null    |
-| `filter_i`               | str      | i-band filter                                                              |          | Null    |
-| `filter_z`               | str      | z-band filter                                                              |          | Null    |
-| `filter_y`               | str      | y-band filter                                                              |          | Null    |
-| `filter_j`               | str      | J band filter                                                              |          | Null    |
-| `fiber_mag_g `           | float    | g-band magnitude within a fiber (AB mag)                                   |          | Null    |
-| `fiber_mag_r `           | float    | r-band magnitude within a fiber (AB mag)                                   |          | Null    |
-| `fiber_mag_i `           | float    | i-band magnitude within a fiber (AB mag)                                   |          | Null    |
-| `fiber_mag_z `           | float    | z-band magnitude within a fiber (AB mag)                                   |          | Null    |
-| `fiber_mag_y `           | float    | y-band magnitude within a fiber (AB mag)                                   |          | Null    |
-| `fiber_mag_j `           | float    | J band magnitude within a fiber (AB mag)                                   |          | Null    |
-| `psf_mag_g `             | float    | g-band PSF magnitude (AB mag)                                              |          | Null    |
-| `psf_mag_r `             | float    | r-band PSF magnitude (AB mag)                                              |          | Null    |
-| `psf_mag_i `             | float    | i-band PSF magnitude (AB mag)                                              |          | Null    |
-| `psf_mag_z `             | float    | z-band PSF magnitude (AB mag)                                              |          | Null    |
-| `psf_mag_y `             | float    | y-band PSF magnitude (AB mag)                                              |          | Null    |
-| `psf_mag_j `             | float    | J band PSF magnitude (AB mag)                                              |          | Null    |
-| `psf_flux_g`             | float    | g-band PSF flux (nJy)                                                      |          | Null    |
-| `psf_flux_r`             | float    | r-band PSF flux (nJy)                                                      |          | Null    |
-| `psf_flux_i`             | float    | i-band PSF flux (nJy)                                                      |          | Null    |
-| `psf_flux_z`             | float    | z-band PSF flux (nJy)                                                      |          | Null    |
-| `psf_flux_y`             | float    | y-band PSF flux (nJy)                                                      |          | Null    |
-| `psf_flux_j`             | float    | J band PSF flux (nJy)                                                      |          | Null    |
-| `psf_mag_error_g `       | float    | Error in g-band PSF magnitude (AB mag)                                     |          | Null    |
-| `psf_mag_error_r `       | float    | Error in r-band PSF magnitude (AB mag)                                     |          | Null    |
-| `psf_mag_error_i `       | float    | Error in i-band PSF magnitude (AB mag)                                     |          | Null    |
-| `psf_mag_error_z `       | float    | Error in z-band PSF magnitude (AB mag)                                     |          | Null    |
-| `psf_mag_error_y `       | float    | Error in y-band PSF magnitude (AB mag)                                     |          | Null    |
-| `psf_mag_error_j `       | float    | Error in J band PSF magnitude (AB mag)                                     |          | Null    |
-| `psf_flux_error_g`       | float    | Error in g-band PSF flux (nJy)                                             |          | Null    |
-| `psf_flux_error_r`       | float    | Error in r-band PSF flux (nJy)                                             |          | Null    |
-| `psf_flux_error_i`       | float    | Error in i-band PSF flux (nJy)                                             |          | Null    |
-| `psf_flux_error_z`       | float    | Error in z-band PSF flux (nJy)                                             |          | Null    |
-| `psf_flux_error_y`       | float    | Error in y-band PSF flux (nJy)                                             |          | Null    |
-| `psf_flux_error_j`       | float    | Error in J band PSF flux (nJy)                                             |          | Null    |
-| `is_medium_resolution`   | bool     | True if the medium resolution mode is requested                            |          | False   |
-| `qa_relative_throughput` | float    | Relative throughput to the reference value requested by the observer       |          | 1.0     |
-| `qa_relative_noise `     | float    | Relative noise to the reference value requested by the observer            |          | 1.0     |
-| `qa_reference_lambda `   | float    | Reference wavelength to evaluate effective exposure time (angstrom or nm?) |          | (TBD)   |
+| name                     | type  | description                                          | unit          | required | default |
+|--------------------------|-------|------------------------------------------------------|---------------|----------|---------|
+| `ob_code`                | str   | Code for a target entry, unique in a proposal        |               | *        |         |
+| `obj_id`                 | int64 | Object ID                                            |               | *        |         |
+| `ra`                     | float | RA (ICRS)                                            | degree        | *        |         |
+| `dec`                    | float | Dec (ICRS)                                           | degree        | *        |         |
+| `epoch`                  | str   | Epoch (e.g., J2000.0, J2016.0)                       |               |          | J2000.0 |
+| `parallax`               | float | Parallax                                             | mas           |          | 1e-7    |
+| `pmra`                   | float | Proper motion in right ascension direction           | mas/yr        |          | 0.0     |
+| `pmdec`                  | float | Proper motion in declination direction               | mas/yr        |          | 0.0     |
+| `tract`                  | int   | Same definition as HSC-SSP (TBD)                     |               |          | Null    |
+| `patch`                  | int   | Same definition as HSC-SSP (TBD)                     |               |          | Null    |
+| `input_catalog_name`     | str   | Input catalog name (e.g., `hscssp_pdr3_wide`)        |               |          | (TBD)   |
+| `priority`               | float | Priority defined by the observer within the proposal |               | *        |         |
+| `effective_exptime `     | float | Requested effective exposure time                    |               | *        |         |
+| `filter_g`               | str   | g-band filter                                        |               | s        | Null    |
+| `filter_r`               | str   | r-band filter                                        |               |          | Null    |
+| `filter_i`               | str   | i-band filter                                        |               |          | Null    |
+| `filter_z`               | str   | z-band filter                                        |               |          | Null    |
+| `filter_y`               | str   | y-band filter                                        |               |          | Null    |
+| `filter_j`               | str   | J band filter                                        |               |          | Null    |
+| `fiber_mag_g `           | float | g-band magnitude within a fiber                      | AB mag        |          | Null    |
+| `fiber_mag_r `           | float | r-band magnitude within a fiber                      | AB mag        |          | Null    |
+| `fiber_mag_i `           | float | i-band magnitude within a fiber                      | AB mag        |          | Null    |
+| `fiber_mag_z `           | float | z-band magnitude within a fiber                      | AB mag        |          | Null    |
+| `fiber_mag_y `           | float | y-band magnitude within a fiber                      | AB mag        |          | Null    |
+| `fiber_mag_j `           | float | J band magnitude within a fiber                      | AB mag        |          | Null    |
+| `psf_mag_g `             | float | g-band PSF magnitude                                 | AB mag        |          | Null    |
+| `psf_mag_r `             | float | r-band PSF magnitude                                 | AB mag        |          | Null    |
+| `psf_mag_i `             | float | i-band PSF magnitude                                 | AB mag        |          | Null    |
+| `psf_mag_z `             | float | z-band PSF magnitude                                 | AB mag        |          | Null    |
+| `psf_mag_y `             | float | y-band PSF magnitude                                 | AB mag        |          | Null    |
+| `psf_mag_j `             | float | J band PSF magnitude                                 | AB mag        |          | Null    |
+| `psf_flux_g`             | float | g-band PSF flux                                      | nJy           |          | Null    |
+| `psf_flux_r`             | float | r-band PSF flux                                      | nJy           |          | Null    |
+| `psf_flux_i`             | float | i-band PSF flux                                      | nJy           |          | Null    |
+| `psf_flux_z`             | float | z-band PSF flux                                      | nJy           |          | Null    |
+| `psf_flux_y`             | float | y-band PSF flux                                      | nJy           |          | Null    |
+| `psf_flux_j`             | float | J band PSF flux                                      | nJy           |          | Null    |
+| `psf_mag_error_g `       | float | Error in g-band PSF magnitude                        | AB mag        |          | Null    |
+| `psf_mag_error_r `       | float | Error in r-band PSF magnitude                        | AB mag        |          | Null    |
+| `psf_mag_error_i `       | float | Error in i-band PSF magnitude                        | AB mag        |          | Null    |
+| `psf_mag_error_z `       | float | Error in z-band PSF magnitude                        | AB mag        |          | Null    |
+| `psf_mag_error_y `       | float | Error in y-band PSF magnitude                        | AB mag        |          | Null    |
+| `psf_mag_error_j `       | float | Error in J band PSF magnitude                        | AB mag        |          | Null    |
+| `psf_flux_error_g`       | float | Error in g-band PSF flux                             | nJy           |          | Null    |
+| `psf_flux_error_r`       | float | Error in r-band PSF flux                             | nJy           |          | Null    |
+| `psf_flux_error_i`       | float | Error in i-band PSF flux                             | nJy           |          | Null    |
+| `psf_flux_error_z`       | float | Error in z-band PSF flux                             | nJy           |          | Null    |
+| `psf_flux_error_y`       | float | Error in y-band PSF flux                             | nJy           |          | Null    |
+| `psf_flux_error_j`       | float | Error in J band PSF flux                             | nJy           |          | Null    |
+| `is_medium_resolution`   | bool  | `True` if the medium resolution mode is requested    |               |          | `False` |
+| `qa_relative_throughput` | float | Relative throughput to the reference value           |               |          | 1.0     |
+| `qa_relative_noise `     | float | Relative noise to the reference value                |               |          | 1.0     |
+| `qa_reference_lambda `   | float | Reference wavelength for QA (angstrom or nm?)        | &#8491; or nm |          | (TBD)   |
 
 
 #### Notes
@@ -78,7 +78,7 @@ The following information is required for each _target_.
 
 If the look-up `tract` and `patch` from the coordinates is not expensive, it is possible for the observatory to automatically fill these information without asking inputs from observers.
 
-##### `input_catalog`
+##### `input_catalog_name`
 
 Currently, the following catalogs are considered, and the list can be easily expanded.
 
@@ -99,7 +99,7 @@ input_catalog_id,input_catalog_name,input_catalog_description
 12,"hscssp_pdr4_dud","HSC-SSP Public Data Release 4 (Deep+UltraDeep)"
 ```
 
-For individual proposals, either assigning a new `input_catalog_id` (e.g., s22a-qn0001_00001 with `input_catalog_id=10001`) or allow them to use pre-assigned `input_catalog` should work.
+For individual proposals, either assigning a new `input_catalog_id` (e.g., s22a-qn0001_00001 with `input_catalog_id=10001`) or allow them to use pre-assigned `input_catalog` should work. Exact policy is still under discussion.
 
 
 ## Inputs from the observatory

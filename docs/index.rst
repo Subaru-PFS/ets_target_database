@@ -7,11 +7,21 @@ Welcome to PFS Target Database (targetDB)'s documentation!
 ==========================================================
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+   :caption: Information for PI
+   :maxdepth: 1
 
-   input_target_list
+   Input target list <input_target_list>
 
+.. toctree::
+   :caption: Information for Developers/Observatory
+   :maxdepth: 1
+
+   Flux standards
+   Input Catalogs
+   Proposals
+   Proposal Categories
+   Sky objects
+   Target Types
 
 
 Indices and tables
