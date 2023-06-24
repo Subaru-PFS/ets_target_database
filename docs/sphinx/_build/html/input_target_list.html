@@ -1,0 +1,977 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="lang:clipboard.copy" content="Copy to clipboard">
+  <meta name="lang:clipboard.copied" content="Copied to clipboard">
+  <meta name="lang:search.language" content="en">
+  <meta name="lang:search.pipeline.stopwords" content="True">
+  <meta name="lang:search.pipeline.trimmer" content="True">
+  <meta name="lang:search.result.none" content="No matching documents">
+  <meta name="lang:search.result.one" content="1 matching document">
+  <meta name="lang:search.result.other" content="# matching documents">
+  <meta name="lang:search.tokenizer" content="[\s\-]+">
+
+  
+    <link href="https://fonts.gstatic.com/" rel="preconnect" crossorigin>
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,500,700|Roboto:300,400,400i,700&display=fallback" rel="stylesheet">
+
+    <style>
+      body,
+      input {
+        font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif
+      }
+
+      code,
+      kbd,
+      pre {
+        font-family: "Roboto Mono", "Courier New", Courier, monospace
+      }
+    </style>
+  
+
+  <link rel="stylesheet" href="_static/stylesheets/application.css"/>
+  <link rel="stylesheet" href="_static/stylesheets/application-palette.css"/>
+  <link rel="stylesheet" href="_static/stylesheets/application-fixes.css"/>
+  
+  <link rel="stylesheet" href="_static/fonts/material-icons.css"/>
+  
+  <meta name="theme-color" content="#3f51b5">
+  <script src="_static/javascripts/modernizr.js"></script>
+  
+  
+  
+    <title>Input Target List &#8212; PFS Target Database (targetDB)  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/material.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Welcome to PFS Target Database (targetDB)’s documentation!" href="index.html" />
+  
+   
+
+  </head>
+  <body dir=ltr
+        data-md-color-primary=deep-purple data-md-color-accent=blue>
+  
+  <svg class="md-svg">
+    <defs data-children-count="0">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448" viewBox="0 0 416 448" id="__github"><path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19T128 352t-18.125-8.5-10.75-19T96 304t3.125-20.5 10.75-19T128 256t18.125 8.5 10.75 19T160 304zm160 0q0 10-3.125 20.5t-10.75 19T288 352t-18.125-8.5-10.75-19T256 304t3.125-20.5 10.75-19T288 256t18.125 8.5 10.75 19T320 304zm40 0q0-30-17.25-51T296 232q-10.25 0-48.75 5.25Q229.5 240 208 240t-39.25-2.75Q130.75 232 120 232q-29.5 0-46.75 21T56 304q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75T360 304zm56-44q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5T212 416q-19.5 0-35.5-.75t-36.875-3.125-38.125-7.5-34.25-12.875T37 371.5t-21.5-28.75Q0 312 0 260q0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875Q171.5 96 212 96q37 0 70 8 26.25-20.5 46.75-30.25T376 64q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z"/></svg>
+      
+    </defs>
+  </svg>
+  
+  <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer">
+  <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search">
+  <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+  <a href="#input_target_list" tabindex="1" class="md-skip"> Skip to content </a>
+  <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex navheader">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href="index.html" title="PFS Target Database (targetDB)  documentation"
+           class="md-header-nav__button md-logo">
+          
+            &nbsp;
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          <span class="md-header-nav__topic">PFS Target Database (targetDB)  documentation</span>
+          <span class="md-header-nav__topic"> Input Target List </span>
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+        
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" action="search.html" method="get" name="search">
+      <input type="text" class="md-search__input" name="q" placeholder="Search"
+             autocapitalize="off" autocomplete="off" spellcheck="false"
+             data-md-component="query" data-md-state="active">
+      <label class="md-icon md-search__icon" for="__search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
+        &#xE5CD;
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result">
+          <div class="md-search-result__meta">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+      </div>
+      
+      
+  
+  <script src="_static/javascripts/version_dropdown.js"></script>
+  <script>
+    var json_loc = ""versions.json"",
+        target_loc = "../",
+        text = "Versions";
+    $( document ).ready( add_version_dropdown(json_loc, target_loc, text));
+  </script>
+  
+
+    </div>
+  </nav>
+</header>
+
+  
+  <div class="md-container">
+    
+    
+    
+  <nav class="md-tabs" data-md-component="tabs">
+    <div class="md-tabs__inner md-grid">
+      <ul class="md-tabs__list">
+          <li class="md-tabs__item"><a href="index.html" class="md-tabs__link">PFS Target Database (targetDB)  documentation</a></li>
+      </ul>
+    </div>
+  </nav>
+    <main class="md-main">
+      <div class="md-main__inner md-grid" data-md-component="container">
+        
+          <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+            <div class="md-sidebar__scrollwrap">
+              <div class="md-sidebar__inner">
+                <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <a href="index.html" title="PFS Target Database (targetDB) documentation" class="md-nav__button md-logo">
+      
+        <img src="_static/" alt=" logo" width="48" height="48">
+      
+    </a>
+    <a href="index.html"
+       title="PFS Target Database (targetDB) documentation">PFS Target Database (targetDB)  documentation</a>
+  </label>
+  
+
+</nav>
+              </div>
+            </div>
+          </div>
+          <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+            <div class="md-sidebar__scrollwrap">
+              <div class="md-sidebar__inner">
+                
+<nav class="md-nav md-nav--secondary">
+    <label class="md-nav__title" for="__toc">Contents</label>
+  <ul class="md-nav__list" data-md-scrollfix="">
+        <li class="md-nav__item"><a href="#input-target-list--page-root" class="md-nav__link">Input Target List</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#inputs-from-observers" class="md-nav__link">Inputs from observers</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#proposal-related-information" class="md-nav__link">Proposal-related information</a>
+        </li>
+        <li class="md-nav__item"><a href="#target-related-information" class="md-nav__link">Target-related information</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#notes" class="md-nav__link">Notes</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#tract-patch" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">tract</span></code>, <code class="docutils literal notranslate"><span class="pre">patch</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#input-catalog-name" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">input_catalog_name</span></code></a>
+        </li></ul>
+            </nav>
+        </li></ul>
+            </nav>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#inputs-from-the-observatory" class="md-nav__link">Inputs from the observatory</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#proposal-category" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">proposal_category</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#target-type" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">target_type</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#proposal" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">proposal</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#other-tables" class="md-nav__link">Other tables</a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#file-format" class="md-nav__link">File format</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#example" class="md-nav__link">Example</a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#notes-on-future-development" class="md-nav__link">Notes on future development</a>
+        </li></ul>
+            </nav>
+        </li>
+    
+<li class="md-nav__item"><a class="md-nav__extra_link" href="_sources/input_target_list.md.txt">Show Source</a> </li>
+
+<li id="searchbox" class="md-nav__item"></li>
+
+  </ul>
+</nav>
+              </div>
+            </div>
+          </div>
+        
+        <div class="md-content">
+          <article class="md-content__inner md-typeset" role="main">
+            
+  <section id="input-target-list">
+<h1 id="input-target-list--page-root">Input Target List<a class="headerlink" href="#input-target-list--page-root" title="Permalink to this heading">¶</a></h1>
+<section id="inputs-from-observers">
+<h2 id="inputs-from-observers">Inputs from observers<a class="headerlink" href="#inputs-from-observers" title="Permalink to this heading">¶</a></h2>
+<section id="proposal-related-information">
+<h3 id="proposal-related-information">Proposal-related information<a class="headerlink" href="#proposal-related-information" title="Permalink to this heading">¶</a></h3>
+<p>The following information is required for each <em>proposal</em>.</p>
+<table border="1">
+<thead>
+<tr>
+<th>name</th>
+<th>type</th>
+<th>description</th>
+<th>required</th>
+<th>default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>proposal_id</code></td>
+<td>str</td>
+<td>Proposal ID (e.g., S22A-QN001)</td>
+<td>*</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="target-related-information">
+<h3 id="target-related-information">Target-related information<a class="headerlink" href="#target-related-information" title="Permalink to this heading">¶</a></h3>
+<p>The following information is required for each <em>target</em>.</p>
+<table border="1">
+<thead>
+<tr>
+<th>name</th>
+<th>type</th>
+<th>description</th>
+<th>unit</th>
+<th>required</th>
+<th>default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ob_code</code></td>
+<td>str</td>
+<td>Code for a target entry, unique in a proposal</td>
+<td></td>
+<td>*</td>
+<td></td>
+</tr>
+<tr>
+<td><code>obj_id</code></td>
+<td>int64</td>
+<td>Object ID</td>
+<td></td>
+<td>*</td>
+<td></td>
+</tr>
+<tr>
+<td><code>ra</code></td>
+<td>float</td>
+<td>RA (ICRS)</td>
+<td>degree</td>
+<td>*</td>
+<td></td>
+</tr>
+<tr>
+<td><code>dec</code></td>
+<td>float</td>
+<td>Dec (ICRS)</td>
+<td>degree</td>
+<td>*</td>
+<td></td>
+</tr>
+<tr>
+<td><code>epoch</code></td>
+<td>str</td>
+<td>Epoch (e.g., J2000.0, J2016.0)</td>
+<td></td>
+<td></td>
+<td>J2000.0</td>
+</tr>
+<tr>
+<td><code>parallax</code></td>
+<td>float</td>
+<td>Parallax</td>
+<td>mas</td>
+<td></td>
+<td>1e-7</td>
+</tr>
+<tr>
+<td><code>pmra</code></td>
+<td>float</td>
+<td>Proper motion in right ascension direction</td>
+<td>mas/yr</td>
+<td></td>
+<td>0.0</td>
+</tr>
+<tr>
+<td><code>pmdec</code></td>
+<td>float</td>
+<td>Proper motion in declination direction</td>
+<td>mas/yr</td>
+<td></td>
+<td>0.0</td>
+</tr>
+<tr>
+<td><code>tract</code></td>
+<td>int</td>
+<td>Same definition as HSC-SSP (TBD)</td>
+<td></td>
+<td></td>
+<td>Null</td>
+</tr>
+<tr>
+<td><code>patch</code></td>
+<td>int</td>
+<td>Same definition as HSC-SSP (TBD)</td>
+<td></td>
+<td></td>
+<td>Null</td>
+</tr>
+<tr>
+<td><code>input_catalog_name</code></td>
+<td>str</td>
+<td>Input catalog name (e.g., <code>hscssp_pdr3_wide</code>)</td>
+<td></td>
+<td></td>
+<td>(TBD)</td>
+</tr>
+<tr>
+<td><code>priority</code></td>
+<td>float</td>
+<td>Priority defined by the observer within the proposal</td>
+<td></td>
+<td>*</td>
+<td></td>
+</tr>
+<tr>
+<td><code>effective_exptime</code></td>
+<td>float</td>
+<td>Requested effective exposure time</td>
+<td></td>
+<td>*</td>
+<td></td>
+</tr>
+<tr>
+<td><code>filter_g</code></td>
+<td>str</td>
+<td>g-band filter</td>
+<td></td>
+<td>s</td>
+<td>Null</td>
+</tr>
+<tr>
+<td><code>filter_r</code></td>
+<td>str</td>
+<td>r-band filter</td>
+<td></td>
+<td></td>
+<td>Null</td>
+</tr>
+<tr>
+<td><code>filter_i</code></td>
+<td>str</td>
+<td>i-band filter</td>
+<td></td>
+<td></td>
+<td>Null</td>
+</tr>
+<tr>
+<td><code>filter_z</code></td>
+<td>str</td>
+<td>z-band filter</td>
+<td></td>
+<td></td>
+<td>Null</td>
+</tr>
+<tr>
+<td><code>filter_y</code></td>
+<td>str</td>
+<td>y-band filter</td>
+<td></td>
+<td></td>
+<td>Null</td>
+</tr>
+<tr>
+<td><code>filter_j</code></td>
+<td>str</td>
+<td>J band filter</td>
+<td></td>
+<td></td>
+<td>Null</td>
+</tr>
+<tr>
+<td><code>fiber_mag_g</code></td>
+<td>float</td>
+<td>g-band magnitude within a fiber</td>
+<td>AB mag</td>
+<td></td>
+<td>Null</td>
+</tr>
+<tr>
+<td><code>fiber_mag_r</code></td>
+<td>float</td>
+<td>r-band magnitude within a fiber</td>
+<td>AB mag</td>
+<td></td>
+<td>Null</td>
+</tr>
+<tr>
+<td><code>fiber_mag_i</code></td>
+<td>float</td>
+<td>i-band magnitude within a fiber</td>
+<td>AB mag</td>
+<td></td>
+<td>Null</td>
+</tr>
+<tr>
+<td><code>fiber_mag_z</code></td>
+<td>float</td>
+<td>z-band magnitude within a fiber</td>
+<td>AB mag</td>
+<td></td>
+<td>Null</td>
+</tr>
+<tr>
+<td><code>fiber_mag_y</code></td>
+<td>float</td>
+<td>y-band magnitude within a fiber</td>
+<td>AB mag</td>
+<td></td>
+<td>Null</td>
+</tr>
+<tr>
+<td><code>fiber_mag_j</code></td>
+<td>float</td>
+<td>J band magnitude within a fiber</td>
+<td>AB mag</td>
+<td></td>
+<td>Null</td>
+</tr>
+<tr>
+<td><code>psf_mag_g</code></td>
+<td>float</td>
+<td>g-band PSF magnitude</td>
+<td>AB mag</td>
+<td></td>
+<td>Null</td>
+</tr>
+<tr>
+<td><code>psf_mag_r</code></td>
+<td>float</td>
+<td>r-band PSF magnitude</td>
+<td>AB mag</td>
+<td></td>
+<td>Null</td>
+</tr>
+<tr>
+<td><code>psf_mag_i</code></td>
+<td>float</td>
+<td>i-band PSF magnitude</td>
+<td>AB mag</td>
+<td></td>
+<td>Null</td>
+</tr>
+<tr>
+<td><code>psf_mag_z</code></td>
+<td>float</td>
+<td>z-band PSF magnitude</td>
+<td>AB mag</td>
+<td></td>
+<td>Null</td>
+</tr>
+<tr>
+<td><code>psf_mag_y</code></td>
+<td>float</td>
+<td>y-band PSF magnitude</td>
+<td>AB mag</td>
+<td></td>
+<td>Null</td>
+</tr>
+<tr>
+<td><code>psf_mag_j</code></td>
+<td>float</td>
+<td>J band PSF magnitude</td>
+<td>AB mag</td>
+<td></td>
+<td>Null</td>
+</tr>
+<tr>
+<td><code>psf_flux_g</code></td>
+<td>float</td>
+<td>g-band PSF flux</td>
+<td>nJy</td>
+<td></td>
+<td>Null</td>
+</tr>
+<tr>
+<td><code>psf_flux_r</code></td>
+<td>float</td>
+<td>r-band PSF flux</td>
+<td>nJy</td>
+<td></td>
+<td>Null</td>
+</tr>
+<tr>
+<td><code>psf_flux_i</code></td>
+<td>float</td>
+<td>i-band PSF flux</td>
+<td>nJy</td>
+<td></td>
+<td>Null</td>
+</tr>
+<tr>
+<td><code>psf_flux_z</code></td>
+<td>float</td>
+<td>z-band PSF flux</td>
+<td>nJy</td>
+<td></td>
+<td>Null</td>
+</tr>
+<tr>
+<td><code>psf_flux_y</code></td>
+<td>float</td>
+<td>y-band PSF flux</td>
+<td>nJy</td>
+<td></td>
+<td>Null</td>
+</tr>
+<tr>
+<td><code>psf_flux_j</code></td>
+<td>float</td>
+<td>J band PSF flux</td>
+<td>nJy</td>
+<td></td>
+<td>Null</td>
+</tr>
+<tr>
+<td><code>psf_mag_error_g</code></td>
+<td>float</td>
+<td>Error in g-band PSF magnitude</td>
+<td>AB mag</td>
+<td></td>
+<td>Null</td>
+</tr>
+<tr>
+<td><code>psf_mag_error_r</code></td>
+<td>float</td>
+<td>Error in r-band PSF magnitude</td>
+<td>AB mag</td>
+<td></td>
+<td>Null</td>
+</tr>
+<tr>
+<td><code>psf_mag_error_i</code></td>
+<td>float</td>
+<td>Error in i-band PSF magnitude</td>
+<td>AB mag</td>
+<td></td>
+<td>Null</td>
+</tr>
+<tr>
+<td><code>psf_mag_error_z</code></td>
+<td>float</td>
+<td>Error in z-band PSF magnitude</td>
+<td>AB mag</td>
+<td></td>
+<td>Null</td>
+</tr>
+<tr>
+<td><code>psf_mag_error_y</code></td>
+<td>float</td>
+<td>Error in y-band PSF magnitude</td>
+<td>AB mag</td>
+<td></td>
+<td>Null</td>
+</tr>
+<tr>
+<td><code>psf_mag_error_j</code></td>
+<td>float</td>
+<td>Error in J band PSF magnitude</td>
+<td>AB mag</td>
+<td></td>
+<td>Null</td>
+</tr>
+<tr>
+<td><code>psf_flux_error_g</code></td>
+<td>float</td>
+<td>Error in g-band PSF flux</td>
+<td>nJy</td>
+<td></td>
+<td>Null</td>
+</tr>
+<tr>
+<td><code>psf_flux_error_r</code></td>
+<td>float</td>
+<td>Error in r-band PSF flux</td>
+<td>nJy</td>
+<td></td>
+<td>Null</td>
+</tr>
+<tr>
+<td><code>psf_flux_error_i</code></td>
+<td>float</td>
+<td>Error in i-band PSF flux</td>
+<td>nJy</td>
+<td></td>
+<td>Null</td>
+</tr>
+<tr>
+<td><code>psf_flux_error_z</code></td>
+<td>float</td>
+<td>Error in z-band PSF flux</td>
+<td>nJy</td>
+<td></td>
+<td>Null</td>
+</tr>
+<tr>
+<td><code>psf_flux_error_y</code></td>
+<td>float</td>
+<td>Error in y-band PSF flux</td>
+<td>nJy</td>
+<td></td>
+<td>Null</td>
+</tr>
+<tr>
+<td><code>psf_flux_error_j</code></td>
+<td>float</td>
+<td>Error in J band PSF flux</td>
+<td>nJy</td>
+<td></td>
+<td>Null</td>
+</tr>
+<tr>
+<td><code>is_medium_resolution</code></td>
+<td>bool</td>
+<td><code>True</code> if the medium resolution mode is requested</td>
+<td></td>
+<td></td>
+<td><code>False</code></td>
+</tr>
+<tr>
+<td><code>qa_relative_throughput</code></td>
+<td>float</td>
+<td>Relative throughput to the reference value</td>
+<td></td>
+<td></td>
+<td>1.0</td>
+</tr>
+<tr>
+<td><code>qa_relative_noise</code></td>
+<td>float</td>
+<td>Relative noise to the reference value</td>
+<td></td>
+<td></td>
+<td>1.0</td>
+</tr>
+<tr>
+<td><code>qa_reference_lambda</code></td>
+<td>float</td>
+<td>Reference wavelength for QA (angstrom or nm?)</td>
+<td>Å or nm</td>
+<td></td>
+<td>(TBD)</td>
+</tr>
+</tbody>
+</table>
+<section id="notes">
+<h4 id="notes">Notes<a class="headerlink" href="#notes" title="Permalink to this heading">¶</a></h4>
+<section id="tract-patch">
+<h5 id="tract-patch"><code class="docutils literal notranslate"><span class="pre">tract</span></code>, <code class="docutils literal notranslate"><span class="pre">patch</span></code><a class="headerlink" href="#tract-patch" title="Permalink to this heading">¶</a></h5>
+<p>If the look-up <code class="docutils literal notranslate"><span class="pre">tract</span></code> and <code class="docutils literal notranslate"><span class="pre">patch</span></code> from the coordinates is not expensive, it is possible for the observatory to automatically fill these information without asking inputs from observers.</p>
+</section>
+<section id="input-catalog-name">
+<h5 id="input-catalog-name"><code class="docutils literal notranslate"><span class="pre">input_catalog_name</span></code><a class="headerlink" href="#input-catalog-name" title="Permalink to this heading">¶</a></h5>
+<p>Currently, the following catalogs are considered, and the list can be easily expanded.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">input_catalog_id</span><span class="p">,</span><span class="n">input_catalog_name</span><span class="p">,</span><span class="n">input_catalog_description</span>
+<span class="mi">0</span><span class="p">,</span><span class="s2">"simulated"</span><span class="p">,</span><span class="s2">"simulated catalog"</span>
+<span class="mi">1</span><span class="p">,</span><span class="s2">"gaia_dr1"</span><span class="p">,</span><span class="s2">"Gaia Data Release 1"</span>
+<span class="mi">2</span><span class="p">,</span><span class="s2">"gaia_dr2"</span><span class="p">,</span><span class="s2">"Gaia Data Release 2"</span>
+<span class="mi">3</span><span class="p">,</span><span class="s2">"gaia_edr3"</span><span class="p">,</span><span class="s2">"Gaia Early Data Release 3"</span>
+<span class="mi">4</span><span class="p">,</span><span class="s2">"gaia_dr3"</span><span class="p">,</span><span class="s2">"Gaia Data Release 3"</span>
+<span class="mi">5</span><span class="p">,</span><span class="s2">"hscssp_pdr1_wide"</span><span class="p">,</span><span class="s2">"HSC-SSP Public Data Release 1 (Wide)"</span>
+<span class="mi">6</span><span class="p">,</span><span class="s2">"hscssp_pdr1_dud"</span><span class="p">,</span><span class="s2">"HSC-SSP Public Data Release 1 (Deep+UltraDeep)"</span>
+<span class="mi">7</span><span class="p">,</span><span class="s2">"hscssp_pdr2_wide"</span><span class="p">,</span><span class="s2">"HSC-SSP Public Data Release 2 (Wide)"</span>
+<span class="mi">8</span><span class="p">,</span><span class="s2">"hscssp_pdr2_dud"</span><span class="p">,</span><span class="s2">"HSC-SSP Public Data Release 2 (Deep+UltraDeep)"</span>
+<span class="mi">9</span><span class="p">,</span><span class="s2">"hscssp_pdr3_wide"</span><span class="p">,</span><span class="s2">"HSC-SSP Public Data Release 3 (Wide)"</span>
+<span class="mi">10</span><span class="p">,</span><span class="s2">"hscssp_pdr3_dud"</span><span class="p">,</span><span class="s2">"HSC-SSP Public Data Release 3 (Deep+UltraDeep)"</span>
+<span class="mi">11</span><span class="p">,</span><span class="s2">"hscssp_pdr4_wide"</span><span class="p">,</span><span class="s2">"HSC-SSP Public Data Release 4 (Wide)"</span>
+<span class="mi">12</span><span class="p">,</span><span class="s2">"hscssp_pdr4_dud"</span><span class="p">,</span><span class="s2">"HSC-SSP Public Data Release 4 (Deep+UltraDeep)"</span>
+</pre></div>
+</div>
+<p>For individual proposals, either assigning a new <code class="docutils literal notranslate"><span class="pre">input_catalog_id</span></code> (e.g., s22a-qn0001_00001 with <code class="docutils literal notranslate"><span class="pre">input_catalog_id=10001</span></code>) or allow them to use pre-assigned <code class="docutils literal notranslate"><span class="pre">input_catalog</span></code> should work. Exact policy is still under discussion.</p>
+</section>
+</section>
+</section>
+</section>
+<section id="inputs-from-the-observatory">
+<h2 id="inputs-from-the-observatory">Inputs from the observatory<a class="headerlink" href="#inputs-from-the-observatory" title="Permalink to this heading">¶</a></h2>
+<p>In the background, the observatory needs to populate the rest of tables such as <code class="docutils literal notranslate"><span class="pre">proposal_category</span></code>, <code class="docutils literal notranslate"><span class="pre">proposal</span></code>, <code class="docutils literal notranslate"><span class="pre">target_type</span></code>, <code class="docutils literal notranslate"><span class="pre">input_catalog</span></code>, and <code class="docutils literal notranslate"><span class="pre">fluxstd</span></code>.</p>
+<section id="proposal-category">
+<h3 id="proposal-category"><code class="docutils literal notranslate"><span class="pre">proposal_category</span></code><a class="headerlink" href="#proposal-category" title="Permalink to this heading">¶</a></h3>
+<p>Currently, <code class="docutils literal notranslate"><span class="pre">proposal_category</span></code> contains the following information.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">proposal_category_id</span><span class="p">,</span><span class="n">proposal_category_name</span><span class="p">,</span><span class="n">proposal_category_description</span>
+<span class="mi">1</span><span class="p">,</span><span class="s2">"openuse"</span><span class="p">,</span><span class="s2">"Subaru openuse proposal"</span>
+<span class="mi">2</span><span class="p">,</span><span class="s2">"keck"</span><span class="p">,</span><span class="s2">"Subaru/Keck time exchange proposal"</span>
+<span class="mi">3</span><span class="p">,</span><span class="s2">"gemini"</span><span class="p">,</span><span class="s2">"Subaru/Gemini time exchange proposal"</span>
+<span class="mi">4</span><span class="p">,</span><span class="s2">"uh"</span><span class="p">,</span><span class="s2">"University of Hawaii proposal"</span>
+</pre></div>
+</div>
+</section>
+<section id="target-type">
+<h3 id="target-type"><code class="docutils literal notranslate"><span class="pre">target_type</span></code><a class="headerlink" href="#target-type" title="Permalink to this heading">¶</a></h3>
+<p>Currently, <code class="docutils literal notranslate"><span class="pre">target_type</span></code> contains teh following entries as defined by the <a class="reference external" href="https://github.com/Subaru-PFS/datamodel/blob/master/datamodel.txt">datamodel</a>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">target_type_id</span><span class="p">,</span><span class="n">target_type_name</span><span class="p">,</span><span class="n">target_type_description</span>
+<span class="mi">1</span><span class="p">,</span><span class="s2">"SCIENCE"</span><span class="p">,</span><span class="s2">"the fiber is intended to be on a science target"</span>
+<span class="mi">2</span><span class="p">,</span><span class="s2">"SKY"</span><span class="p">,</span><span class="s2">"the fiber is intended to be on blank sky, and used for sky subtraction"</span>
+<span class="mi">3</span><span class="p">,</span><span class="s2">"FLUXSTD"</span><span class="p">,</span><span class="s2">"the fiber is intended to be on a flux standard, and used for flux calibration"</span>
+<span class="mi">4</span><span class="p">,</span><span class="s2">"UNASSIGNED"</span><span class="p">,</span><span class="s2">"the fiber is not targeted on anything in particular"</span>
+<span class="mi">5</span><span class="p">,</span><span class="s2">"ENGINEERING"</span><span class="p">,</span><span class="s2">"the fiber is an engineering fiber"</span>
+<span class="mi">6</span><span class="p">,</span><span class="s2">"SUNSS_IMAGING"</span><span class="p">,</span><span class="s2">"the fiber goes to the SuNSS imaging leg"</span>
+<span class="mi">7</span><span class="p">,</span><span class="s2">"SUNSS_DIFFUSE"</span><span class="p">,</span><span class="s2">"the fiber goes to the SuNSS diffuse leg"</span>
+</pre></div>
+</div>
+</section>
+<section id="proposal">
+<h3 id="proposal"><code class="docutils literal notranslate"><span class="pre">proposal</span></code><a class="headerlink" href="#proposal" title="Permalink to this heading">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">proposal</span></code> table’s schema is the following.</p>
+<table border="1">
+<thead>
+<tr>
+<th style="text-align: left;">name</th>
+<th style="text-align: left;">type</th>
+<th style="text-align: left;">primary_key</th>
+<th style="text-align: left;">autoincrement</th>
+<th style="text-align: left;">comment</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">proposal_id</td>
+<td style="text-align: left;">VARCHAR</td>
+<td style="text-align: left;">True</td>
+<td style="text-align: left;">False</td>
+<td style="text-align: left;">Unique identifier for proposal (e.g, S21B-OT06?)</td>
+</tr>
+<tr>
+<td style="text-align: left;">group_id</td>
+<td style="text-align: left;">VARCHAR</td>
+<td style="text-align: left;">False</td>
+<td style="text-align: left;">False</td>
+<td style="text-align: left;">Group ID in STARS (e.g., o21195?)</td>
+</tr>
+<tr>
+<td style="text-align: left;">pi_first_name</td>
+<td style="text-align: left;">VARCHAR</td>
+<td style="text-align: left;">False</td>
+<td style="text-align: left;">False</td>
+<td style="text-align: left;">PI's first name</td>
+</tr>
+<tr>
+<td style="text-align: left;">pi_last_name</td>
+<td style="text-align: left;">VARCHAR</td>
+<td style="text-align: left;">False</td>
+<td style="text-align: left;">False</td>
+<td style="text-align: left;">PI's last name</td>
+</tr>
+<tr>
+<td style="text-align: left;">pi_middle_name</td>
+<td style="text-align: left;">VARCHAR</td>
+<td style="text-align: left;">False</td>
+<td style="text-align: left;">False</td>
+<td style="text-align: left;">PI's middle name</td>
+</tr>
+<tr>
+<td style="text-align: left;">rank</td>
+<td style="text-align: left;">FLOAT</td>
+<td style="text-align: left;">False</td>
+<td style="text-align: left;">False</td>
+<td style="text-align: left;">TAC score</td>
+</tr>
+<tr>
+<td style="text-align: left;">grade</td>
+<td style="text-align: left;">VARCHAR</td>
+<td style="text-align: left;">False</td>
+<td style="text-align: left;">False</td>
+<td style="text-align: left;">TAC grade (A/B/C/F in the case of HSC queue)</td>
+</tr>
+<tr>
+<td style="text-align: left;">allocated_time</td>
+<td style="text-align: left;">FLOAT</td>
+<td style="text-align: left;">False</td>
+<td style="text-align: left;">False</td>
+<td style="text-align: left;">Total fiberhours allocated by TAC (hour)</td>
+</tr>
+<tr>
+<td style="text-align: left;">proposal_category_id</td>
+<td style="text-align: left;">INTEGER</td>
+<td style="text-align: left;">False</td>
+<td style="text-align: left;">False</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">created_at</td>
+<td style="text-align: left;">DATETIME</td>
+<td style="text-align: left;">False</td>
+<td style="text-align: left;">False</td>
+<td style="text-align: left;">Creation time [YYYY-MM-DDThh:mm:ss] (UTC)</td>
+</tr>
+<tr>
+<td style="text-align: left;">updated_at</td>
+<td style="text-align: left;">DATETIME</td>
+<td style="text-align: left;">False</td>
+<td style="text-align: left;">False</td>
+<td style="text-align: left;">Update time [YYYY-MM-DDThh:mm:ss] (UTC)</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="other-tables">
+<h3 id="other-tables">Other tables<a class="headerlink" href="#other-tables" title="Permalink to this heading">¶</a></h3>
+<p>There are more tables which are still under development such as <code class="docutils literal notranslate"><span class="pre">sky</span></code> and <code class="docutils literal notranslate"><span class="pre">cluster</span></code>.</p>
+</section>
+</section>
+<section id="file-format">
+<h2 id="file-format">File format<a class="headerlink" href="#file-format" title="Permalink to this heading">¶</a></h2>
+<p>As a target list contains proposal-specific and target-specific information, a file format which can handle metadata would be preferable.</p>
+<p>A couple of candidates can be recommended.</p>
+<ol class="arabic simple">
+<li><p>FITS binary table</p></li>
+<li><p>ECSV (Enhanced CSV)</p></li>
+</ol>
+<p>Both can be easily prepared with Astropy.</p>
+<section id="example">
+<h3 id="example">Example<a class="headerlink" href="#example" title="Permalink to this heading">¶</a></h3>
+<p>Prepare a list for targets.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">astropy.table</span> <span class="kn">import</span> <span class="n">Table</span>
+<span class="n">tb</span> <span class="o">=</span> <span class="n">Table</span><span class="p">([[</span><span class="mi">42687868933508256</span><span class="p">,</span> <span class="mi">42687868933508552</span><span class="p">],</span>
+            <span class="p">[</span><span class="mf">351.32788192091937</span><span class="p">,</span> <span class="mf">351.2784400775651</span><span class="p">],</span>
+            <span class="p">[</span><span class="mf">0.713249785705446</span><span class="p">,</span> <span class="mf">0.7191567004328004</span><span class="p">],</span>
+            <span class="p">[</span><span class="s2">"J2000.0"</span><span class="p">,</span> <span class="s2">"J2000.0"</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">9706</span><span class="p">,</span> <span class="mi">9706</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">304</span><span class="p">,</span> <span class="mi">304</span><span class="p">],</span>
+            <span class="p">[</span><span class="s2">"hscssp_pdr3_dud"</span><span class="p">,</span> <span class="s2">"hscssp_pdr3_dud"</span><span class="p">],</span>
+            <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span>
+            <span class="p">[</span><span class="mf">900.0</span><span class="p">,</span> <span class="mf">900.0</span><span class="p">]],</span>
+            <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s2">"obj_id"</span><span class="p">,</span>
+                   <span class="s2">"ra"</span><span class="p">,</span>
+                   <span class="s2">"dec"</span><span class="p">,</span>
+                   <span class="s2">"epoch"</span><span class="p">,</span>
+                   <span class="s2">"tract"</span><span class="p">,</span>
+                   <span class="s2">"patch"</span><span class="p">,</span>
+                   <span class="s2">"input_catalog"</span><span class="p">,</span>
+                   <span class="s2">"priority"</span><span class="p">,</span>
+                   <span class="s2">"effective_exptime"</span><span class="p">],</span>
+            <span class="n">meta</span><span class="o">=</span><span class="p">{</span><span class="s2">"proposal_id"</span><span class="p">:</span> <span class="s2">"S22A-QN001"</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>If you have a similar list as <code class="docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code>, the following should work.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tb</span> <span class="o">=</span> <span class="n">Table</span><span class="o">.</span><span class="n">from_pandas</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="n">tb</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s1">'proposal_id'</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"S22A-QN001"</span>
+</pre></div>
+</div>
+<p>You can save the object into a file.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tb</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">'targets_s22a-qn001.fits'</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">'fits'</span><span class="p">)</span>
+<span class="n">tb</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">'targets_s22a-qn001.ecsv'</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">'ascii.ecsv'</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Reading the data is easy.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">tb2</span> <span class="o">=</span> <span class="n">Table</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">'targets_s22a-qn001.fits'</span><span class="p">)</span>
+<span class="n">tb2</span> <span class="o">=</span> <span class="n">Table</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">'targets_s22a-qn001.ecsv'</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">tb2</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">"proposal_id"</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">tb2</span><span class="p">)</span>
+
+</pre></div>
+</div>
+</section>
+</section>
+<section id="notes-on-future-development">
+<h2 id="notes-on-future-development">Notes on future development<a class="headerlink" href="#notes-on-future-development" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Currently, only creating entries in <code class="docutils literal notranslate"><span class="pre">targetDB</span></code> is tested. Updating and removing them need to be implemented in the future.</p></li>
+<li><p>Also, the script/function to create entries is still as of the 2021 November commissioning. This will be modified accordingly.</p></li>
+</ul>
+</section>
+</section>
+
+
+          </article>
+        </div>
+      </div>
+    </main>
+  </div>
+  <footer class="md-footer">
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+          
+            <a href="index.html" title="Welcome to PFS Target Database (targetDB)’s documentation!"
+               class="md-flex md-footer-nav__link md-footer-nav__link--prev"
+               rel="prev">
+              <div class="md-flex__cell md-flex__cell--shrink">
+                <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+              </div>
+              <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+                <span class="md-flex__ellipsis">
+                  <span
+                      class="md-footer-nav__direction"> Previous </span> Welcome to PFS Target Database (targetDB)’s documentation! </span>
+              </div>
+            </a>
+          
+          
+        </a>
+        
+      </nav>
+    </div>
+    <div class="md-footer-meta md-typeset">
+      <div class="md-footer-meta__inner md-grid">
+        <div class="md-footer-copyright">
+          <div class="md-footer-copyright__highlight">
+              &#169; Copyright 2023, Masato Onodera.
+              
+          </div>
+            Created using
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
+             and
+            <a href="https://github.com/bashtage/sphinx-material/">Material for
+              Sphinx</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <script src="_static/javascripts/application.js"></script>
+  <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script>
+  </body>
+</html>
