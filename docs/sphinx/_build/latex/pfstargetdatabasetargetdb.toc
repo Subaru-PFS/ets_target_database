@@ -1,0 +1,17 @@
+\babel@toc {english}{}\relax 
+\contentsline {chapter}{\numberline {1}Input Target List}{1}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Inputs from observers}{1}{section.1.1}%
+\contentsline {subsection}{\numberline {1.1.1}Proposal\sphinxhyphen {}related information}{1}{subsection.1.1.1}%
+\contentsline {subsection}{\numberline {1.1.2}Target\sphinxhyphen {}related information}{1}{subsection.1.1.2}%
+\contentsline {subsubsection}{Notes}{2}{subsubsection*.3}%
+\contentsline {paragraph}{\sphinxstyleliteralintitle {\sphinxupquote {tract}}, \sphinxstyleliteralintitle {\sphinxupquote {patch}}}{2}{paragraph*.4}%
+\contentsline {paragraph}{\sphinxstyleliteralintitle {\sphinxupquote {input\_catalog}}}{2}{paragraph*.5}%
+\contentsline {section}{\numberline {1.2}Inputs from the observatory}{3}{section.1.2}%
+\contentsline {subsection}{\numberline {1.2.1}\sphinxstyleliteralintitle {\sphinxupquote {proposal\_category}}}{3}{subsection.1.2.1}%
+\contentsline {subsection}{\numberline {1.2.2}\sphinxstyleliteralintitle {\sphinxupquote {target\_type}}}{3}{subsection.1.2.2}%
+\contentsline {subsection}{\numberline {1.2.3}\sphinxstyleliteralintitle {\sphinxupquote {proposal}}}{3}{subsection.1.2.3}%
+\contentsline {subsection}{\numberline {1.2.4}Other tables}{4}{subsection.1.2.4}%
+\contentsline {section}{\numberline {1.3}File format}{4}{section.1.3}%
+\contentsline {subsection}{\numberline {1.3.1}Example}{4}{subsection.1.3.1}%
+\contentsline {section}{\numberline {1.4}Notes on future development}{5}{section.1.4}%
+\contentsline {chapter}{\numberline {2}Indices and tables}{7}{chapter.2}%
