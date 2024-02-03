@@ -10,8 +10,7 @@ https://github.com/pypa/sampleproject
 import pathlib
 
 # Always prefer setuptools over distutils
-from setuptools import find_packages
-from setuptools import setup
+from setuptools import find_packages, setup
 
 here = pathlib.Path(__file__).parent.resolve()
 
@@ -152,7 +151,7 @@ setup(
     # 'Programming Language' classifiers above, 'pip install' will check this
     # and refuse to install the project if the version does not match. See
     # https://packaging.python.org/guides/distributing-packages-using-setuptools/#python-requires
-    python_requires=">=3.6, <4",
+    python_requires=">=3.8, <4",
     #
     #
     # This field lists other packages that your project depends on to run.
@@ -161,7 +160,7 @@ setup(
     #
     # For an analysis of "install_requires" vs pip's requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
-    install_requires=["sqlalchemy", "pandas", "tabulate", "toml"],  # Optional
+    install_requires=["sqlalchemy", "pandas", "tabulate", "toml", "loguru"],  # Optional
     #
     #
     # List additional groups of dependencies here (e.g. development
@@ -205,6 +204,7 @@ setup(
             "pfs_targetdb_create_schema=targetdb.cli.pfs_targetdb_create_schema:main",
             "pfs_targetdb_generate_mdtable=targetdb.cli.pfs_targetdb_generate_mdtable:main",
             "pfs_targetdb_draw_diagram=targetdb.cli.pfs_targetdb_draw_diagram:main",
+            # "pfs_targetdb_inputchecker=targetdb.cli.pfs_targetdb_inputchecker:main",
         ],
     },
     #

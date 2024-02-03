@@ -5,10 +5,9 @@ import os
 import subprocess
 import sys
 
-import logzero
 import pandas as pd
 import toml
-from logzero import logger
+from loguru import logger
 
 from .models import Base
 
@@ -84,21 +83,21 @@ def draw_diagram(
 
     comm = [
         f"{os.path.join(conf['schemacrawler']['SCHEMACRAWLERDIR'],'_schemacrawler/bin/schemacrawler.sh')}",
-        f"--command=schema",
-        f"--server=postgresql",
+        "--command=schema",
+        "--server=postgresql",
         f"--host={conf['targetdb']['db']['host']}",
         f"--port={conf['targetdb']['db']['port']}",
         f"--database={conf['targetdb']['db']['dbname']}",
-        f"--schemas=public",
+        "--schemas=public",
         f"--user={conf['targetdb']['db']['user']}",
         f"--password={conf['targetdb']['db']['password']}",
         f"--info-level={sc_info_level}",
         f"--log-level={sc_log_level}",
-        f"--portable-names",
+        "--portable-names",
         f"--title={sc_title}",
-        f"--output-format=pdf",
+        "--output-format=pdf",
         f"--output-file={outfile}",
-        f"--no-remarks",
+        "--no-remarks",
     ]
 
     logger.debug(f"{comm}")
