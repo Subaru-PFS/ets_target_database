@@ -2,8 +2,9 @@
 
 import argparse
 
-import logzero
-from logzero import logger
+# import logzero
+# from logzero import logger
+from loguru import logger
 
 from .. import draw_diagram
 
@@ -61,10 +62,10 @@ def main():
 
     args = get_arguments()
 
-    if args.debug:
-        logzero.loglevel(logzero.DEBUG)
-    else:
-        logzero.loglevel(logzero.INFO)
+    # if args.debug:
+    #     logzero.loglevel(logzero.DEBUG)
+    # else:
+    #     logzero.loglevel(logzero.INFO)
 
     logger.info(args)
 
