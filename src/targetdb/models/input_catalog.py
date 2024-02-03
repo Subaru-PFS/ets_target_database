@@ -30,8 +30,8 @@ class input_catalog(Base):
         String, comment="Description of the input catalog"
     )
     upload_id = Column(
-        String,
-        comment="A 8-bit hex string assigned at the submission of the target list (default: empty string)",
+        String(16),
+        comment="A 8-bit hex string (16 characters) assigned at the submission of the target list (default: empty string)",
         default="",
     )
     created_at = Column(DateTime)
