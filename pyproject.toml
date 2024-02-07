@@ -1,0 +1,53 @@
+[project]
+name = "targetdb"
+version = "0.1.0"
+description = "PFS target database (targetDB) tools"
+authors = [{ name = "Masato Onodera", email = "monodera@naoj.org" }]
+dependencies = [
+    "setuptools>=69.0.3",
+    "loguru>=0.7.2",
+    "pandas>=2.2.0",
+    "sqlalchemy>=2.0.25",
+    "tabulate>=0.9.0",
+    "toml>=0.10.2",
+    "numpy>=1.26.4",
+    "alembic>=1.13.1",
+    "psycopg2>=2.9.9",
+    "sqlalchemy-utils>=0.41.1",
+    "wheel>=0.42.0",
+    "ipython>=8.18.1",
+]
+requires-python = ">=3.9, <4"
+readme = "README.md"
+license = { text = "MIT" }
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Database",
+    "Topic :: Scientific/Engineering :: Astronomy",
+]
+
+[project.urls]
+homepage = "https://github.com/Subaru-PFS/ets_target_database"
+source = "https://github.com/Subaru-PFS/ets_target_database"
+
+[project.scripts]
+pfs_targetdb_create_database = "targetdb.cli.pfs_targetdb_database_helpers:main_create_database"
+pfs_targetdb_create_schema = "targetdb.cli.pfs_targetdb_create_schema:main"
+pfs_targetdb_draw_diagram = "targetdb.cli.pfs_targetdb_draw_diagram:main"
+pfs_targetdb_drop_database = "targetdb.cli.pfs_targetdb_database_helpers:main_drop_database"
+pfs_targetdb_generate_mdtable = "targetdb.cli.pfs_targetdb_generate_mdtable:main"
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+include-package-data = true
+
+# [tool.setuptools.dynamic]
+# version = { attr = "targetdb.__version__" }
