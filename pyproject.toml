@@ -1,6 +1,7 @@
 [project]
 name = "targetdb"
-version = "0.1.0"
+# version = "0.1.0"
+dynamic = ["version"]
 description = "PFS target database (targetDB) tools"
 authors = [{ name = "Masato Onodera", email = "monodera@naoj.org" }]
 dependencies = [
@@ -49,5 +50,5 @@ build-backend = "setuptools.build_meta"
 package-dir = { "" = "src" }
 include-package-data = true
 
-# [tool.setuptools.dynamic]
-# version = { attr = "targetdb.__version__" }
+[tool.setuptools.dynamic]
+version = { attr = "targetdb.__version__" }
