@@ -13,7 +13,7 @@ dependencies = [
     "toml",
     "numpy",
     "alembic",
-    "psycopg2",
+    "psycopg2-binary",
     "sqlalchemy-utils",
     "wheel",
     "ipython",
