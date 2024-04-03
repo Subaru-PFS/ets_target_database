@@ -2,10 +2,8 @@
 
 import io
 
-import numpy as np
 import pandas as pd
 from sqlalchemy import create_engine
-from sqlalchemy import update
 from sqlalchemy.orm import sessionmaker
 
 from . import models
@@ -17,15 +15,13 @@ class TargetDB(object):
     def __init__(
         self,
         host="localhost",
-        port="5432",
+        port: int = 5432,
         dbname="testdb",
         user="admin",
         password="ask someone",
         dialect="postgresql",
     ):
-        self.dbinfo = "{0}://{1}:{2}@{3}:{4}/{5}".format(
-            dialect, user, password, host, port, dbname
-        )
+        self.dbinfo = f"{dialect}://{user}:{password}@{host}:{port}/{dbname}"
 
     def connect(self):
         self.engine = create_engine(self.dbinfo)
@@ -76,7 +72,9 @@ class TargetDB(object):
         ############################################################
     """
 
-    def insert_mappings(self, tablename, mappings, return_defaults=False):
+    def insert_mappings(
+        self, tablename, mappings, return_defaults=False, dry_run=False
+    ):
         """
         Description
         -----------
@@ -95,7 +93,12 @@ class TargetDB(object):
             self.session.bulk_insert_mappings(
                 model, mappings, return_defaults=return_defaults
             )
-            self.session.commit()
+            if dry_run:
+                self.session.rollback()
+                return None
+            else:
+                self.session.commit()
+
             if return_defaults:
                 df_ret = pd.DataFrame.from_records(mappings)
                 return df_ret
@@ -106,7 +109,7 @@ class TargetDB(object):
             self.session.rollback()
             raise
 
-    def insert(self, tablename, dataframe, return_defaults=False):
+    def insert(self, tablename, dataframe, return_defaults=False, dry_run=False):
         """
         Description
         -----------
@@ -124,14 +127,14 @@ class TargetDB(object):
         """
         mappings_dict = dataframe.to_dict(orient="records")
         df_ret = self.insert_mappings(
-            tablename, mappings_dict, return_defaults=return_defaults
+            tablename, mappings_dict, return_defaults=return_defaults, dry_run=dry_run
         )
         if return_defaults:
             return df_ret
         else:
             return None
 
-    def insert_by_copy(self, tablename, data, colnames):
+    def insert_by_copy(self, tablename, data, colnames, dry_run=False):
         """
         Description
         -----------
@@ -150,11 +153,14 @@ class TargetDB(object):
         conn = self.engine.raw_connection()
         cur = conn.cursor()
         cur.copy_from(data, tablename, ",", columns=colnames)
-        conn.commit()
+        if dry_run:
+            conn.rollback()
+        else:
+            conn.commit()
         cur.close()
         conn.close()
 
-    def update(self, tablename, dataframe):
+    def update(self, tablename, dataframe, dry_run=False):
         """
         Description
         -----------
@@ -175,7 +181,10 @@ class TargetDB(object):
             self.session.bulk_update_mappings(
                 model, dataframe.to_dict(orient="records")
             )
-            self.session.commit()
+            if dry_run:
+                self.session.rollback()
+            else:
+                self.session.commit()
         except:
             self.session.rollback()
             raise
