@@ -2,9 +2,8 @@
 
 import io
 
-import numpy as np
 import pandas as pd
-from sqlalchemy import create_engine, update
+from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from . import models
@@ -16,15 +15,13 @@ class TargetDB(object):
     def __init__(
         self,
         host="localhost",
-        port="5432",
+        port: int = 5432,
         dbname="testdb",
         user="admin",
         password="ask someone",
         dialect="postgresql",
     ):
-        self.dbinfo = "{0}://{1}:{2}@{3}:{4}/{5}".format(
-            dialect, user, password, host, port, dbname
-        )
+        self.dbinfo = f"{dialect}://{user}:{password}@{host}:{port}/{dbname}"
 
     def connect(self):
         self.engine = create_engine(self.dbinfo)
@@ -137,7 +134,7 @@ class TargetDB(object):
         else:
             return None
 
-    def insert_by_copy(self, tablename, data, colnames):
+    def insert_by_copy(self, tablename, data, colnames, dry_run=False):
         """
         Description
         -----------
@@ -156,11 +153,14 @@ class TargetDB(object):
         conn = self.engine.raw_connection()
         cur = conn.cursor()
         cur.copy_from(data, tablename, ",", columns=colnames)
-        conn.commit()
+        if dry_run:
+            conn.rollback()
+        else:
+            conn.commit()
         cur.close()
         conn.close()
 
-    def update(self, tablename, dataframe):
+    def update(self, tablename, dataframe, dry_run=False):
         """
         Description
         -----------
@@ -181,7 +181,10 @@ class TargetDB(object):
             self.session.bulk_update_mappings(
                 model, dataframe.to_dict(orient="records")
             )
-            self.session.commit()
+            if dry_run:
+                self.session.rollback()
+            else:
+                self.session.commit()
         except:
             self.session.rollback()
             raise
