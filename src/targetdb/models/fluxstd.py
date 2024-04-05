@@ -187,6 +187,23 @@ class fluxstd(Base):
         comment="Upper confidence level (84%) of surface gravity from Brutus code [log cgs]",
     )
 
+    teff_gspphot = Column(
+        Float, comment="Effective temperature inferred by GSP-phot Aeneas [K]"
+    )
+    teff_gspphot_lower = Column(
+        Float,
+        comment="Lower confidence level (16%) of effective temperature inferred by GSP-phot Aeneas [K]",
+    )
+    teff_gspphot_upper = Column(
+        Float,
+        comment="Upper confidence level (84%) of effective temperature inferred by GSP-phot Aeneas [K]",
+    )
+    is_fstar_gaia = Column(
+        Boolean,
+        default=False,
+        comment="Flag for F-star from Gaia (Teff=6000-7500K if True)",
+    )
+
     # version string
     version = Column(
         String,
@@ -267,6 +284,10 @@ class fluxstd(Base):
         logg_brutus,
         logg_brutus_low,
         logg_brutus_high,
+        teff_gspphot,
+        teff_gspphot_lower,
+        teff_gspphot_upper,
+        is_fstar_gaia,
         version,
         created_at,
         updated_at,
@@ -325,5 +346,9 @@ class fluxstd(Base):
         self.logg_brutus = logg_brutus
         self.logg_brutus_low = logg_brutus_low
         self.logg_brutus_high = logg_brutus_high
+        self.teff_gspphot = teff_gspphot
+        self.teff_gspphot_lower = teff_gspphot_lower
+        self.teff_gspphot_upper = teff_gspphot_upper
+        self.is_fstar_gaia = is_fstar_gaia
         self.created_at = created_at
         self.updated_at = updated_at
