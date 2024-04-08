@@ -227,7 +227,7 @@ class fluxstd(Base):
     filter_i_rels = relationship(filter_name, foreign_keys=[filter_i])
     filter_z_rels = relationship(filter_name, foreign_keys=[filter_z])
     filter_y_rels = relationship(filter_name, foreign_keys=[filter_y])
-    filter_g_rels = relationship(filter_name, foreign_keys=[filter_j])
+    filter_j_rels = relationship(filter_name, foreign_keys=[filter_j])
 
     def __init__(
         self,
