@@ -151,8 +151,10 @@ def main_csv_to_feather():
         os.makedirs(args.output_dir)
 
     # Iterate over all files in the input directory
-    for filename in os.listdir(args.input_dir):
+    input_files = os.listdir(args.input_dir)
+    for i, filename in enumerate(input_files):
         # Check if the file is a CSV file
+        logger.info(f"Processing... {i+1}/{len(input_files)}: {filename}")
         if filename.endswith(".csv"):
             t1 = time.time()
             logger.info(f"Converting {filename} to the Feather format")
