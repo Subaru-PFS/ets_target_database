@@ -1,15 +1,9 @@
 #!/usr/bin/env python3
 
 import argparse
-import glob
 import json
-import os
-import time
 
-import pandas as pd
-from loguru import logger
-
-from .cli_utils import load_input_data
+from ..utils import check_fluxstd_dups, csv_to_feather
 
 
 def main_checkdups():
@@ -39,80 +33,12 @@ def main_checkdups():
 
     args = parser.parse_args()
 
-    if not os.path.exists(args.outdir):
-        os.makedirs(args.outdir)
-
-    # Get a list of all feather files in the directory
-    input_files = glob.glob(os.path.join(args.dir, f"*.{args.format}"))
-
-    if len(input_files) == 0:
-        logger.error(f"No files found in the directory: {args.dir}")
-        return
-
-    logger.info(f"Total number of files: {len(dataframes)}")
-
-    dataframes = []
-
-    # Loop through the list of feather files
-    for f in input_files:
-        logger.info(f"Reading file: {f}")
-        # Read the feather file into a DataFrame
-        file_df = load_input_data(f, logger=logger)
-        file_df["input_file"] = f.rsplit("/")[-1].replace(".feather", "")
-
-        # only selected columns are included because of the memory limit
-        dataframes.append(
-            file_df.loc[
-                :,
-                [
-                    "obj_id",
-                    "ra",
-                    "dec",
-                    "input_catalog_id",
-                    "version",
-                    "input_file",
-                    "is_fstar_gaia",
-                    "prob_f_star",
-                ],
-            ]
-        )
-
-    logger.info("Finished reading all input files.")
-
-    # Concatenate all DataFrames into a single DataFrame
-    df = pd.concat(dataframes, ignore_index=True)
-
-    # Check for duplicates
-    duplicates = df.duplicated(
-        subset=["obj_id", "input_catalog_id", "version"],
-        keep=False,
+    check_fluxstd_dups(
+        indir=args.dir,
+        outdir=args.outdir,
+        format=args.format,
+        skip_save_merged=args.skip_save_merged,
     )
-
-    # Print the result
-    logger.info(f"Duplicates exist: {duplicates.any()}")
-
-    if duplicates.any():
-        logger.info(f"Number of duplicates: {duplicates.sum()}")
-        logger.info(f"Duplicate rows: \n{df[duplicates]}")
-        df[duplicates].sort_values(by=["obj_id"]).to_csv(
-            os.path.join(f"{args.outdir}", "duplicates.csv"),
-            index=False,
-        )
-    else:
-        logger.info("No duplicates found.")
-
-    # save duplicate-removed dataframe as a feather file
-    if not args.skip_save_merged:
-        df_cleaned = df.drop_duplicates(
-            subset=["obj_id", "input_catalog_id", "version"],
-            ignore_index=True,
-        )
-        df_cleaned.to_feather(
-            os.path.join(
-                f"{args.outdir}",
-                "all_merged_nodups.feather",
-            )
-        )
 
 
 def main_csv_to_feather():
@@ -146,36 +72,10 @@ def main_csv_to_feather():
 
     args = parser.parse_args()
 
-    # Check if output directory exists, if not, create it
-    if not os.path.exists(args.output_dir):
-        os.makedirs(args.output_dir)
-
-    # Iterate over all files in the input directory
-    input_files = os.listdir(args.input_dir)
-    for i, filename in enumerate(input_files):
-        # Check if the file is a CSV file
-        logger.info(f"Processing... {i+1}/{len(input_files)}: {filename}")
-        if filename.endswith(".csv"):
-            t1 = time.time()
-            logger.info(f"Converting {filename} to the Feather format")
-
-            # Read the CSV file
-            df = pd.read_csv(os.path.join(args.input_dir, filename))
-
-            # rename fstar_gaia to is_fstar_gaia
-            df.rename(columns=args.rename_cols, inplace=True)
-
-            # add input_catalog_id
-            df["input_catalog_id"] = args.input_catalog_id
-
-            # add version column to df as strings
-            df["version"] = args.version
-
-            # Convert the filename from .csv to .feather
-            # feather_filename = filename.rsplit(".", 1)[0] + ".feather"
-            feather_filename = f"{os.path.splitext(filename)[0]}.feather"
-
-            # Write the DataFrame to a Feather file
-            df.to_feather(os.path.join(args.output_dir, feather_filename))
-            t2 = time.time()
-            logger.info(f"Conversion took {t2-t1:.2f} seconds for {df.index.size} rows")
+    csv_to_feather(
+        args.input_dir,
+        args.output_dir,
+        args.version,
+        args.input_catalog_id,
+        rename_cols=args.rename_cols,
+    )
