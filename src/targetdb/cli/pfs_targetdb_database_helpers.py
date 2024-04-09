@@ -14,10 +14,7 @@ from sqlalchemy_utils import create_database, database_exists, drop_database
 
 from targetdb.targetdb import TargetDB
 
-try:
-    import tomllib
-except ModuleNotFoundError:
-    import tomli as tomllib
+from .cli_utils import load_config, load_input_data
 
 
 def query_yes_no(question, default="yes"):
@@ -97,26 +94,6 @@ def main_drop_database():
             drop_database(engine.url)
     else:
         print("Database does not exist: {:s}".format(args.dbinfo))
-
-
-def load_config(config_file):
-    with open(config_file, "rb") as fp:
-        config = tomllib.load(fp)
-    return config
-
-
-def load_input_data(input_file):
-    _, ext = os.path.splitext(input_file)
-    if ext == ".csv":
-        df = pd.read_csv(input_file)
-    elif ext == ".feather":
-        df = pd.read_feather(input_file)
-    elif ext == ".ecsv":
-        df = Table.read(input_file).to_pandas()
-    else:
-        logger.error(f"Unsupported file extension: {ext}")
-        raise ValueError(f"Unsupported file extension: {ext}")
-    return df
 
 
 def get_arguments_with_config(desc=None):

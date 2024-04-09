@@ -44,6 +44,8 @@ pfs_targetdb_drop_database = "targetdb.cli.pfs_targetdb_database_helpers:main_dr
 pfs_targetdb_create_database = "targetdb.cli.pfs_targetdb_database_helpers:main_create_database"
 pfs_targetdb_insert = "targetdb.cli.pfs_targetdb_database_helpers:main_insert"
 pfs_targetdb_update = "targetdb.cli.pfs_targetdb_database_helpers:main_update"
+pfs_targetdb_fluxstd_checkdup = "targetdb.cli.pfs_targetdb_fluxstd_utils:main_checkdups"
+pfs_targetdb_fluxstd_csv2feather = "targetdb.cli.pfs_targetdb_fluxstd_utils:main_csv_to_feather"
 
 
 [build-system]
