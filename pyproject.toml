@@ -5,18 +5,19 @@ dynamic = ["version"]
 description = "PFS target database (targetDB) tools"
 authors = [{ name = "Masato Onodera", email = "monodera@naoj.org" }]
 dependencies = [
-    "setuptools",
+    "alembic",
+    "astropy",
+    "ipython",
     "loguru",
+    "numpy",
     "pandas",
+    "psycopg2-binary",
+    "setuptools",
+    "sqlalchemy-utils",
     "sqlalchemy",
     "tabulate",
-    "toml",
-    "numpy",
-    "alembic",
-    "psycopg2-binary",
-    "sqlalchemy-utils",
     "wheel",
-    "ipython",
+    'tomli >= 1.1.0 ; python_version < "3.11"',
 ]
 requires-python = ">=3.8, <4"
 readme = "README.md"
@@ -36,11 +37,14 @@ homepage = "https://github.com/Subaru-PFS/ets_target_database"
 source = "https://github.com/Subaru-PFS/ets_target_database"
 
 [project.scripts]
-pfs_targetdb_create_database = "targetdb.cli.pfs_targetdb_database_helpers:main_create_database"
 pfs_targetdb_create_schema = "targetdb.cli.pfs_targetdb_create_schema:main"
 pfs_targetdb_draw_diagram = "targetdb.cli.pfs_targetdb_draw_diagram:main"
-pfs_targetdb_drop_database = "targetdb.cli.pfs_targetdb_database_helpers:main_drop_database"
 pfs_targetdb_generate_mdtable = "targetdb.cli.pfs_targetdb_generate_mdtable:main"
+pfs_targetdb_drop_database = "targetdb.cli.pfs_targetdb_database_helpers:main_drop_database"
+pfs_targetdb_create_database = "targetdb.cli.pfs_targetdb_database_helpers:main_create_database"
+pfs_targetdb_insert = "targetdb.cli.pfs_targetdb_database_helpers:main_insert"
+pfs_targetdb_update = "targetdb.cli.pfs_targetdb_database_helpers:main_update"
+
 
 [build-system]
 requires = ["setuptools", "wheel"]
