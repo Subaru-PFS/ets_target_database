@@ -119,6 +119,17 @@ def get_arguments_with_config(desc=None):
         action="store_true",
         help="Fetch all table entries and print (default: False)",
     )
+    parser.add_argument(
+        "--from-uploader",
+        action="store_true",
+        help="Target list from the PFS Target Uploader",
+    )
+    parser.add_argument(
+        "--upload_id", type=str, default=None, help="Upload ID issued by the uploader"
+    )
+    parser.add_argument(
+        "--proposal_id", type=str, default=None, help="Proposal ID (e.g., S24B-QT001)"
+    )
     parser.add_argument("-v", "--verbose", action="store_true", help="Verbose mode")
 
     args = parser.parse_args()
@@ -148,6 +159,9 @@ def main_insert():
         verbose=args.verbose,
         config=config,
         df=df,
+        from_uploader=args.from_uploader,
+        proposal_id=args.proposal_id,
+        upload_id=args.upload_id,
         insert=True,
     )
 
@@ -165,6 +179,9 @@ def main_update():
         verbose=args.verbose,
         config=config,
         df=df,
+        from_uploader=args.from_uploader,
+        proposal_id=args.proposal_id,
+        upload_id=args.upload_id,
         update=True,
     )
 

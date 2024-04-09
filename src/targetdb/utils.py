@@ -231,6 +231,119 @@ def add_backref_values(df, db=None, table=None):
     return df_tmp
 
 
+def make_target_df_from_uploader(
+    df,
+    db=None,
+    table=None,
+    proposal_id=None,
+    upload_id=None,
+    target_type_name="SCIENCE",
+    insert=False,
+    update=False,
+):
+    logger.info(f"The default target_type_name {target_type_name} is used.")
+
+    if proposal_id is None:
+        logger.error("proposal_id is not provided.")
+        raise ValueError("proposal_id is not provided.")
+    else:
+        logger.info(f"proposal_id is provided: {proposal_id}")
+
+    if upload_id is None:
+        logger.error("upload_id is not provided.")
+        raise ValueError("upload_id is not provided.")
+    else:
+        logger.info(f"upload_id is provided: {upload_id}")
+
+    if "exptime" in df.columns:
+        df.rename(columns={"exptime": "effective_exptime"}, inplace=True)
+
+    # fill missing values with None or NaN for filters and fluxes
+    for band in ["g", "r", "i", "z", "y", "j"]:
+        if f"filter_{band}" in df.columns:
+            # if the table is a masked table, fill the masked values with None for filters
+            # if the table is not a masked table, just pass
+            try:
+                df.loc[df[f"filter_{band}"].isna(), f"filter_{band}"] = None
+            except AttributeError:
+                pass
+        if f"flux_{band}" in df.columns:
+            df.rename(columns={f"flux_{band}": f"psf_flux_{band}"}, inplace=True)
+        if f"flux_error_{band}" in df.columns:
+            df.rename(
+                columns={f"flux_error_{band}": f"psf_flux_error_{band}"}, inplace=True
+            )
+
+    df["target_type_name"] = target_type_name
+    df["proposal_id"] = proposal_id
+    df["upload_id"] = upload_id
+
+    n_target = df.index.size
+    logger.info(f"{n_target=}")
+
+    # FIXME: loop is slow for a large target list. Want to look for a fast and better way.
+    if update:
+        logger.info("Look up the target table by (ob_code, proposal_id)")
+        df_target = pd.DataFrame()
+        for i in range(df.index.size):
+            df_target_tmp = db.fetch_by_id(
+                table,
+                ob_code=df["ob_code"][i],
+                proposal_id=df["proposal_id"][i],
+            )
+            if not df_target_tmp.empty:
+                df_target = pd.concat(
+                    [df_target, df_target_tmp],
+                    ignore_index=True,
+                )
+        logger.info(f"Merged DataFrame\n{df_target}")
+        df = df.merge(
+            df_target.loc[:, ["target_id", "ob_code", "proposal_id"]],
+            on=["ob_code", "proposal_id"],
+            how="left",
+        )
+        n_target_lookup = df_target.index.size
+        if n_target_lookup != n_target:
+            logger.error(
+                "The number of targets are different before and after the table lookup. "
+                f"Please check if any new targets are provided. {n_target=}, {n_target_lookup=}"
+            )
+            raise ValueError(
+                f"The number of targets are different before and after the table lookup. {n_target=}, {n_target_lookup=}"
+            )
+
+    df_tmp = df.copy()
+    backref_tables, backref_keys, backref_check_keys = [], [], []
+
+    if "upload_id" in df_tmp.columns:
+        logger.info(
+            "upload_id is found in the DataFrame. Use it for back reference for input_catalog"
+        )
+        backref_tables = ["proposal", "input_catalog", "target_type"]
+        backref_keys = ["proposal_id", "upload_id", "target_type_name"]
+        backref_check_keys = ["proposal_id", "upload_id", "target_type_id"]
+    elif "input_catalog_name" in df.columns:
+        logger.info("upload_id is not provided. Use input_catalog_name instead")
+        backref_tables = ["proposal", "input_catalog", "target_type"]
+        backref_keys = ["proposal_id", "input_catalog_name", "target_type_name"]
+        backref_check_keys = ["proposal_id", "input_catalog_id", "target_type_id"]
+
+    # Join referenced values
+    for i in range(len(backref_tables)):
+        df_tmp = join_backref_values(
+            df_tmp,
+            db=db,
+            table=backref_tables[i],
+            key=backref_keys[i],
+            check_key=backref_check_keys[i],
+        )
+
+    # add the is_medium_resolution column by looking at the resolution column
+    df_tmp["is_medium_resolution"] = df["resolution"] == "M"
+
+    return df_tmp
+
+
 def add_database_rows(
     input_file=None,
     config_file=None,
@@ -240,6 +353,9 @@ def add_database_rows(
     verbose=False,
     config=None,
     df=None,
+    from_uploader=False,
+    proposal_id=None,
+    upload_id=None,
     insert=False,
     update=False,
 ):
@@ -251,11 +367,24 @@ def add_database_rows(
     db = TargetDB(**config["targetdb"]["db"])
     db.connect()
 
-    if table in ["proposal", "fluxstd", "target", "sky"]:
-        t_begin = time.time()
+    t_begin = time.time()
+    if table in ["proposal", "fluxstd", "sky"]:
         df = add_backref_values(df, db=db, table=table)
-        t_end = time.time()
-        logger.info(f"Added back reference values in {t_end - t_begin:.2f} s")
+    elif table in ["target"]:
+        if from_uploader:
+            df = make_target_df_from_uploader(
+                df,
+                db=db,
+                table=table,
+                proposal_id=proposal_id,
+                upload_id=upload_id,
+                insert=insert,
+                update=update,
+            )
+        else:
+            df = add_backref_values(df, db=db, table=table)
+    t_end = time.time()
+    logger.info(f"Added back reference values in {t_end - t_begin:.2f} s")
 
     utcnow = datetime.now(timezone.utc)
     if insert:
