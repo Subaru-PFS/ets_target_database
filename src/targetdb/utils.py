@@ -21,17 +21,90 @@ except ModuleNotFoundError:
 
 
 def load_config(config_file):
+    """
+    Load configuration from a TOML file.
+
+    Parameters
+    ----------
+    config_file : str
+        The path to the configuration file.
+
+    Returns
+    -------
+    config : dict
+        The configuration dictionary.
+
+    Raises
+    ------
+    FileNotFoundError
+        If the configuration file does not exist.
+
+    Notes
+    -----
+    This function uses the tomllib or tomli library to parse the TOML file.
+    """
     with open(config_file, "rb") as fp:
         config = tomllib.load(fp)
     return config
 
 
 def read_conf(config_file):
-    # alias for load_config()
+    """
+    Alias for the load_config function.
+
+    Parameters
+    ----------
+    config_file : str
+        The path to the configuration file.
+
+    Returns
+    -------
+    config : dict
+        The configuration dictionary.
+
+    Raises
+    ------
+    FileNotFoundError
+        If the configuration file does not exist.
+
+    Notes
+    -----
+    This function is an alias for the load_config function.
+    It uses the load_config function to load the configuration from the TOML file.
+    """
+
     return load_config(config_file)
 
 
 def load_input_data(input_file, logger=logger):
+    """
+    Load input data from a file.
+
+    Parameters
+    ----------
+    input_file : str
+        The path to the input file.
+    logger : loguru.logger, optional
+        The logger to use for logging messages. Defaults to the root logger.
+
+    Returns
+    -------
+    df : pandas.DataFrame or astropy.table.Table
+        The loaded data.
+
+    Raises
+    ------
+    ValueError
+        If the file extension is not supported.
+    FileNotFoundError
+        If the input file does not exist.
+
+    Notes
+    -----
+    This function uses pandas or astropy to load the data depending on the file format.
+    It supports CSV, Feather, and ECSV file formats.
+    """
+
     _, ext = os.path.splitext(input_file)
     if ext == ".csv":
         df = pd.read_csv(input_file)
@@ -134,6 +207,33 @@ def draw_diagram(
 
 
 def join_backref_values(df, db=None, table=None, key=None, check_key=None):
+    """
+    Joins a DataFrame with a table from a database on a specified key and checks for non-existing keys.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        The DataFrame to join with the table.
+    db : Database, optional
+        The database object where the table is located. Defaults to None.
+    table : str, optional
+        The name of the table to join with the DataFrame. Defaults to None.
+    key : str, optional
+        The key on which to join the DataFrame and the table. Defaults to None.
+    check_key : str, optional
+        The key to check for non-existing values after the join. Defaults to None.
+
+    Returns
+    -------
+    df_joined : pandas.DataFrame
+        The DataFrame after joining with the table.
+
+    Raises
+    ------
+    ValueError
+        If there is at least one non-existing value in the check_key column after the join.
+    """
+
     res = db.fetch_all(table)
     df_joined = df.merge(
         res,
@@ -148,6 +248,35 @@ def join_backref_values(df, db=None, table=None, key=None, check_key=None):
 
 
 def add_backref_values(df, db=None, table=None):
+    """
+    Add back reference values to a DataFrame based on the specified table.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        The DataFrame to which back reference values are to be added.
+    db : Database, optional
+        The database object that contains the table. Defaults to None.
+    table : str, optional
+        The name of the table to use for back reference values. Defaults to None.
+
+    Returns
+    -------
+    df_tmp : pandas.DataFrame
+        The DataFrame after adding back reference values.
+
+    Raises
+    ------
+    KeyError
+        If the necessary keys for back reference are not found in the DataFrame.
+
+    Notes
+    -----
+    This function makes a copy of the input DataFrame and modifies the copy.
+    The function checks for the presence of certain keys in the DataFrame based on the table name.
+    If the necessary keys are not found, it raises a KeyError.
+    """
+
     df_tmp = df.copy()
     backref_tables, backref_keys, backref_check_keys = [], [], []
 
@@ -241,6 +370,43 @@ def make_target_df_from_uploader(
     insert=False,
     update=False,
 ):
+    """
+    Create a target DataFrame from an uploader.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        The DataFrame to be processed.
+    db : Database, optional
+        The database object that contains the table. Defaults to None.
+    table : str, optional
+        The name of the table to use for back reference values. Defaults to None.
+    proposal_id : str, optional
+        The proposal id to be used. Defaults to None.
+    upload_id : str, optional
+        The upload id to be used. Defaults to None.
+    target_type_name : str, optional
+        The type of the target. Defaults to "SCIENCE".
+    insert : bool, optional
+        If True, insert the DataFrame into the database. Defaults to False.
+    update : bool, optional
+        If True, update the DataFrame in the database. Defaults to False.
+
+    Returns
+    -------
+    df : pandas.DataFrame
+        The processed DataFrame.
+
+    Raises
+    ------
+    ValueError
+        If proposal_id or upload_id is not provided.
+
+    Notes
+    -----
+    This function renames the 'exptime' column to 'effective_exptime' if it exists in the DataFrame.
+    """
+
     logger.info(f"The default target_type_name {target_type_name} is used.")
 
     if proposal_id is None:
@@ -359,6 +525,54 @@ def add_database_rows(
     insert=False,
     update=False,
 ):
+    """
+    Add rows to a database from an input file or DataFrame.
+
+    Parameters
+    ----------
+    input_file : str, optional
+        The path to the input file. Defaults to None.
+    config_file : str, optional
+        The path to the configuration file. Defaults to None.
+    table : str, optional
+        The name of the table in the database to add rows to. Defaults to None.
+    commit : bool, optional
+        If True, commit the changes to the database. Defaults to False.
+    fetch : bool, optional
+        If True, fetch the results after adding rows. Defaults to False.
+    verbose : bool, optional
+        If True, print verbose output. Defaults to False.
+    config : dict, optional
+        The configuration dictionary. Defaults to None.
+    df : pandas.DataFrame, optional
+        The DataFrame to add rows from. Defaults to None.
+    from_uploader : bool, optional
+        If True, the DataFrame is from an uploader. Defaults to False.
+    proposal_id : int, optional
+        The proposal id to be used. Defaults to None.
+    upload_id : int, optional
+        The upload id to be used. Defaults to None.
+    insert : bool, optional
+        If True, insert the DataFrame into the database. Defaults to False.
+    update : bool, optional
+        If True, update the DataFrame in the database. Defaults to False.
+
+    Returns
+    -------
+    None
+
+    Raises
+    ------
+    ValueError
+        If neither insert nor update is selected.
+
+    Notes
+    -----
+    This function connects to the targetDB and adds rows to the specified table.
+    If the table is 'proposal', 'fluxstd', or 'sky', it adds back reference values to the DataFrame.
+    If the table is 'target' and the DataFrame is from an uploader, it makes a target DataFrame from the uploader.
+    """
+
     if not insert and not update:
         logger.warning("Neither insert nor update is selected. Exiting...")
         return
@@ -429,6 +643,24 @@ def add_database_rows(
 def check_fluxstd_dups(
     indir=None, outdir=None, format="feather", skip_save_merged=False
 ):
+    """
+    Checks for duplicates in the flux standard star files in a given directory.
+
+    Parameters
+    ----------
+    indir : str
+        The directory containing the input files. Defaults to None.
+    outdir : str
+        The directory where the output files will be saved. Defaults to None.
+    format : str, optional
+        The format of the input files. Defaults to "feather".
+    skip_save_merged : bool, optional
+        If True, the merged dataframe will not be saved. Defaults to False.
+
+    Returns
+    -------
+    None
+    """
 
     if not os.path.exists(outdir):
         os.makedirs(outdir)
@@ -507,6 +739,26 @@ def check_fluxstd_dups(
 
 
 def csv_to_feather(input_dir, output_dir, version, input_catalog_id, rename_cols=None):
+    """
+    Converts CSV files in a given directory to Feather format.
+
+    Parameters
+    ----------
+    input_dir : str
+        The directory containing the input CSV files.
+    output_dir : str
+        The directory where the output Feather files will be saved.
+    version : str
+        The version string to be added to the dataframe.
+    input_catalog_id : str
+        The input catalog ID to be added to the dataframe.
+    rename_cols : dict, optional
+        A dictionary mapping old column names to new ones. Defaults to None.
+
+    Returns
+    -------
+    None
+    """
 
     # Check if output directory exists, if not, create it
     if not os.path.exists(output_dir):
