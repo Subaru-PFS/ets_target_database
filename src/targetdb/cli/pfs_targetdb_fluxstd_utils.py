@@ -3,7 +3,7 @@
 import argparse
 import json
 
-from ..utils import check_fluxstd_dups, csv_to_feather
+from ..utils import check_fluxstd_dups, csv_to_pyarrow
 
 
 def main_checkdups():
