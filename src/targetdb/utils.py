@@ -820,7 +820,7 @@ def csv_to_pyarrow(
         logger.info(f"Processing... {i+1}/{len(input_files)}: {filename}")
         if filename.endswith(".csv"):
             t1 = time.time()
-            logger.info(f"\tConverting {filename} to the Feather format")
+            logger.info(f"\tConverting {filename} to the {format} format")
 
             # Read the CSV file
             df = pd.read_csv(os.path.join(input_dir, filename))
