@@ -15,8 +15,8 @@ def main_checkdups():
     parser.add_argument(
         "--format",
         type=str,
-        default="feather",
-        help="File format to be used (default: feather)",
+        default="parquet",
+        help="File format to be used, feather or parquet (default: parquet)",
     )
     parser.add_argument(
         "-o",
@@ -28,7 +28,7 @@ def main_checkdups():
     parser.add_argument(
         "--skip-save-merged",
         action="store_true",
-        help="Do not save the merged DataFrame as a feather file",
+        help="Do not save the merged DataFrame as a feather or parquet file",
     )
 
     args = parser.parse_args()

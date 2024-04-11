@@ -90,7 +90,7 @@ def load_input_data(input_file, logger=logger):
 
     Returns
     -------
-    df : pandas.DataFrame or astropy.table.Table
+    df : pandas.DataFrame
         The loaded data.
 
     Raises
@@ -103,7 +103,7 @@ def load_input_data(input_file, logger=logger):
     Notes
     -----
     This function uses pandas or astropy to load the data depending on the file format.
-    It supports CSV, Feather, and ECSV file formats.
+    It supports CSV, Feather, Parquet, and ECSV file formats.
     """
 
     _, ext = os.path.splitext(input_file)
@@ -111,6 +111,8 @@ def load_input_data(input_file, logger=logger):
         df = pd.read_csv(input_file)
     elif ext == ".feather":
         df = pd.read_feather(input_file)
+    elif ext == ".parquet":
+        df = pd.read_parquet(input_file)
     elif ext == ".ecsv":
         df = Table.read(input_file).to_pandas()
     else:
@@ -681,7 +683,7 @@ def add_database_rows(
 
 
 def check_fluxstd_dups(
-    indir=None, outdir=None, format="feather", skip_save_merged=False
+    indir=None, outdir=None, format="parquet", skip_save_merged=False
 ):
     """
     Checks for duplicates in the flux standard star files in a given directory.
@@ -693,7 +695,8 @@ def check_fluxstd_dups(
     outdir : str
         The directory where the output files will be saved. Defaults to None.
     format : str, optional
-        The format of the input files. Defaults to "feather".
+        The format of the input files. The Feather or Parquet formats are supported.
+        Defaults to "parquet".
     skip_save_merged : bool, optional
         If True, the merged dataframe will not be saved. Defaults to False.
 
@@ -716,12 +719,12 @@ def check_fluxstd_dups(
 
     dataframes = []
 
-    # Loop through the list of feather files
+    # Loop through the list of input files
     for i, f in enumerate(input_files):
         logger.info(f"Reading file {i+1}/{len(input_files)}: {f}")
-        # Read the feather file into a DataFrame
+        # Read the input file into a DataFrame
         file_df = load_input_data(f, logger=logger)
-        file_df["input_file"] = f.rsplit("/")[-1].replace(".feather", "")
+        file_df["input_file"] = f.rsplit("/")[-1].replace(f".{format}", "")
 
         # only selected columns are included because of the memory limit
         dataframes.append(
@@ -764,18 +767,22 @@ def check_fluxstd_dups(
     else:
         logger.info("No duplicates found.")
 
-    # save duplicate-removed dataframe as a feather file
+    # save duplicate-removed dataframe as a feather or parquet file
     if not skip_save_merged:
         df_cleaned = df.drop_duplicates(
             subset=["obj_id", "input_catalog_id", "version"],
             ignore_index=True,
         )
-        df_cleaned.to_feather(
-            os.path.join(
-                f"{outdir}",
-                "all_merged_nodups.feather",
-            )
+        output_file = os.path.join(
+            f"{outdir}",
+            f"all_merged_nodups.{format}",
         )
+        if format == "feather":
+            df_cleaned.to_feather(output_file)
+        elif format == "parquet":
+            df_cleaned.to_parquet(output_file)
+        else:
+            logger.error(f"Unsupported file format: {format}")
 
 
 def csv_to_pyarrow(
@@ -787,14 +794,14 @@ def csv_to_pyarrow(
     format="parquet",
 ):
     """
-    Converts CSV files in a given directory to Feather format.
+    Converts CSV files in a given directory to Feather or Parquet format.
 
     Parameters
     ----------
     input_dir : str
         The directory containing the input CSV files.
     output_dir : str
-        The directory where the output Feather files will be saved.
+        The directory where the output files will be saved.
     version : str
         The version string to be added to the dataframe.
     input_catalog_id : str
@@ -838,7 +845,7 @@ def csv_to_pyarrow(
             logger.info(f"\tAdding version string: {version}")
             df["version"] = version
 
-            # Convert the filename from .csv to .feather
+            # Convert the filename from .csv to pyarrow formats
             filename_body = f"{os.path.splitext(filename)[0]}"
             if format == "parquet":
                 parquet_filename = f"{filename_body}.parquet"
