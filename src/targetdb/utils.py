@@ -778,7 +778,14 @@ def check_fluxstd_dups(
         )
 
 
-def csv_to_feather(input_dir, output_dir, version, input_catalog_id, rename_cols=None):
+def csv_to_pyarrow(
+    input_dir,
+    output_dir,
+    version,
+    input_catalog_id,
+    rename_cols=None,
+    format="parquet",
+):
     """
     Converts CSV files in a given directory to Feather format.
 
@@ -794,6 +801,8 @@ def csv_to_feather(input_dir, output_dir, version, input_catalog_id, rename_cols
         The input catalog ID to be added to the dataframe.
     rename_cols : dict, optional
         A dictionary mapping old column names to new ones. Defaults to None.
+    format : str, optional
+        The format of the output files, "feather" or "parquet". Defaults to "parquet".
 
     Returns
     -------
@@ -830,11 +839,15 @@ def csv_to_feather(input_dir, output_dir, version, input_catalog_id, rename_cols
             df["version"] = version
 
             # Convert the filename from .csv to .feather
-            # feather_filename = filename.rsplit(".", 1)[0] + ".feather"
-            feather_filename = f"{os.path.splitext(filename)[0]}.feather"
-
-            # Write the DataFrame to a Feather file
-            df.to_feather(os.path.join(output_dir, feather_filename))
+            filename_body = f"{os.path.splitext(filename)[0]}"
+            if format == "parquet":
+                parquet_filename = f"{filename_body}.parquet"
+                # Write the DataFrame to a Parquet file
+                df.to_parquet(os.path.join(output_dir, parquet_filename), index=False)
+            elif format == "feather":
+                feather_filename = f"{filename_body}.feather"
+                # Write the DataFrame to a Feather file
+                df.to_feather(os.path.join(output_dir, feather_filename))
             t2 = time.time()
             logger.info(
                 f"Done. Conversion took {t2-t1:.2f} seconds for {df.index.size} rows\n"

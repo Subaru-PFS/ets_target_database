@@ -42,9 +42,7 @@ def main_checkdups():
 
 
 def main_csv_to_feather():
-    parser = argparse.ArgumentParser(
-        description="Check for duplicates in the F-star candidate files"
-    )
+    parser = argparse.ArgumentParser(description="Convert CSV files to Feather files")
     parser.add_argument(
         "input_dir", type=str, help="Directory path containing input CSV files"
     )
@@ -72,10 +70,50 @@ def main_csv_to_feather():
 
     args = parser.parse_args()
 
-    csv_to_feather(
+    csv_to_pyarrow(
         args.input_dir,
         args.output_dir,
         args.version,
         args.input_catalog_id,
         rename_cols=args.rename_cols,
+        format="feather",
+    )
+
+
+def main_csv_to_parquet():
+    parser = argparse.ArgumentParser(description="Convert CSV files to Parquet files")
+    parser.add_argument(
+        "input_dir", type=str, help="Directory path containing input CSV files"
+    )
+    parser.add_argument(
+        "output_dir", type=str, help="Directory path to save the Feather files"
+    )
+    parser.add_argument(
+        "--version",
+        type=str,
+        required=True,
+        help="Version **string** for the F-star candidate catalog (e.g., '3.3')",
+    )
+    parser.add_argument(
+        "--input_catalog_id",
+        type=int,
+        required=True,
+        help="Input catalog ID for the F-star candidate catalog",
+    )
+    parser.add_argument(
+        "--rename-cols",
+        default=None,
+        type=json.loads,
+        help='Dictionary to rename columns (e.g., \'{"fstar_gaia": "is_fstar_gaia"}\'; default is None)',
+    )
+
+    args = parser.parse_args()
+
+    csv_to_pyarrow(
+        args.input_dir,
+        args.output_dir,
+        args.version,
+        args.input_catalog_id,
+        rename_cols=args.rename_cols,
+        format="parquet",
     )
