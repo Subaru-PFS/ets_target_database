@@ -37,15 +37,15 @@ homepage = "https://github.com/Subaru-PFS/ets_target_database"
 source = "https://github.com/Subaru-PFS/ets_target_database"
 
 [project.scripts]
-pfs_targetdb_create_schema = "targetdb.cli.pfs_targetdb_create_schema:main"
-pfs_targetdb_draw_diagram = "targetdb.cli.pfs_targetdb_draw_diagram:main"
-pfs_targetdb_generate_mdtable = "targetdb.cli.pfs_targetdb_generate_mdtable:main"
-pfs_targetdb_drop_database = "targetdb.cli.pfs_targetdb_database_helpers:main_drop_database"
 pfs_targetdb_create_database = "targetdb.cli.pfs_targetdb_database_helpers:main_create_database"
-pfs_targetdb_insert = "targetdb.cli.pfs_targetdb_database_helpers:main_insert"
-pfs_targetdb_update = "targetdb.cli.pfs_targetdb_database_helpers:main_update"
+pfs_targetdb_drop_database = "targetdb.cli.pfs_targetdb_database_helpers:main_drop_database"
+pfs_targetdb_create_schema = "targetdb.cli.pfs_targetdb_create_schema:main_create_schema"
 pfs_targetdb_fluxstd_checkdups = "targetdb.cli.pfs_targetdb_fluxstd_utils:main_checkdups"
 pfs_targetdb_fluxstd_csv2feather = "targetdb.cli.pfs_targetdb_fluxstd_utils:main_csv_to_feather"
+pfs_targetdb_insert = "targetdb.cli.pfs_targetdb_database_helpers:main_insert"
+pfs_targetdb_update = "targetdb.cli.pfs_targetdb_database_helpers:main_update"
+pfs_targetdb_draw_diagram = "targetdb.cli.pfs_targetdb_draw_diagram:main"
+pfs_targetdb_generate_mdtable = "targetdb.cli.pfs_targetdb_generate_mdtable:main"
 
 
 [build-system]

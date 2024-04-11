@@ -1,19 +1,14 @@
 #!/usr/bin/env python
 
 import argparse
-
-# import os
 import sys
 import time
 
-# from datetime import datetime, timezone
-# import pandas as pd
-# from astropy.table import Table
 from loguru import logger
 from sqlalchemy import create_engine
 from sqlalchemy_utils import create_database, database_exists, drop_database
 
-from ..utils import add_database_rows, load_config, load_input_data
+from ..utils import add_database_rows, get_url_object, load_config, load_input_data
 
 
 def query_yes_no(question, default="yes"):
@@ -47,52 +42,53 @@ def query_yes_no(question, default="yes"):
             sys.stdout.write("Please respond with 'yes' or 'no' " "(or 'y' or 'n').\n")
 
 
-def get_arguments():
-    parser = argparse.ArgumentParser(
-        description="Create targetDB itself on PostgreSQL."
-    )
+def get_arguments(desc=None):
+    parser = argparse.ArgumentParser(description=desc)
     parser.add_argument(
-        "dbinfo",
-        type=str,
-        help="Database URL (postgresql://user:password@hostname:port/dbname)",
+        "-c",
+        "--config",
+        default=None,
+        required=True,
+        help="Database config file (.toml)",
     )
 
     args = parser.parse_args()
 
-    return args
+    logger.info(f"Loading config file: {args.config}")
+    config = load_config(args.config)
+
+    return args, config
 
 
 def main_create_database():
-    args = get_arguments()
-
-    print(args)
-
-    engine = create_engine(args.dbinfo)
+    _, config = get_arguments(desc="Create a database on PostgreSQL.")
+    url_object = get_url_object(config)
+    engine = create_engine(url_object)
 
     if not database_exists(engine.url):
-        print("Creating database: {:s}".format(args.dbinfo))
+        logger.info(f"Creating database: {url_object.render_as_string()}")
         create_database(engine.url)
     else:
-        print("Database already exists: {:s}".format(args.dbinfo))
+        logger.info(f"Database already exists: {url_object.render_as_string()}")
 
 
 def main_drop_database():
-    args = get_arguments()
+    _, config = get_arguments(desc="Drop a database on PostgreSQL.")
 
-    print(args)
+    url_object = get_url_object(config)
 
-    engine = create_engine(args.dbinfo)
+    engine = create_engine(url_object)
 
     if database_exists(engine.url):
         print(
-            "WARNING: you are going to delete the database, {:s}.".format(args.dbinfo)
+            f"WARNING: you are going to delete the database, {url_object.render_as_string()}"
         )
         proceed = query_yes_no("Proceed? ", default="no")
         if proceed:
-            print("Dropping database: {:s}".format(args.dbinfo))
+            logger.info(f"Dropping database: {url_object.render_as_string()}")
             drop_database(engine.url)
     else:
-        print("Database does not exist: {:s}".format(args.dbinfo))
+        logger.info("Database does not exist: {url_object.render_as_string()}")
 
 
 def get_arguments_with_config(desc=None):

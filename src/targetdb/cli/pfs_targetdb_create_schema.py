@@ -1,17 +1,22 @@
 #!/usr/bin/env python
 
 import argparse
-import sys
 
-from ..utils import create_schema
+from loguru import logger
+
+from ..manage import create_schema
+from ..utils import get_url_object, load_config
 
 
-def get_arguments():
-    parser = argparse.ArgumentParser(description="Create the schema in targetDB.")
+def get_arguments(desc=None):
+
+    parser = argparse.ArgumentParser(description=desc)
     parser.add_argument(
-        "dbinfo",
-        type=str,
-        help="Database URL (postgresql://user:password@hostname:port/dbname)",
+        "-c",
+        "--config",
+        default=None,
+        required=True,
+        help="Database config file (.toml)",
     )
     parser.add_argument(
         "--drop_all",
@@ -21,17 +26,22 @@ def get_arguments():
 
     args = parser.parse_args()
 
-    return args
+    logger.info(f"Loading config file: {args.config}")
+    config = load_config(args.config)
+
+    return args, config
 
 
-def main():
+def main_create_schema():
 
-    args = get_arguments()
+    args, config = get_arguments(
+        desc="Create tables of the target dabatabase in a database."
+    )
 
-    print(args)
+    url_object = get_url_object(config)
 
-    create_schema(args.dbinfo, drop_all=args.drop_all)
+    create_schema(url_object, drop_all=args.drop_all)
 
 
 if __name__ == "__main__":
-    main()
+    pass

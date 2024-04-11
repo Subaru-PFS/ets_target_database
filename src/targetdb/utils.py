@@ -10,6 +10,7 @@ from datetime import datetime, timezone
 import pandas as pd
 from astropy.table import Table
 from loguru import logger
+from sqlalchemy import URL
 
 from .models import Base
 from .targetdb import TargetDB
@@ -116,6 +117,45 @@ def load_input_data(input_file, logger=logger):
         logger.error(f"Unsupported file extension: {ext}")
         raise ValueError(f"Unsupported file extension: {ext}")
     return df
+
+
+def get_url_object(config):
+    """
+    Create a URL object from the given configuration.
+
+    Parameters
+    ----------
+    config : dict
+        The configuration dictionary containing the database connection details.
+        Expected keys are 'targetdb'->'db'->'dialect', 'user', 'password', 'host', 'port', 'dbname'.
+
+    Returns
+    -------
+    url_object : sqlalchemy.engine.url.URL
+        The created URL object representing the database connection.
+
+    Raises
+    ------
+    KeyError
+        If a necessary key is missing from the config dictionary.
+
+    Examples
+    --------
+    >>> config = {'targetdb': {'db': {'dialect':'postgresql', 'user':'username', 'password':'password', 'host':'localhost', 'port':5432, 'dbname':'test_db'}}}
+    >>> url_object = get_url_object(config)
+    >>> print(url_object)
+    postgresql://username:password@localhost:5432/test_db
+    """
+    url_object = URL.create(
+        drivername=config["targetdb"]["db"]["dialect"],
+        username=config["targetdb"]["db"]["user"],
+        password=config["targetdb"]["db"]["password"],
+        host=config["targetdb"]["db"]["host"],
+        port=config["targetdb"]["db"]["port"],
+        database=config["targetdb"]["db"]["dbname"],
+    )
+
+    return url_object
 
 
 def generate_schema_markdown(schema_md=sys.stdout):
