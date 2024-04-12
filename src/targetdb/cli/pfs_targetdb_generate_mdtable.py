@@ -3,7 +3,7 @@
 import argparse
 import sys
 
-from .. import generate_schema_markdown
+from ..utils import generate_schema_markdown
 
 
 def get_arguments():

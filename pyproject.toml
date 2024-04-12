@@ -5,20 +5,22 @@ dynamic = ["version"]
 description = "PFS target database (targetDB) tools"
 authors = [{ name = "Masato Onodera", email = "monodera@naoj.org" }]
 dependencies = [
-    "setuptools",
+    "alembic",
+    "astropy",
+    # "ipython",
     "loguru",
+    "numpy",
     "pandas",
+    # "psycopg2-binary",
+    "pyarrow",
+    # "setuptools",
+    "sqlalchemy-utils",
     "sqlalchemy",
     "tabulate",
-    "toml",
-    "numpy",
-    "alembic",
-    "psycopg2-binary",
-    "sqlalchemy-utils",
-    "wheel",
-    "ipython",
+    # "wheel",
+    'tomli >= 1.1.0 ; python_version < "3.11"',
 ]
-requires-python = ">=3.8, <4"
+requires-python = ">=3.9, <4"
 readme = "README.md"
 license = { text = "MIT" }
 classifiers = [
@@ -26,10 +28,15 @@ classifiers = [
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
     "Topic :: Database",
     "Topic :: Scientific/Engineering :: Astronomy",
 ]
+
+[project.optional-dependencies]
+dev = ["ipython"]
 
 [project.urls]
 homepage = "https://github.com/Subaru-PFS/ets_target_database"
@@ -37,10 +44,16 @@ source = "https://github.com/Subaru-PFS/ets_target_database"
 
 [project.scripts]
 pfs_targetdb_create_database = "targetdb.cli.pfs_targetdb_database_helpers:main_create_database"
-pfs_targetdb_create_schema = "targetdb.cli.pfs_targetdb_create_schema:main"
-pfs_targetdb_draw_diagram = "targetdb.cli.pfs_targetdb_draw_diagram:main"
 pfs_targetdb_drop_database = "targetdb.cli.pfs_targetdb_database_helpers:main_drop_database"
+pfs_targetdb_create_schema = "targetdb.cli.pfs_targetdb_create_schema:main_create_schema"
+pfs_targetdb_fluxstd_checkdups = "targetdb.cli.pfs_targetdb_fluxstd_utils:main_checkdups"
+pfs_targetdb_fluxstd_csv2feather = "targetdb.cli.pfs_targetdb_fluxstd_utils:main_csv_to_feather"
+pfs_targetdb_fluxstd_csv2parquet = "targetdb.cli.pfs_targetdb_fluxstd_utils:main_csv_to_parquet"
+pfs_targetdb_insert = "targetdb.cli.pfs_targetdb_database_helpers:main_insert"
+pfs_targetdb_update = "targetdb.cli.pfs_targetdb_database_helpers:main_update"
+pfs_targetdb_draw_diagram = "targetdb.cli.pfs_targetdb_draw_diagram:main"
 pfs_targetdb_generate_mdtable = "targetdb.cli.pfs_targetdb_generate_mdtable:main"
+
 
 [build-system]
 requires = ["setuptools", "wheel"]

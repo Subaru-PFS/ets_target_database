@@ -2,11 +2,9 @@
 
 import argparse
 
-# import logzero
-# from logzero import logger
 from loguru import logger
 
-from .. import draw_diagram
+from ..utils import draw_diagram
 
 
 def get_arguments():
