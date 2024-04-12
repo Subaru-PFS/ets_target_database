@@ -7,19 +7,20 @@ authors = [{ name = "Masato Onodera", email = "monodera@naoj.org" }]
 dependencies = [
     "alembic",
     "astropy",
-    "ipython",
+    # "ipython",
     "loguru",
     "numpy",
     "pandas",
-    "psycopg2-binary",
-    "setuptools",
+    # "psycopg2-binary",
+    "pyarrow",
+    # "setuptools",
     "sqlalchemy-utils",
     "sqlalchemy",
     "tabulate",
-    "wheel",
+    # "wheel",
     'tomli >= 1.1.0 ; python_version < "3.11"',
 ]
-requires-python = ">=3.8, <4"
+requires-python = ">=3.9, <4"
 readme = "README.md"
 license = { text = "MIT" }
 classifiers = [
@@ -27,10 +28,15 @@ classifiers = [
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
     "Topic :: Database",
     "Topic :: Scientific/Engineering :: Astronomy",
 ]
+
+[project.optional-dependencies]
+dev = ["ipython"]
 
 [project.urls]
 homepage = "https://github.com/Subaru-PFS/ets_target_database"

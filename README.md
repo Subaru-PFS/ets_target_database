@@ -84,69 +84,71 @@
 </details> -->
 
 
-## Note
-- `commissioning_2021nov` branch will be used for the preparation of the November 2021 commissioning.
-
-
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-PFS Target Database is an implementation of `targetDB` for Prime Focus Spectrograph at Subaru Telescope.
+PFS Target Database (targetdb) is a Python package to manage and interact with a [PostgreSQL](https://www.postgresql.org/) database for Prime Focus Spectrograph at [Subaru Telescope](https://subarutelescope.org/). The `targetdb` is designed to store information from the observatory and observers on proposals and science targets. It also stores information on sky positions and flux standard stars required for PFS observation.
 
 
 
-### Built With (or I'm developing the package with)
+## Prerequisites
 
-The following packages and their dependencies are required to use the main functionality of the package.
+### PostgreSQL database
 
-* [Python 3.9.12](https://www.python.org/)
-* [SQLAlchemy 1.4.32](https://www.sqlalchemy.org/)
-* [NumPy 1.22.3](https://numpy.org/)
-* [pandas 1.4.1](https://pandas.pydata.org/)
+You need a PostgreSQL server to host the database. If you do not have a PostgreSQL server, you can use a Docker container to host a database for testing without affecting the host environment. To set up a PostgreSQL Docker container, you need to install Docker from [Docker Hub](https://hub.docker.com/search?type=edition&offering=community).
 
-Additionally, the following packages and their dependencies are required to use additional functionality of the package and run some example scripts.
+The Q3C extension is required for the database. You can install it by the following instruction in the [q3c repository](https://github.com/segasai/q3c)
 
-* [SQLAlchemy-Utils 0.38.2](https://sqlalchemy-utils.readthedocs.io/en/latest/)
-* [tabulate 0.8.9](https://pypi.org/project/tabulate/)
-* [Astropy 5.0.3](https://www.astropy.org/)
-* [logzero 1.7.0](https://logzero.readthedocs.io/en/latest/)
-* [SchemaCrawler 16.16.14](https://www.schemacrawler.com/)
-* [md-to-pdf 5.0.1](https://github.com/simonhaenisch/md-to-pdf)
-* [Docker 20.10.13](https://www.docker.com/)
 
-Some other useful tools.
-* [DBeaver](https://dbeaver.io/)
+### Python environment
+Python and the following packages as well as their dependencies will be used by installing `targetdb`.
+Package versions shown here are those used for the development (as of April 2024).
+Newer (and somewhat older) versions should also work.
 
-Note that we are currently developing the package with macOS 11.6 on Intel-based Mac using Anaconda for creating a Python environment.
+| Package                                                                | Version |
+|------------------------------------------------------------------------|--------:|
+| [Python](https://www.python.org/)                                      |  3.9.18 |
+| [SQLAlchemy](https://www.sqlalchemy.org/)                              |  2.0.29 |
+| [pandas](https://pandas.pydata.org/)                                   |   2.2.2 |
+| [NumPy](https://numpy.org)                                             |  1.26.4 |
+| [Astropy](https://www.astropy.org/)                                    |   6.0.1 |
+| [loguru](https://loguru.readthedocs.io/)                               |   0.7.2 |
+| [SQLAlchemy-Utils](https://sqlalchemy-utils.readthedocs.io/en/latest/) |  0.41.2 |
+| [tabulate](https://pypi.org/project/tabulate/)                         |   0.9.0 |
+| [alembic](https://alembic.sqlalchemy.org/en/latest/)                   |  1.13.1 |
+| [pyarrow](https://arrow.apache.org/docs/python/)                       |  15.0.2 |
+
+If you are using Python 3.10 or earlier, you may need to install [tomli](https://github.com/hukkin/tomli) package.
+
+Additionally, the following tools may be useful for testing and development.
+
+- [SchemaCrawler](https://www.schemacrawler.com/)
+- [md-to-pdf](https://github.com/simonhaenisch/md-to-pdf)
+- [Docker](https://www.docker.com/)
+- [DBeaver](https://dbeaver.io/)
 
 
 <!-- GETTING STARTED -->
 ## Getting Started
 
-### Prerequisites
-
-If you do not have a PostgreSQL server, you can use Docker container to host a database for testing without affecting the host environment. To setup a PostgreSQL Docker container, you need to install Docker from [Docker Hub](https://hub.docker.com/search?type=edition&offering=community).
-
 ### Installation
 
-1. Clone the repo and go to the cloned directory.
-   ```sh
-   git clone https://github.com/monodera/pfs_target_database.git
-   cd pfs_target_database
-   ```
+```sh
+# Clone the repository and go to the cloned directory.
+git clone https://github.com/Subaru-PFS/ets_target_database.git
+cd ets_target_database
 
-2. Build the package
-   ```sh
-   python ./setup.py build
-   ```
+# (optional) Create a virtual environment
+python3 -m venv .venv
+source .venv/bin/activate
 
-3. Link the package
-    ```sh
-    python ./setup.py develop
-    ```
-    By doing this, Python imports pacakges directly from this folder. It's good for development. If you want to install the package under the python library folder, you can execute `python ./setup.py install`.  This command will install some executables under the directory where your Python executable is located.
+# Install the package
+python3 -m pip install -e .
+```
 
+By doing this, Python imports `targetdb` package directly from the cloned directory, which is convenient for development. If you want to install the package under the Python library directory, you can execute `python3 -m pip install .`.
 
+The installation process will install some command-line tools under the directory where your Python executable is located.
 
 <!-- USAGE EXAMPLES -->
 ## Usage
@@ -155,7 +157,7 @@ Here, we describe how to test the package.
 
 ### Setup a PostgreSQL server (optional)
 
-If a postgres database server to create `targetDB` is not running, you can easily make one as a Docker container.
+If a postgres database server to create `targetdb` is not running, you can easily make one as a Docker container.
 
 ```sh
 cd example/docker/postgres
