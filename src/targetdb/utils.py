@@ -12,8 +12,8 @@ from astropy.table import Table
 from loguru import logger
 from sqlalchemy import URL
 
+from . import TargetDB
 from .models import Base
-from .targetdb import TargetDB
 
 try:
     import tomllib

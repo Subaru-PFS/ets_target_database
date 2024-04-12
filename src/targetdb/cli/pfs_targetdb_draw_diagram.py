@@ -2,8 +2,6 @@
 
 import argparse
 
-# import logzero
-# from logzero import logger
 from loguru import logger
 
 from ..utils import draw_diagram
