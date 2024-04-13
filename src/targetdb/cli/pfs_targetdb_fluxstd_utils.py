@@ -3,7 +3,7 @@
 import argparse
 import json
 
-from ..utils import check_fluxstd_dups, csv_to_pyarrow
+from ..utils import check_fluxstd_dups, prep_fluxstd_data
 
 
 def main_checkdups():
@@ -50,13 +50,19 @@ def main_checkdups():
     )
 
 
-def main_csv_to_feather():
-    parser = argparse.ArgumentParser(description="Convert CSV files to Feather files")
-    parser.add_argument(
-        "input_dir", type=str, help="Directory path containing input CSV files"
+def main_prep_data():
+    parser = argparse.ArgumentParser(
+        description="Prepare flux standard data for the target database by supplementing additional required fields."
     )
     parser.add_argument(
-        "output_dir", type=str, help="Directory path to save the Feather files"
+        "input_dir",
+        type=str,
+        help="Directory path containing input files. "
+        "Files must be in one of the following formats: parquet, feather, or csv. "
+        "The input files must be generated in a certain format to be compatible for targetdb.",
+    )
+    parser.add_argument(
+        "output_dir", type=str, help="Directory path to save the output files."
     )
     parser.add_argument(
         "--version",
@@ -76,53 +82,20 @@ def main_csv_to_feather():
         type=json.loads,
         help='Dictionary to rename columns (e.g., \'{"fstar_gaia": "is_fstar_gaia"}\'; default is None)',
     )
-
-    args = parser.parse_args()
-
-    csv_to_pyarrow(
-        args.input_dir,
-        args.output_dir,
-        args.version,
-        args.input_catalog_id,
-        rename_cols=args.rename_cols,
-        format="feather",
-    )
-
-
-def main_csv_to_parquet():
-    parser = argparse.ArgumentParser(description="Convert CSV files to Parquet files")
     parser.add_argument(
-        "input_dir", type=str, help="Directory path containing input CSV files"
-    )
-    parser.add_argument(
-        "output_dir", type=str, help="Directory path to save the Feather files"
-    )
-    parser.add_argument(
-        "--version",
+        "--format",
         type=str,
-        required=True,
-        help="Version **string** for the F-star candidate catalog (e.g., '3.3')",
-    )
-    parser.add_argument(
-        "--input_catalog_id",
-        type=int,
-        required=True,
-        help="Input catalog ID for the F-star candidate catalog",
-    )
-    parser.add_argument(
-        "--rename-cols",
-        default=None,
-        type=json.loads,
-        help='Dictionary to rename columns (e.g., \'{"fstar_gaia": "is_fstar_gaia"}\'; default is None)',
+        default="feather",
+        help="File format to be used, feather or parquet (default: parquet)",
     )
 
     args = parser.parse_args()
 
-    csv_to_pyarrow(
+    prep_fluxstd_data(
         args.input_dir,
         args.output_dir,
         args.version,
         args.input_catalog_id,
         rename_cols=args.rename_cols,
-        format="parquet",
+        format=args.format,
     )

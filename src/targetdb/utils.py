@@ -790,7 +790,7 @@ def check_fluxstd_dups(
             logger.error(f"Unsupported file format: {format}")
 
 
-def csv_to_pyarrow(
+def prep_fluxstd_data(
     input_dir,
     output_dir,
     version,
@@ -799,12 +799,12 @@ def csv_to_pyarrow(
     format="parquet",
 ):
     """
-    Converts CSV files in a given directory to Feather or Parquet format.
+    Prepare flux standard data ready to be inserted to the target database.
 
     Parameters
     ----------
     input_dir : str
-        The directory containing the input CSV files.
+        The directory containing the input files.
     output_dir : str
         The directory where the output files will be saved.
     version : str
@@ -830,12 +830,13 @@ def csv_to_pyarrow(
     for i, filename in enumerate(input_files):
         # Check if the file is a CSV file
         logger.info(f"Processing... {i+1}/{len(input_files)}: {filename}")
-        if filename.endswith(".csv"):
+        if filename.endswith((".csv", ".feather", ".parquet")):
             t1 = time.time()
             logger.info(f"\tConverting {filename} to the {format} format")
 
             # Read the CSV file
-            df = pd.read_csv(os.path.join(input_dir, filename))
+            # df = pd.read_csv(os.path.join(input_dir, filename))
+            df = load_input_data(os.path.join(input_dir, filename), logger=logger)
 
             # rename fstar_gaia to is_fstar_gaia
             if rename_cols is not None:
@@ -863,4 +864,8 @@ def csv_to_pyarrow(
             t2 = time.time()
             logger.info(
                 f"Done. Conversion took {t2-t1:.2f} seconds for {df.index.size} rows\n"
+            )
+        else:
+            logger.warning(
+                f"Skipping... {filename} does not end with one of .csv, .feather, and .parquet"
             )
