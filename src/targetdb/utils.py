@@ -683,7 +683,11 @@ def add_database_rows(
 
 
 def check_fluxstd_dups(
-    indir=None, outdir=None, format="parquet", skip_save_merged=False
+    indir=None,
+    outdir=None,
+    format="parquet",
+    skip_save_merged=False,
+    additional_columns=[],
 ):
     """
     Checks for duplicates in the flux standard star files in a given directory.
@@ -739,7 +743,8 @@ def check_fluxstd_dups(
                     "input_file",
                     "is_fstar_gaia",
                     "prob_f_star",
-                ],
+                ]
+                + additional_columns,
             ]
         )
 
