@@ -58,8 +58,8 @@ def main_prep_data():
         "input_dir",
         type=str,
         help="Directory path containing input files. "
-        "Files must be in one of the following formats: parquet, feather, or csv. ",
-        "The input files must be generated in a certain format to be compatible for targetdb."
+        "Files must be in one of the following formats: parquet, feather, or csv. "
+        "The input files must be generated in a certain format to be compatible for targetdb.",
     )
     parser.add_argument(
         "output_dir", type=str, help="Directory path to save the output files."
