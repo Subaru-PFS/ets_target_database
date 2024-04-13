@@ -30,6 +30,14 @@ def main_checkdups():
         action="store_true",
         help="Do not save the merged DataFrame as a feather or parquet file",
     )
+    parser.add_argument(
+        "--additional-columns",
+        nargs="*",
+        default=[],
+        help="Additional columns to output for the merged file.  (e.g., 'psf_mag_g' 'psf_mag_r'). "
+        "The following columns are saved by default: "
+        '"obj_id", "ra", "dec", "input_catalog_id", "version", "input_file", "is_fstar_gaia", "prob_f_star"',
+    )
 
     args = parser.parse_args()
 
@@ -38,6 +46,7 @@ def main_checkdups():
         outdir=args.outdir,
         format=args.format,
         skip_save_merged=args.skip_save_merged,
+        additional_columns=args.additional_columns,
     )
 
 
