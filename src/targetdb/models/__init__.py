@@ -35,4 +35,5 @@ __all__ = [
     "cluster",
     "input_catalog_id_start",
     "input_catalog_id_max",
+    "input_catalog_id_absolute_max",
 ]
