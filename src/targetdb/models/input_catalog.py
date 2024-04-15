@@ -7,8 +7,9 @@ from sqlalchemy import (
     Integer,
     String,
 )
+from sqlalchemy.schema import Identity
 
-from . import Base
+from . import Base, input_catalog_id_max, input_catalog_id_start
 
 
 class input_catalog(Base):
@@ -16,14 +17,17 @@ class input_catalog(Base):
 
     input_catalog_id = Column(
         Integer,
+        Identity(
+            start=input_catalog_id_start,
+            maxvalue=input_catalog_id_max,
+            cycle=False,
+        ),
         primary_key=True,
         unique=True,
-        autoincrement=False,
         comment="Unique identifier for input catalogs",
     )
     input_catalog_name = Column(
         String,
-        unique=True,
         comment="Name of the input catalog (e.g., Gaia DR2, HSC-SSP PDR3, etc.)",
     )
     input_catalog_description = Column(

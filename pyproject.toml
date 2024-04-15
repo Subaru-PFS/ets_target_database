@@ -11,7 +11,7 @@ dependencies = [
     "loguru",
     "numpy",
     "pandas",
-    # "psycopg2-binary",
+    "psycopg2-binary",
     "pyarrow",
     # "setuptools",
     "sqlalchemy-utils",

@@ -13,7 +13,12 @@ from loguru import logger
 from sqlalchemy import URL
 
 from . import TargetDB
-from .models import Base
+from .models import (
+    Base,
+    input_catalog_id_absolute_max,
+    input_catalog_id_max,
+    input_catalog_id_start,
+)
 
 try:
     import tomllib
@@ -552,6 +557,33 @@ def make_target_df_from_uploader(
     return df_tmp
 
 
+def check_input_catalog(
+    df,
+    input_catalog_id_start=input_catalog_id_start,
+    input_catalog_id_max=input_catalog_id_max,
+):
+
+    if "input_catalog_id" in df.columns:
+        logger.info("input_catalog_id is found in the DataFrame. Check values.")
+        for i in range(df.index.size):
+            if (df["input_catalog_id"][i] >= input_catalog_id_start) and (
+                df["input_catalog_id"][i] <= input_catalog_id_max
+            ):
+                logger.error(
+                    f"input_catalog_id for manual insert must be outside of {input_catalog_id_start} to {input_catalog_id_max}."
+                )
+                raise ValueError(
+                    f"input_catalog_id for manual insert must be outside of {input_catalog_id_start} to {input_catalog_id_max}."
+                )
+            elif df["input_catalog_id"][i] > input_catalog_id_absolute_max:
+                logger.error(
+                    "input_catalog_id must be less than 100000 due to datamodel constraint."
+                )
+                raise ValueError("input_catalog_id is too large")
+    else:
+        logger.info("input_catalog_id is not found in the DataFrame. Proceed.")
+
+
 def add_database_rows(
     input_file=None,
     config_file=None,
@@ -639,6 +671,12 @@ def add_database_rows(
             )
         else:
             df = add_backref_values(df, db=db, table=table)
+    elif table in ["input_catalog"]:
+        check_input_catalog(
+            df,
+            input_catalog_id_start=input_catalog_id_start,
+            input_catalog_id_max=input_catalog_id_max,
+        )
     t_end = time.time()
     logger.info(f"Added back reference values in {t_end - t_begin:.2f} s")
 

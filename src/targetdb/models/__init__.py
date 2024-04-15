@@ -3,6 +3,10 @@
 # from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import declarative_base
 
+input_catalog_id_start = 10000
+input_catalog_id_max = 89999
+input_catalog_id_absolute_max = 99999
+
 Base = declarative_base()
 
 # Note: Order of import is important!
@@ -17,6 +21,7 @@ from .target import target  # isort:skip
 
 from .cluster import cluster  # isort:skip
 
+
 __all__ = [
     "Base",
     "filter_name",
@@ -28,4 +33,7 @@ __all__ = [
     "fluxstd",
     "target",
     "cluster",
+    "input_catalog_id_start",
+    "input_catalog_id_max",
+    "input_catalog_id_absolute_max",
 ]
