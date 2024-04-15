@@ -688,6 +688,7 @@ def check_fluxstd_dups(
     format="parquet",
     skip_save_merged=False,
     additional_columns=[],
+    check_columns=["obj_id", "input_catalog_id", "version"],
 ):
     """
     Checks for duplicates in the flux standard star files in a given directory.
@@ -754,8 +755,9 @@ def check_fluxstd_dups(
     df = pd.concat(dataframes, ignore_index=True)
 
     # Check for duplicates
+    logger.info(f"Checking for duplicates using the following columns: {check_columns}")
     duplicates = df.duplicated(
-        subset=["obj_id", "input_catalog_id", "version"],
+        subset=check_columns,
         keep=False,
     )
 

@@ -38,6 +38,12 @@ def main_checkdups():
         "The following columns are saved by default: "
         '"obj_id", "ra", "dec", "input_catalog_id", "version", "input_file", "is_fstar_gaia", "prob_f_star"',
     )
+    parser.add_argument(
+        "--check-columns",
+        nargs="*",
+        default=["obj_id", "input_catalog_id", "version"],
+        help="Columns used to check for duplicates. (default: obj_id, input_catalog_id, version)",
+    )
 
     args = parser.parse_args()
 
@@ -47,6 +53,7 @@ def main_checkdups():
         format=args.format,
         skip_save_merged=args.skip_save_merged,
         additional_columns=args.additional_columns,
+        check_columns=args.check_columns,
     )
 
 
