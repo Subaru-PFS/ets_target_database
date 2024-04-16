@@ -21,7 +21,13 @@ from . import Base, filter_name, input_catalog, proposal, target_type
 class target(Base):
     __tablename__ = "target"
     __table_args__ = (
-        UniqueConstraint("proposal_id", "ob_code", name="uq_proposal_id_ob_code"),
+        UniqueConstraint(
+            "proposal_id",
+            "ob_code",
+            "input_catalog_id",
+            "obj_id",
+            name="uq_proposal_id_ob_code_input_catalog_id_obj_id",
+        ),
         Index("target_q3c_ang2ipix_idx", sqlalchemy.text("q3c_ang2ipix(ra, dec)")),
         {},
     )
@@ -124,13 +130,6 @@ class target(Base):
     psf_flux_error_y = Column(Float, comment="Error in y-band PSF flux (nJy)")
     psf_flux_error_j = Column(Float, comment="Error in J band PSF flux (nJy)")
 
-    # filter_g = Column(String, comment="g-band filter (g_hsc, g_ps1, g_sdss, etc.)")
-    # filter_r = Column(String, comment="r-band filter (r_hsc, r_ps1, r_sdss, etc.)")
-    # filter_i = Column(String, comment="i-band filter (i_hsc, i_ps1, i_sdss, etc.)")
-    # filter_z = Column(String, comment="z-band filter (z_hsc, z_ps1, z_sdss, etc.)")
-    # filter_y = Column(String, comment="y-band filter (y_hsc, y_ps1, y_sdss, etc.)")
-    # filter_j = Column(String, comment="j-band filter (j_mko, etc.)")
-
     filter_g = Column(
         String,
         ForeignKey("filter_name.filter_name"),
@@ -213,7 +212,7 @@ class target(Base):
     filter_i_rels = relationship(filter_name, foreign_keys=[filter_i])
     filter_z_rels = relationship(filter_name, foreign_keys=[filter_z])
     filter_y_rels = relationship(filter_name, foreign_keys=[filter_y])
-    filter_g_rels = relationship(filter_name, foreign_keys=[filter_j])
+    filter_j_rels = relationship(filter_name, foreign_keys=[filter_j])
 
     def __init__(
         self,
