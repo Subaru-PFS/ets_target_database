@@ -1,0 +1,88 @@
+site_name: PFS Target Database
+site_url: https://pfs-etc.naoj.hawaii.edu/targetdb/doc/
+site_author: Masato Onodera
+
+copyright: Copyright &copy; <a href="https://subarutelescope.org">Subaru Telescope</a>, <a href="https://www.nao.ac.jp">NAOJ</a>
+
+repo_url: https://github.com/Subaru-PFS/ets_target_database/
+repo_name: Subaru-PFS/ets_target_database
+
+# use_directory_urls: false
+
+nav:
+  - Introduction: index.md
+  - Getting Started: getting_started.md
+  - Data Schema:
+    - filter_name: schema/filter_name.md
+    - fluxstd: schema/fluxstd.md
+    - input_catalog: schema/input_catalog.md
+    - proposal: schema/proposal.md
+    - proposal_category: schema/proposal_category.md
+    - sky: schema/sky.md
+    - target: schema/target.md
+    - target_type: schema/target_type.md
+  - Command-line Tools: cli_tools.md
+  # - API Reference: api.md
+  - Examples: examples.md
+  - Contact: contact.md
+
+plugins:
+  - search
+  - social
+  - privacy
+
+theme:
+  name: material
+  palette:
+    primary: blue grey
+  icon:
+    logo: material/database
+    repo: fontawesome/brands/github
+  font:
+    text: Roboto
+    code: Roboto Mono
+    # text: Lato
+    # code: Fira Code
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.top
+    - toc.follow
+    - toc.integrate
+    - search.highlight
+    - search.suggest
+    - content.code.copy
+    - content.code.select
+
+markdown_extensions:
+  - tables
+  - footnotes
+  - attr_list
+  - def_list
+  - md_in_html
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - admonition
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/Subaru-PFS/ets_target_database/
+      name: Subaru-PFS/ets_target_database on GitHub

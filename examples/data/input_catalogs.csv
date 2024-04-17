@@ -1,0 +1,18 @@
+input_catalog_id,input_catalog_name,input_catalog_description,upload_id,created_at,updated_at
+0,simulated,simulated catalog,,2022-04-30 02:07:08.486471,2022-04-30 02:07:08.486471
+1,gaia_dr1,Gaia Data Release 1,,2022-04-30 02:07:08.486471,2022-04-30 02:07:08.486471
+2,gaia_dr2,Gaia Data Release 2,,2022-04-30 02:07:08.486471,2022-04-30 02:07:08.486471
+3,gaia_edr3,Gaia Early Data Release 3,,2022-04-30 02:07:08.486471,2022-04-30 02:07:08.486471
+4,gaia_dr3,Gaia Data Release 3,,2022-04-30 02:07:08.486471,2022-04-30 02:07:08.486471
+5,hscssp_pdr1_wide,HSC-SSP Public Data Release 1 (Wide),,2022-04-30 02:07:08.486471,2022-04-30 02:07:08.486471
+6,hscssp_pdr1_dud,HSC-SSP Public Data Release 1 (Deep+UltraDeep),,2022-04-30 02:07:08.486471,2022-04-30 02:07:08.486471
+7,hscssp_pdr2_wide,HSC-SSP Public Data Release 2 (Wide),,2022-04-30 02:07:08.486471,2022-04-30 02:07:08.486471
+8,hscssp_pdr2_dud,HSC-SSP Public Data Release 2 (Deep+UltraDeep),,2022-04-30 02:07:08.486471,2022-04-30 02:07:08.486471
+9,hscssp_pdr3_wide,HSC-SSP Public Data Release 3 (Wide),,2022-04-30 02:07:08.486471,2022-04-30 02:07:08.486471
+10,hscssp_pdr3_dud,HSC-SSP Public Data Release 3 (Deep+UltraDeep),,2022-04-30 02:07:08.486471,2022-04-30 02:07:08.486471
+11,hscssp_pdr4_wide,HSC-SSP Public Data Release 4 (Wide),,2022-04-30 02:07:08.486471,2022-04-30 02:07:08.486471
+12,hscssp_pdr4_dud,HSC-SSP Public Data Release 4 (Deep+UltraDeep),,2022-04-30 02:07:08.486471,2022-04-30 02:07:08.486471
+1001,sky_hscssp_s21a_wide,Sky positions from S21A HSC-SSP (Wide),,2022-04-30 02:07:08.486471,2022-04-30 02:07:08.486471
+1002,sky_ps1,Sky positions from PS1,,2022-09-16 03:09:51.519010,2022-09-16 03:09:51.519010
+1003,sky_gaia,Sky positions from Gaia,,2022-09-16 03:09:51.519010,2022-09-16 03:09:51.519010
+1004,sky_nops1,Sky positionns for regions without PS1 data,,2022-11-01 07:55:03.145611,2022-11-01 07:55:03.145611
