@@ -37,6 +37,7 @@ classifiers = [
 
 [project.optional-dependencies]
 dev = ["ipython"]
+doc = ["mkdocs", "mkdocs-material[imaging]", "mkdocstrings-python"]
 
 [project.urls]
 homepage = "https://github.com/Subaru-PFS/ets_target_database"

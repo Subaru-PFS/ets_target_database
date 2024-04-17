@@ -1,0 +1,11 @@
+
+[targetdb.db]
+host = "localhost"
+port = 15432
+dbname = "targetdb_local_test"
+user = "admin"
+password = "admin"
+dialect = "postgresql"
+
+[schemacrawler]
+SCHEMACRAWLERDIR = "/Users/monodera/Dropbox/NAOJ/PFS/Subaru-PFS/schemacrawler-16.16.14-distribution/"
