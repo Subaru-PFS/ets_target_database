@@ -9,7 +9,7 @@ This guide will help you get started with the PFS Target Database.
 
 You need a [PostgreSQL](https://www.postgresql.org/) server to host the database.
 If you do not have a PostgreSQL server, you can use a Docker container to host a database for testing without affecting the host environment.
-To set up a PostgreSQL Docker container, you need to install Docker from [Docker Hub](https://hub.docker.com/search?type=edition&offering=community). See the [example](example.md) for more details.
+To set up a PostgreSQL Docker container, you need to install Docker from [Docker Hub](https://hub.docker.com/search?type=edition&offering=community). See the [examples](examples.md) for more details.
 
 The Q3C extension is required for the database. You can install it by the following instruction in the [q3c repository](https://github.com/segasai/q3c)
 
