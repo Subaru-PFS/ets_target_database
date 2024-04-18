@@ -11,9 +11,10 @@ def get_arguments():
         description="Create tables in targetDB in Markdown format."
     )
     parser.add_argument(
-        "--schema_md",
+        "--output-file",
         type=str,
-        default=sys.stdout,
+        # default=sys.stdout,
+        default=None,
         help="Output markdown file to write tables in the database (Default: sys.stdout)",
     )
 
@@ -28,7 +29,7 @@ def main():
 
     print(args)
 
-    generate_schema_markdown(schema_md=args.schema_md)
+    generate_schema_markdown(output_file=args.output_file)
 
 
 if __name__ == "__main__":
