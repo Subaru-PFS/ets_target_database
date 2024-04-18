@@ -24,7 +24,11 @@ from ..utils import (
     prep_fluxstd_data,
 )
 
-app = typer.Typer(help="PFS Target Database CLI Tool")
+CONTEXT_SETTINGS = dict(help_option_names=["--help", "-h"])
+app = typer.Typer(
+    help="PFS Target Database CLI Tool",
+    context_settings=CONTEXT_SETTINGS,
+)
 
 
 @app.command(help="Create a database on a PostgreSQL server.")
