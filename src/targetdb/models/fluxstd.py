@@ -18,7 +18,14 @@ from sqlalchemy import (
 from sqlalchemy.orm import backref, relationship
 
 # from . import proposal
-from . import Base, filter_name, input_catalog, target_type
+from . import (
+    Base,
+    comment_created_at,
+    comment_updated_at,
+    filter_name,
+    input_catalog,
+    target_type,
+)
 
 
 class fluxstd(Base):
@@ -213,8 +220,8 @@ class fluxstd(Base):
     )
 
     # timestamp
-    created_at = Column(DateTime)
-    updated_at = Column(DateTime)
+    created_at = Column(DateTime, comment=comment_created_at)
+    updated_at = Column(DateTime, comment=comment_updated_at)
 
     # relations to other tables
     target_types = relationship(target_type, backref=backref("fluxstd"))

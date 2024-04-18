@@ -8,12 +8,12 @@ The `filter_name` table is used to store the information on astronomical filters
 
 Here are the columns in the `filter_name` table:
 
-| Column Name             | Type     | Description                                               | Required[^1] | Default |
-|-------------------------|----------|-----------------------------------------------------------|--------------|---------|
-| filter_name             | str      | The name of the filter.                                   | *            |         |
-| filter_name_description | str      | A brief description of the filter.                        |              |         |
-| created_at              | datetime | The date and time in UTC when the record was created.     |              |         |
-| updated_at              | datetime | The date and time in UTCwhen the record was last updated. |              |         |
+| Column Name             | Type     | Description                                                | Required[^1] | Default |
+|-------------------------|----------|------------------------------------------------------------|--------------|---------|
+| filter_name             | str      | The name of the filter.                                    | *            |         |
+| filter_name_description | str      | A brief description of the filter.                         |              |         |
+| created_at              | datetime | The date and time in UTC when the record was created.      |              |         |
+| updated_at              | datetime | The date and time in UTC when the record was last updated. |              |         |
 
 [^1]: Required when inserted by using [command line tools](../cli_tools.md), `pfs_targetdb_insert` and `pfs_targetdb_update`, or equivalent functions.
 

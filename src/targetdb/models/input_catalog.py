@@ -9,7 +9,13 @@ from sqlalchemy import (
 )
 from sqlalchemy.schema import Identity
 
-from . import Base, input_catalog_id_max, input_catalog_id_start
+from . import (
+    Base,
+    comment_created_at,
+    comment_updated_at,
+    input_catalog_id_max,
+    input_catalog_id_start,
+)
 
 
 class input_catalog(Base):
@@ -38,8 +44,8 @@ class input_catalog(Base):
         comment="A 8-bit hex string (16 characters) assigned at the submission of the target list (default: empty string)",
         default="",
     )
-    created_at = Column(DateTime)
-    updated_at = Column(DateTime)
+    created_at = Column(DateTime, comment=comment_created_at)
+    updated_at = Column(DateTime, comment=comment_updated_at)
 
     def __init__(
         self,

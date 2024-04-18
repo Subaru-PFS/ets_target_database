@@ -214,7 +214,7 @@ def generate_schema_markdown(schema_md=sys.stdout):
 
 
 def draw_diagram(
-    conf_file,
+    config,
     sc_info_level="maximum",
     sc_log_level="SEVERE",
     sc_outdir=".",
@@ -223,22 +223,22 @@ def draw_diagram(
     logger=logger,
 ):
 
-    conf = read_conf(conf_file)
+    # conf = read_conf(conf_file)
 
     time_string = datetime.now().strftime("%Y%m%d%H%M%S")
 
     outfile = os.path.join(sc_outdir, f"{sc_outprefix}-{time_string}.pdf")
 
     comm = [
-        f"{os.path.join(conf['schemacrawler']['SCHEMACRAWLERDIR'],'_schemacrawler/bin/schemacrawler.sh')}",
+        f"{os.path.join(config['schemacrawler']['SCHEMACRAWLERDIR'],'_schemacrawler/bin/schemacrawler.sh')}",
         "--command=schema",
         "--server=postgresql",
-        f"--host={conf['targetdb']['db']['host']}",
-        f"--port={conf['targetdb']['db']['port']}",
-        f"--database={conf['targetdb']['db']['dbname']}",
+        f"--host={config['targetdb']['db']['host']}",
+        f"--port={config['targetdb']['db']['port']}",
+        f"--database={config['targetdb']['db']['dbname']}",
         "--schemas=public",
-        f"--user={conf['targetdb']['db']['user']}",
-        f"--password={conf['targetdb']['db']['password']}",
+        f"--user={config['targetdb']['db']['user']}",
+        f"--password={config['targetdb']['db']['password']}",
         f"--info-level={sc_info_level}",
         f"--log-level={sc_log_level}",
         "--portable-names",

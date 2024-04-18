@@ -4,20 +4,27 @@ import argparse
 
 from loguru import logger
 
-from ..utils import draw_diagram
+from ..utils import draw_diagram, load_config
 
 
 def get_arguments():
     parser = argparse.ArgumentParser(
         description="Create the ER diagram of the database in PDF"
     )
-
     parser.add_argument(
-        "conf",
-        type=str,
-        default="config.toml",
-        help="Config file for the script to run. Must be a .toml file (default: config.toml)",
+        "-c",
+        "--config",
+        default=None,
+        required=True,
+        help="Database config file (.toml)",
     )
+
+    # parser.add_argument(
+    #     "conf",
+    #     type=str,
+    #     default="config.toml",
+    #     help="Config file for the script to run. Must be a .toml file (default: config.toml)",
+    # )
 
     parser.add_argument(
         "--sc_info_level",
@@ -53,12 +60,15 @@ def get_arguments():
 
     args = parser.parse_args()
 
-    return args
+    logger.info(f"Loading config file: {args.config}")
+    config = load_config(args.config)
+
+    return args, config
 
 
 def main():
 
-    args = get_arguments()
+    args, config = get_arguments()
 
     # if args.debug:
     #     logzero.loglevel(logzero.DEBUG)
@@ -68,7 +78,7 @@ def main():
     logger.info(args)
 
     draw_diagram(
-        args.conf,
+        config,
         sc_info_level=args.sc_info_level,
         sc_log_level=args.sc_log_level,
         sc_outdir=args.sc_outdir,
