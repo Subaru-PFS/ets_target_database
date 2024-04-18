@@ -3,9 +3,12 @@
 # from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import declarative_base
 
-input_catalog_id_start = 10000
-input_catalog_id_max = 89999
-input_catalog_id_absolute_max = 99999
+input_catalog_id_start: int = 10000
+input_catalog_id_max: int = 89999
+input_catalog_id_absolute_max: int = 99999
+
+comment_created_at: str = "The date and time in UTC when the record was created"
+comment_updated_at: str = "The date and time in UTC when the record was last updated"
 
 Base = declarative_base()
 
@@ -36,4 +39,6 @@ __all__ = [
     "input_catalog_id_start",
     "input_catalog_id_max",
     "input_catalog_id_absolute_max",
+    "comment_created_at",
+    "comment_updated_at",
 ]

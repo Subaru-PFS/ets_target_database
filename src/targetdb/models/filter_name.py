@@ -7,7 +7,7 @@ from sqlalchemy import (
     String,
 )
 
-from . import Base
+from . import Base, comment_created_at, comment_updated_at
 
 
 class filter_name(Base):
@@ -27,8 +27,8 @@ class filter_name(Base):
         comment="Description of the filter",
     )
 
-    created_at = Column(DateTime, comment="Creation time [YYYY-MM-DDThh:mm:ss] (UTC)")
-    updated_at = Column(DateTime, comment="Update time [YYYY-MM-DDThh:mm:ss] (UTC)")
+    created_at = Column(DateTime, comment=comment_created_at)
+    updated_at = Column(DateTime, comment=comment_updated_at)
 
     def __init__(
         self,

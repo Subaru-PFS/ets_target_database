@@ -71,6 +71,7 @@ optional arguments:
 
 ### Duplication check
 
+
 ```text
 $ pfs_targetdb_fluxstd_checkdups --help
 
@@ -95,6 +96,10 @@ optional arguments:
   --check-columns [CHECK_COLUMNS ...]
                         Columns used to check for duplicates. (default: obj_id, input_catalog_id, version)
 ```
+
+!!! note
+    `pfs_targetdb_fluxstd_checkdups` may be used for checking duplicates in other data files as well. The `--check-columns` option can be used to specify the columns to check for duplicates.
+
 
 ### Prepare fluxstd data file
 

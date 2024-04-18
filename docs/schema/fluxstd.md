@@ -90,3 +90,7 @@ Photometric flux columns must be filled as much as possible for the best calibra
 Photometric magnitudes are optional. Fluxes are more important.
 
 Columns related to the Brutus calculation (`teff_brutus`, `teff_brutus_low`, `teff_brutus_high`, `logg_brutus`, `logg_brutus_low`, `logg_brutus_high`, and `prob_f_star`) are required when PS1 photometry is available and computation is possible.
+
+## Reference
+
+More details on the flux standard star data can be found in the [doc/catalog.md](https://github.com/Subaru-PFS/drp_fstar_photo/blob/main/doc/catalog.md) file in the [drp_fstar_photo](https://github.com/Subaru-PFS/drp_fstar_photo/) repository.

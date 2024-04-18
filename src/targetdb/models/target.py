@@ -15,7 +15,15 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import backref, relationship
 
-from . import Base, filter_name, input_catalog, proposal, target_type
+from . import (
+    Base,
+    comment_created_at,
+    comment_updated_at,
+    filter_name,
+    input_catalog,
+    proposal,
+    target_type,
+)
 
 
 class target(Base):
@@ -197,8 +205,8 @@ class target(Base):
     )
 
     # timestamp
-    created_at = Column(DateTime)
-    updated_at = Column(DateTime)
+    created_at = Column(DateTime, comment=comment_created_at)
+    updated_at = Column(DateTime, comment=comment_updated_at)
 
     # unique_objects = relation(unique_object, backref=backref("target"))
     proposals = relationship(proposal, backref=backref("target"))

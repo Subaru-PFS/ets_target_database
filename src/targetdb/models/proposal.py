@@ -10,7 +10,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import backref, relationship
 
-from . import Base, proposal_category
+from . import Base, comment_created_at, comment_updated_at, proposal_category
 
 
 class proposal(Base):
@@ -53,12 +53,8 @@ class proposal(Base):
         Integer, ForeignKey("proposal_category.proposal_category_id")
     )
 
-    created_at = Column(
-        DateTime, comment="Creation time [YYYY-MM-DDThh:mm:ss] (UTC or HST?)"
-    )
-    updated_at = Column(
-        DateTime, comment="Update time [YYYY-MM-DDThh:mm:ss] (UTC or HST?)"
-    )
+    created_at = Column(DateTime, comment=comment_created_at)
+    updated_at = Column(DateTime, comment=comment_updated_at)
 
     proposal_categories = relationship(proposal_category, backref=backref("proposal"))
 

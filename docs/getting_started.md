@@ -2,7 +2,6 @@
 
 This guide will help you get started with the PFS Target Database.
 
-
 ## Prerequisites
 
 ### PostgreSQL database

@@ -1,5 +1,5 @@
 site_name: PFS Target Database
-site_url: https://pfs-etc.naoj.hawaii.edu/targetdb/doc/
+site_url: https://pfs-etc.naoj.hawaii.edu/targetdb/
 site_author: Masato Onodera
 
 copyright: Copyright &copy; <a href="https://subarutelescope.org">Subaru Telescope</a>, <a href="https://www.nao.ac.jp">NAOJ</a>
@@ -13,6 +13,7 @@ nav:
   - Introduction: index.md
   - Getting Started: getting_started.md
   - Data Schema:
+    - schema/index.md
     - filter_name: schema/filter_name.md
     - fluxstd: schema/fluxstd.md
     - input_catalog: schema/input_catalog.md
@@ -21,10 +22,25 @@ nav:
     - sky: schema/sky.md
     - target: schema/target.md
     - target_type: schema/target_type.md
-  - Command-line Tools: cli_tools.md
+  - CLI Tools: cli_tools.md
   # - API Reference: api.md
-  - Examples: examples.md
+  - Examples:
+    - examples/index.md
+    - Operating targetdb: examples/operation.md
+    - Preparing input data: examples/preparation.md
+    - Useful Queries: examples/queries.md
+    - Docker tutorial: examples/docker.md
   - Contact: contact.md
+  - tbls:
+    - tbls/README.md
+    - tbls/public.filter_name.md
+    - tbls/public.fluxstd.md
+    - tbls/public.input_catalog.md
+    - tbls/public.proposal.md
+    - tbls/public.proposal_category.md
+    - tbls/public.sky.md
+    - tbls/public.target.md
+    - tbls/public.target_type.md
 
 plugins:
   - search
@@ -39,20 +55,23 @@ theme:
     logo: material/database
     repo: fontawesome/brands/github
   font:
-    text: Roboto
-    code: Roboto Mono
+    text: Lato
+    code: Intel One Mono
     # text: Lato
     # code: Fira Code
   features:
     - navigation.tabs
     - navigation.tabs.sticky
     - navigation.top
+    # - navigation.sections
+    - navigation.indexes
     - toc.follow
     - toc.integrate
     - search.highlight
     - search.suggest
     - content.code.copy
     - content.code.select
+    - content.code.annotate
 
 markdown_extensions:
   - tables
