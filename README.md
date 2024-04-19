@@ -4,6 +4,8 @@
 
 PFS Target Database (targetdb) is a Python package to manage and interact with a [PostgreSQL](https://www.postgresql.org/) database for Prime Focus Spectrograph at [Subaru Telescope](https://subarutelescope.org/). The `targetdb` is designed to store information from the observatory and observers on proposals and science targets. It also stores information on sky positions and flux standard stars required for PFS observation.
 
+Please see [the documentation](https://pfs-etc.naoj.hawaii.edu/targetdb/) for more details.
+
 ## Prerequisites
 
 ### PostgreSQL database
@@ -13,6 +15,7 @@ You need a PostgreSQL server to host the database. If you do not have a PostgreS
 The Q3C extension is required for the database. You can install it by the following instruction in the [q3c repository](https://github.com/segasai/q3c)
 
 ### Python environment
+
 Python and the following packages as well as their dependencies will be used by installing `targetdb`.
 Package versions shown here are those used for the development (as of April 2024).
 Newer (and somewhat older) versions should also work.
@@ -29,8 +32,16 @@ Newer (and somewhat older) versions should also work.
 | [tabulate](https://pypi.org/project/tabulate/)                         |   0.9.0 |
 | [alembic](https://alembic.sqlalchemy.org/en/latest/)                   |  1.13.1 |
 | [pyarrow](https://arrow.apache.org/docs/python/)                       |  15.0.2 |
+| [Typer](https://typer.tiangolo.com/)                                   |  0.12.3 |
 
 If you are using Python 3.10 or earlier, you may need to install [tomli](https://github.com/hukkin/tomli) package.
+
+For building the documentation, the following packages are required.
+
+| Package                                                         | Version |
+|-----------------------------------------------------------------|--------:|
+| [MkDocs](https://www.mkdocs.org/)                               |   1.5.3 |
+| [mkdocs-material](https://squidfunk.github.io/mkdocs-material/) |  9.5.18 |
 
 Additionally, the following tools may be useful for testing and development.
 

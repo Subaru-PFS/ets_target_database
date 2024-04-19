@@ -31,8 +31,16 @@ Newer (and somewhat older) versions should also work.
 | [tabulate](https://pypi.org/project/tabulate/)                         |   0.9.0 |
 | [alembic](https://alembic.sqlalchemy.org/en/latest/)                   |  1.13.1 |
 | [pyarrow](https://arrow.apache.org/docs/python/)                       |  15.0.2 |
+| [Typer](https://typer.tiangolo.com/)                                   |  0.12.3 |
 
 If you are using Python 3.10 or earlier, you may need to install [tomli](https://github.com/hukkin/tomli) package.
+
+For building the documentation, the following packages are required.
+
+| Package                                                         | Version |
+|-----------------------------------------------------------------|--------:|
+| [MkDocs](https://www.mkdocs.org/)                               |   1.5.3 |
+| [mkdocs-material](https://squidfunk.github.io/mkdocs-material/) |  9.5.18 |
 
 Additionally, the following tools may be useful for testing and development.
 
@@ -134,3 +142,17 @@ print(df.head())
 # close the connection
 db.close()
 ```
+
+## Build the Documentation
+
+The documentation can be built by the following command:
+
+```bash
+# Install the required packages for building the documentation
+python3 -m pip install -e ".[docs]"
+
+# Build the documentation with MkDocs
+mkdocs build
+```
+
+The documentation will be generated in the `site` directory.
