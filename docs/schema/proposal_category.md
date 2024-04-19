@@ -16,7 +16,7 @@ Here are the columns in the `proposal_category` table:
 | created_at                    | datetime | The date and time in UTC when the record was created.      |              |         |
 | updated_at                    | datetime | The date and time in UTC when the record was last updated. |              |         |
 
-[^1]: Required when inserted by using [command line tools](../cli_tools.md), `pfs_targetdb_insert` and `pfs_targetdb_update`, or equivalent functions.
+[^1]: Required when inserted by using the [CLI tool](../reference/cli.md) or equivalent functions.
 
 ## Unique constraint
 

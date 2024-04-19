@@ -179,7 +179,7 @@ def checkdups(
     help="Prepare flux standard data for the target database by supplementing additional required fields."
 )
 def prep_fluxstd(
-    directory: Annotated[
+    input_dir: Annotated[
         str,
         typer.Argument(
             show_default=False,
@@ -229,7 +229,7 @@ def prep_fluxstd(
         rename_cols = json.loads(rename_cols)
 
     prep_fluxstd_data(
-        directory,
+        input_dir,
         output_dir,
         version,
         input_catalog_id,
@@ -395,7 +395,7 @@ def update(
         str,
         typer.Argument(
             show_default=False,
-            help="Input file to be inserted to targetdb (CSV, ECSV, Feather, or Parquet format)",
+            help="Input file containing data to update records in the PFS Target Database (CSV, ECSV, or Feather formats) (required)",
         ),
     ],
     config_file: Annotated[

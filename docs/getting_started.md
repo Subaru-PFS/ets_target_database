@@ -8,7 +8,7 @@ This guide will help you get started with the PFS Target Database.
 
 You need a [PostgreSQL](https://www.postgresql.org/) server to host the database.
 If you do not have a PostgreSQL server, you can use a Docker container to host a database for testing without affecting the host environment.
-To set up a PostgreSQL Docker container, you need to install Docker from [Docker Hub](https://hub.docker.com/search?type=edition&offering=community). See the [examples](examples.md) for more details.
+To set up a PostgreSQL Docker container, you need to install Docker from [Docker Hub](https://hub.docker.com/search?type=edition&offering=community). See the [examples](examples/index.md) for more details.
 
 The Q3C extension is required for the database. You can install it by the following instruction in the [q3c repository](https://github.com/segasai/q3c)
 
@@ -83,7 +83,7 @@ dialect = "postgresql"  # database dialect
 
 
 [schemacrawler]
-SCHEMACRAWLERDIR = "<path to schemacrawler>"  # "_schemacrawler/bin/schemacrawler.sh" under the path will be used
+SCHEMACRAWLERDIR = "<path to schemacrawler directory>"  # "_schemacrawler/bin/schemacrawler.sh" under the path will be used
 ```
 
 The following commands are to create the `targetdb` database, install the Q3C extension,
@@ -91,21 +91,21 @@ create tables, and generate an entity-relationship diagram of the database.
 
 ```bash
 # create a database
-pfs_targetdb_create_database -c dbconf.toml
+pfs-targetdb-cli create-db -c dbconf.toml
 
 # install the Q3C extension
 psql -h localhost -U admin -d targetdb -c "CREATE EXTENSION q3c;"
 Password for user admin: (enter the password)
 
 # create tables in the database
-pfs_targetdb_create_schema -c dbconf.toml
+pfs-targetdb-cli create-schema -c dbconf.toml
 ```
 
 ### Generate an ER diagram
 
 ```
 # draw the ER diagram
-pfs_targetdb_draw_diagram dbconf.toml
+pfs-targetdb-cli diagram -c dbconf.toml
 ```
 
 An ER diagram will be generated as `erdiagram_targetdb-YYYYMMDDHHmmss.pdf` in the current directory.
