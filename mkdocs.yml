@@ -10,7 +10,7 @@ repo_name: Subaru-PFS/ets_target_database
 # use_directory_urls: false
 
 nav:
-  - Introduction: index.md
+  - Home: index.md
   - Getting Started: getting_started.md
   - Data Schema:
     - schema/index.md
