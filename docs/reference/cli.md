@@ -24,219 +24,262 @@ The command-line interface (CLI) tool `pfs-targetdb-cli` is provided to work wit
 
     The `schemacrawler` section is required only if you want to draw an ER diagram of the database schema with SchemaCrawler.
 
-## **`pfs-targetdb-cli`**
+## `pfs-targetdb-cli`
 
 PFS Target Database CLI Tool
 
-**Usage:**
+**Usage**:
 
-```text
-pfs-targetdb-cli [OPTIONS] COMMAND [ARGS]...
+```console
+$ pfs-targetdb-cli [OPTIONS] COMMAND [ARGS]...
 ```
 
-**Options:**
+**Options**:
 
-- `--install-completion`: Install completion for the current shell.
-- `--show-completion`: Show completion for the current shell, to copy it or customize the installation.
-- `--help`, `-h`: Show this message and exit.
+* `--help`: Show this message and exit.
+
+**Commands**:
+
+* `checkdups`: Check for duplicates in data files in a...
+* `create-db`: Create a database on a PostgreSQL server.
+* `create-schema`: Create tables of the PFS tartedb in a...
+* `diagram`: Generate an ER diagram of a database.
+* `download`: wip: Download data from the uploader to...
+* `drop-db`: Drop a database on a PostgreSQL server.
+* `insert`: Insert rows into a table in the PFS Target...
+* `mdtable`: Generate a Markdown output of the schema...
+* `parse-ph2`: wip: Parse a spreadsheet with TAC...
+* `prep-fluxstd`: Prepare flux standard data for the target...
+* `update`: Update rows in a table in the PFS Target...
 
 ---
 
-**Commands:**
-
-### **`checkdups`**
+### `checkdups`
 
 Check for duplicates in data files in a directory.
 
-**Usage:**
+**Usage**:
 
-```text
-pfs-targetdb-cli checkdups [OPTIONS] DIRECTORY
+```console
+$ pfs-targetdb-cli checkdups [OPTIONS] DIRECTORY
 ```
 
-**Arguments:**
+**Arguments**:
 
-- `directory`: Directory path containing input files (required)
+* `DIRECTORY`: Directory path containing input files  [required]
 
-**Options:**
+**Options**:
 
-- `--format`: File format of the merged data file, feather or parquet (default: parquet)
-- `--outdir`, `-o`: Path to output directory (default: .)
-- `--skip-save-merged`: Do not save the merged DataFrame
-- `--additional-columns`: Additional columns to output for the merged file. For example, 'psf_mag_g' 'psf_mag_r'. The following columns are saved by default: "obj_id", "ra", "dec", "input_catalog_id", "version", "input_file", "is_fstar_gaia", "prob_f_star"
-- `--check-columns`: Columns used to check for duplicates. (default: obj_id, input_catalog_id, version)
-- `--help`, `-h`: Show this message and exit.
+* `--format TEXT`: File format of the merged data file, feather or parquet  [default: parquet]
+* `-o, --outdir TEXT`: Path to output directory.  [default: .]
+* `--skip-save-merged`: Do not save the merged DataFrame
+* `--additional-columns TEXT`: Additional columns to output for the merged file.  (e.g., 'psf_mag_g' 'psf_mag_r'). The following columns are saved by default: "obj_id", "ra", "dec", "input_catalog_id", "version", "input_file", "is_fstar_gaia", "prob_f_star"
+* `--check-columns TEXT`: Columns used to check for duplicates. (default: obj_id, input_catalog_id, version)  [default: obj_id, input_catalog_id, version]
+* `--help`: Show this message and exit.
 
 ---
 
-### **`create-db`**
+### `create-db`
 
 Create a database on a PostgreSQL server.
 
-**Usage:**
+**Usage**:
 
-```text
-pfs-targetdb-cli create-db [OPTIONS]
+```console
+$ pfs-targetdb-cli create-db [OPTIONS]
 ```
 
-**Options:**
+**Options**:
 
-- `--config`, `-c`: Database configuration file (.toml) (required)
-- `--help`, `-h`: Show this message and exit.
+* `-c, --config TEXT`: Database configuration file (.toml)  [required]
+* `--help`: Show this message and exit.
 
 ---
 
-### **`create-schema`**
+### `create-schema`
 
 Create tables of the PFS tartedb in a database.
 
-**Usage:**
+**Usage**:
 
-```text
-pfs-targetdb-cli create-schema [OPTIONS]
+```console
+$ pfs-targetdb-cli create-schema [OPTIONS]
 ```
 
-**Options:**
+**Options**:
 
-- `--config`, `-c`: Database configuration file (.toml) (required)
-- `--drop-all`: Drop all tables before creating schema. (Default: False)
-- `--help`, `-h`: Show this message and exit.
+* `-c, --config TEXT`: Database configuration file (.toml)  [required]
+* `--drop-all`: Drop all tables before creating schema. (Default: False)
+* `--help`: Show this message and exit.
 
 ---
 
-### **`diagram`**
-Generate an ER diagram of a database. You can choose between SchemaCrawler and tbls to generate the diagram.
-The chosen program must be installed.
+### `diagram`
 
-**Usage:**
+Generate an ER diagram of a database.
 
-```text
-pfs-targetdb-cli diagram [OPTIONS]
+**Usage**:
+
+```console
+$ pfs-targetdb-cli diagram [OPTIONS]
 ```
 
-**Options:**
+**Options**:
 
-- `--config`, `-c`: Database configuration file (.toml) (required)
-- `--generator`: Program to generate ER diagram (schemacrawler or tbls) (default: schemacrawler)
-- `--output-dir`: Output directory (default: diagram)
-- `--title`: Title of the ER diagram (default: PFS Target Database)
-- `--sc-info-level`: SchemaCrawler info level (default: maximum)
-- `--sc-level-level`: SchemaCrawler log level (default: SEVERE)
-- `--sc-outprefix`: Output file prefix (default: erdiagram_targetdb)
-- `--tbls-format`: tbls format (default: mermaid)
-- `--help`, `-h`: Show this message and exit.
+* `-c, --config TEXT`: Database configuration file (.toml)  [required]
+* `--generator [schemacrawler|tbls]`: Program to generate ER diagram (schemacrawler or tbls)  [default: schemacrawler]
+* `--output-dir TEXT`: Output directory  [default: diagram]
+* `--title TEXT`: Title of the ER diagram  [default: PFS Target Database]
+* `--sc-info-level TEXT`: SchemaCrawler info level  [default: maximum]
+* `--sc-level-level TEXT`: SchemaCrawler log level  [default: SEVERE]
+* `--sc-outprefix TEXT`: Output file prefix  [default: erdiagram_targetdb]
+* `--tbls-format TEXT`: tbls format  [default: mermaid]
+* `--help`: Show this message and exit.
 
 ---
 
-### **`drop-db`**
+### `download`
+
+wip: Download data from the uploader to the local machine.
+
+**Usage**:
+
+```console
+$ pfs-targetdb-cli download [OPTIONS]
+```
+
+**Options**:
+
+* `--help`: Show this message and exit.
+
+---
+
+### `drop-db`
 
 Drop a database on a PostgreSQL server.
 
-**Usage:**
+**Usage**:
 
-```text
-pfs-targetdb-cli drop-db [OPTIONS]
+```console
+$ pfs-targetdb-cli drop-db [OPTIONS]
 ```
 
-**Options:**
+**Options**:
 
-- `--config`, `-c`: Database configuration file (.toml) (required)
-- `--help`, `-h`: Show this message and exit.
+* `-c, --config TEXT`: Database configuration file (.toml)  [required]
+* `--help`: Show this message and exit.
 
 ---
 
-### **`insert`**
+### `insert`
 
 Insert rows into a table in the PFS Target Database.
 
-**Usage:**
+**Usage**:
 
-```text
-pfs-targetdb-cli insert [OPTIONS] INPUT_FILE
+```console
+$ pfs-targetdb-cli insert [OPTIONS] INPUT_FILE
 ```
 
-**Arguments:**
+**Arguments**:
 
-- `input_file`: Input file to be inserted to targetDB (CSV, ECSV, or Feather formats) (required)
+* `INPUT_FILE`: Input file to be inserted to targetdb (CSV, ECSV, Feather, or Parquet format)  [required]
 
-**Options:**
+**Options**:
 
-- `--config`, `-c`: Database configuration file (.toml) (required)
-- `--table`, `-t`: Table name to insert data (required)
-- `--commit`: Commit changes to the database
-- `--fetch`: Fetch data from database at the end
-- `--from_uploader`: Flag to indicate the data is coming from the PFS Target Uploader. Only required for the target table
-- `--upload_id`: Upload ID issued by the PFS Target Uploader. Only required for the target table
-- `--proposal_id`: Proposal ID (e.g., S24B-QT001). Only required for the target table
-- `--verbose`, `-v`: Verbose output
-- `--help`, `-h`: Show this message and exit.
+* `-c, --config TEXT`: Database configuration file (.toml)  [required]
+* `-t, --table TEXT`: Table name to insert data  [required]
+* `--commit`: Commit changes to the database
+* `--fetch`: Fetch data from database a the end
+* `--from_uploader`: Flag to indicate the data is coming from the PFS Target Uploader. Only required for the target table
+* `--upload_id TEXT`: Upload ID issued by the PFS Target Uploader. Only required for the target table
+* `--proposal_id TEXT`: Proposal ID (e.g., S24B-QT001). Only required for the target table
+* `-v, --verbose`: Verbose output
+* `--help`: Show this message and exit.
 
 ---
 
-### **`mdtable`**
+### `mdtable`
 
 Generate a Markdown output of the schema of the PFS Target Database.
 
-**Usage:**
+**Usage**:
 
-```text
-pfs-targetdb-cli mdtable [OPTIONS]
+```console
+$ pfs-targetdb-cli mdtable [OPTIONS]
 ```
 
-**Options:**
+**Options**:
 
-- `--output-file`, `-o`: Output file (default: None)
-- `--help`, `-h`: Show this message and exit.
+* `-o, --output-file TEXT`: Output file
+* `--help`: Show this message and exit.
 
 ---
 
-### **`prep-fluxstd`**
+### `parse-ph2`
+
+wip: Parse a spreadsheet with TAC allocations.
+
+**Usage**:
+
+```console
+$ pfs-targetdb-cli parse-ph2 [OPTIONS]
+```
+
+**Options**:
+
+* `--help`: Show this message and exit.
+
+---
+
+### `prep-fluxstd`
 
 Prepare flux standard data for the target database by supplementing additional required fields.
 
-**Usage:**
+**Usage**:
 
-```text
-pfs-targetdb-cli prep-fluxstd [OPTIONS] INPUT_DIR OUTPUT_DIR
+```console
+$ pfs-targetdb-cli prep-fluxstd [OPTIONS] INPUT_DIR OUTPUT_DIR
 ```
 
-**Arguments:**
+**Arguments**:
 
-- `input_dir`: Directory path containing input files. Files must be in one of the following formats: parquet, feather, or csv. The input files must be generated in a certain format to be compatible for targetdb (required)
-- `output_dir`: Directory path to save the output files (required)
+* `INPUT_DIR`: Directory path containing input files. Files must be in one of the following formats: parquet, feather, or csv. The input files must be generated in a certain format to be compatible for targetdb.  [required]
+* `OUTPUT_DIR`: Directory path to save the output files.  [required]
 
-**Options:**
+**Options**:
 
-- `--version`: Version **string** for the F-star candidate catalog (e.g., '3.3') (required)
-- `--input_catalog_id`: Input catalog ID for the F-star candidate catalog (required)
-- `--rename-cols`: Dictionary to rename columns (e.g., '{"fstar_gaia": "is_fstar_gaia"}') (default: None)
-- `--format`: File format of the merged data file, feather or parquet (default: parquet)
-- `--help`, `-h`: Show this message and exit.
+* `--version TEXT`: Version **string** for the F-star candidate catalog (e.g., '3.3')  [required]
+* `--input_catalog_id INTEGER`: Input catalog ID for the F-star candidate catalog
+* `--input_catalog_name TEXT`: Input catalog name for the F-star candidate catalog
+* `--rename-cols TEXT`: Dictionary to rename columns (e.g., '{"fstar_gaia": "is_fstar_gaia"}')
+* `--format TEXT`: File format of the output data file, feather or parquet  [default: parquet]
+* `--help`: Show this message and exit.
 
 ---
 
-### **`update`**
+### `update`
 
 Update rows in a table in the PFS Target Database.
 
-**Usage:**
+**Usage**:
 
-```text
-pfs-targetdb-cli update [OPTIONS] INPUT_FILE
+```console
+$ pfs-targetdb-cli update [OPTIONS] INPUT_FILE
 ```
 
-**Arguments:**
+**Arguments**:
 
-- `input_file`: Input file containing data to update rows in the PFS Target Database (CSV, ECSV, or Feather formats) (required)
+* `INPUT_FILE`: Input file containing data to update records in the PFS Target Database (CSV, ECSV, or Feather formats) (required)  [required]
 
-**Options:**
+**Options**:
 
-- `--config`, `-c`: Database configuration file (.toml) (required)
-- `--table`, `-t`: Table name to insert data (required)
-- `--commit`: Commit changes to the database
-- `--fetch`: Fetch data from database at the end
-- `--from_uploader`: Flag to indicate the data is coming from the PFS Target Uploader. Only required for the target table
-- `--upload_id`: Upload ID issued by the PFS Target Uploader. Only required for the target table
-- `--proposal_id`: Proposal ID (e.g., S24B-QT001). Only required for the target table
-- `--verbose`: Verbose output
-- `--help`, `-h`: Show this message and exit.
+* `-c, --config TEXT`: Database configuration file (.toml)  [required]
+* `-t, --table TEXT`: Table name to insert data  [required]
+* `--commit`: Commit changes to the database
+* `--fetch`: Fetch data from database a the end
+* `--from_uploader`: Flag to indicate the data is coming from the PFS Target Uploader. Only required for the target table
+* `--upload_id TEXT`: Upload ID issued by the PFS Target Uploader. Only required for the target table
+* `--proposal_id TEXT`: Proposal ID (e.g., S24B-QT001). Only required for the target table
+* `--verbose`: Verbose output
+* `--help`: Show this message and exit.

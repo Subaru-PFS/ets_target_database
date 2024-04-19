@@ -14,7 +14,7 @@ from typing_extensions import Annotated, Optional
 
 from ..utils import (
     add_database_rows,
-    check_fluxstd_dups,
+    check_duplicates,
     draw_diagram,
     generate_schema_markdown,
     get_url_object,
@@ -164,7 +164,7 @@ def checkdups(
     ] = ["obj_id", "input_catalog_id", "version"],
 ):
 
-    check_fluxstd_dups(
+    check_duplicates(
         indir=directory,
         outdir=output_dir,
         format=file_format,
@@ -208,7 +208,15 @@ def prep_fluxstd(
             show_default=False,
             help="Input catalog ID for the F-star candidate catalog",
         ),
-    ],
+    ] = None,
+    input_catalog_name: Annotated[
+        str,
+        typer.Option(
+            "--input_catalog_name",
+            show_default=False,
+            help="Input catalog name for the F-star candidate catalog",
+        ),
+    ] = None,
     rename_cols: Annotated[
         str,
         typer.Option(
@@ -220,10 +228,16 @@ def prep_fluxstd(
         str,
         typer.Option(
             "--format",
-            help="File format of the merged data file, feather or parquet",
+            help="File format of the output data file, feather or parquet",
         ),
     ] = "parquet",
 ):
+
+    if input_catalog_id is None and input_catalog_name is None:
+        raise typer.BadParameter(
+            "Either input_catalog_id or input_catalog_name must be provided."
+        )
+
     if rename_cols is not None:
         rename_cols = json.loads(rename_cols)
 
@@ -232,6 +246,7 @@ def prep_fluxstd(
         output_dir,
         version,
         input_catalog_id,
+        input_catalog_name,
         rename_cols=rename_cols,
         format=file_format,
     )
