@@ -27,13 +27,21 @@ SCHEMACRAWLERDIR = "<path to the schemacrawler package>"
 
 ## **`pfs-targetdb-cli`**
 
-Options:
+**Usage:**
+
+```text
+pfs-targetdb-cli [OPTIONS] COMMAND [ARGS]...
+```
+
+**Options:**
 
 - `--install-completion`: Install completion for the current shell.
 - `--show-completion`: Show completion for the current shell, to copy it or customize the installation.
 - `--help`, `-h`: Show this message and exit.
 
-Commands:
+---
+
+**Commands:**
 
 ### **`checkdups`**
 
@@ -58,6 +66,8 @@ pfs-targetdb-cli checkdups [OPTIONS] DIRECTORY
 - `--check-columns`: Columns used to check for duplicates. (default: obj_id, input_catalog_id, version)
 - `--help`, `-h`: Show this message and exit.
 
+---
+
 ### **`create-db`**
 
 Create a database on a PostgreSQL server.
@@ -73,6 +83,7 @@ pfs-targetdb-cli create-db [OPTIONS]
 - `--config`, `-c`: Database configuration file (.toml) (required)
 - `--help`, `-h`: Show this message and exit.
 
+---
 
 ### `create-schema`
 
@@ -89,6 +100,8 @@ pfs-targetdb-cli create-schema [OPTIONS]
 - `--config`, `-c`: Database configuration file (.toml) (required)
 - `--drop-all`: Drop all tables before creating schema. (Default: False)
 - `--help`, `-h`: Show this message and exit.
+
+---
 
 ### `diagram`
 Generate an ER diagram of a database. You can choose between SchemaCrawler and tbls to generate the diagram.
@@ -112,6 +125,8 @@ pfs-targetdb-cli diagram [OPTIONS]
 - `--tbls-format`: tbls format (default: mermaid)
 - `--help`, `-h`: Show this message and exit.
 
+---
+
 ### `drop-db`
 
 Drop a database on a PostgreSQL server.
@@ -126,6 +141,8 @@ pfs-targetdb-cli drop-db [OPTIONS]
 
 - `--config`, `-c`: Database configuration file (.toml) (required)
 - `--help`, `-h`: Show this message and exit.
+
+---
 
 ### `insert`
 
@@ -153,6 +170,8 @@ pfs-targetdb-cli insert [OPTIONS] INPUT_FILE
 - `--verbose`, `-v`: Verbose output
 - `--help`, `-h`: Show this message and exit.
 
+---
+
 ### `mdtable`
 
 Generate a Markdown output of the schema of the PFS Target Database.
@@ -167,6 +186,8 @@ pfs-targetdb-cli mdtable [OPTIONS]
 
 - `--output-file`, `-o`: Output file (default: None)
 - `--help`, `-h`: Show this message and exit.
+
+---
 
 ### `prep-fluxstd`
 
@@ -190,6 +211,8 @@ pfs-targetdb-cli prep-fluxstd [OPTIONS] INPUT_DIR OUTPUT_DIR
 - `--rename-cols`: Dictionary to rename columns (e.g., '{"fstar_gaia": "is_fstar_gaia"}') (default: None)
 - `--format`: File format of the merged data file, feather or parquet (default: parquet)
 - `--help`, `-h`: Show this message and exit.
+
+---
 
 ### `update`
 
