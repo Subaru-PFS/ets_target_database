@@ -149,7 +149,7 @@ The documentation can be built by the following command:
 
 ```bash
 # Install the required packages for building the documentation
-python3 -m pip install -e ".[docs]"
+python3 -m pip install -e ".[doc]"
 
 # Build the documentation with MkDocs
 mkdocs build
