@@ -7,7 +7,6 @@ authors = [{ name = "Masato Onodera", email = "monodera@naoj.org" }]
 dependencies = [
     "alembic",
     "astropy",
-    # "ipython",
     "loguru",
     "numpy",
     "pandas",
