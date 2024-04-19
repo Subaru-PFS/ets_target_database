@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import json
-import sys
 import time
 from enum import Enum
 from typing import List
@@ -24,10 +23,10 @@ from ..utils import (
     prep_fluxstd_data,
 )
 
-CONTEXT_SETTINGS = dict(help_option_names=["--help", "-h"])
 app = typer.Typer(
     help="PFS Target Database CLI Tool",
-    context_settings=CONTEXT_SETTINGS,
+    context_settings={"help_option_names": ["--help", "-h"]},
+    add_completion=False,
 )
 
 
@@ -467,6 +466,17 @@ def update(
         upload_id=upload_id,
         update=True,
     )
+
+
+# Placeholders
+@app.command(help="wip: Parse a spreadsheet with TAC allocations.")
+def parse_ph2():
+    pass
+
+
+@app.command(help="wip: Download data from the uploader to the local machine.")
+def download():
+    pass
 
 
 if __name__ == "__main__":
