@@ -28,11 +28,15 @@ class sky(Base):
     #     ),
     #     {},
     # )
+
     __table_args__ = (
-        Index(
-            "sky_q3c_ang2ipix_idx",
-            sqlalchemy.text("q3c_ang2ipix(ra, dec)"),
+        UniqueConstraint(
+            "obj_id",
+            "input_catalog_id",
+            "version",
+            name="sky_obj_id_input_catalog_id_version_key",
         ),
+        Index("sky_q3c_ang2ipix_idx", sqlalchemy.text("q3c_ang2ipix(ra, dec)")),
         {},
     )
 
