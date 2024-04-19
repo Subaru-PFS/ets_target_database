@@ -2,30 +2,31 @@
 
 The command-line interface (CLI) tool `pfs-targetdb-cli` is provided to work with the database.
 
-## Configuration file
+!!! note Configuration file
 
-The command-line tools introduced below require a configuration file in TOML format to connect the database.
-The configuration file should look like teh following and provided as an argument to the command-line tools with `--config` or `-c` option.:
+    Some commands of the CLI tool introduced below requires a configuration file in [TOML](https://toml.io/en/) format to connect the database.
+    The configuration file should look like teh following and provided as an option by `--config` or `-c`.
 
-```toml title="dbconf.toml"
-[targetdb.db]
-host = "localhost"  # database host
-port = 5432 # database port
-dbname = "targetdb" # database name
-user = "admin" # database user
-password = "admin" # database password
-dialect = "postgresql" # database dialect
+    ```toml title="dbconf.toml"
+    [targetdb.db]
+    host = "localhost"  # database host
+    port = 5432 # database port
+    dbname = "targetdb" # database name
+    user = "admin" # database user
+    password = "admin" # database password
+    dialect = "postgresql" # database dialect
 
-# Optional section for SchemaCrawler
-[schemacrawler]
-# "_schemacrawler/bin/schemacrawler.sh" under the path will be used
-SCHEMACRAWLERDIR = "<path to the schemacrawler package>"
-```
+    # Optional section for SchemaCrawler
+    [schemacrawler]
+    # "_schemacrawler/bin/schemacrawler.sh" under the path will be used
+    SCHEMACRAWLERDIR = "<path to the schemacrawler package>"
+    ```
 
-!!! Note
     The `schemacrawler` section is required only if you want to draw an ER diagram of the database schema with SchemaCrawler.
 
 ## **`pfs-targetdb-cli`**
+
+PFS Target Database CLI Tool
 
 **Usage:**
 
@@ -85,7 +86,7 @@ pfs-targetdb-cli create-db [OPTIONS]
 
 ---
 
-### `create-schema`
+### **`create-schema`**
 
 Create tables of the PFS tartedb in a database.
 
@@ -103,7 +104,7 @@ pfs-targetdb-cli create-schema [OPTIONS]
 
 ---
 
-### `diagram`
+### **`diagram`**
 Generate an ER diagram of a database. You can choose between SchemaCrawler and tbls to generate the diagram.
 The chosen program must be installed.
 
@@ -127,7 +128,7 @@ pfs-targetdb-cli diagram [OPTIONS]
 
 ---
 
-### `drop-db`
+### **`drop-db`**
 
 Drop a database on a PostgreSQL server.
 
@@ -144,7 +145,7 @@ pfs-targetdb-cli drop-db [OPTIONS]
 
 ---
 
-### `insert`
+### **`insert`**
 
 Insert rows into a table in the PFS Target Database.
 
@@ -172,7 +173,7 @@ pfs-targetdb-cli insert [OPTIONS] INPUT_FILE
 
 ---
 
-### `mdtable`
+### **`mdtable`**
 
 Generate a Markdown output of the schema of the PFS Target Database.
 
@@ -189,7 +190,7 @@ pfs-targetdb-cli mdtable [OPTIONS]
 
 ---
 
-### `prep-fluxstd`
+### **`prep-fluxstd`**
 
 Prepare flux standard data for the target database by supplementing additional required fields.
 
@@ -214,7 +215,7 @@ pfs-targetdb-cli prep-fluxstd [OPTIONS] INPUT_DIR OUTPUT_DIR
 
 ---
 
-### `update`
+### **`update`**
 
 Update rows in a table in the PFS Target Database.
 
