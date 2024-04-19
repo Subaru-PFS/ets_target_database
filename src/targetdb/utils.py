@@ -769,7 +769,7 @@ def add_database_rows(
     db.close()
 
 
-def check_fluxstd_dups(
+def check_duplicates(
     indir=None,
     outdir=None,
     format="parquet",
@@ -778,7 +778,7 @@ def check_fluxstd_dups(
     check_columns=["obj_id", "input_catalog_id", "version"],
 ):
     """
-    Checks for duplicates in the flux standard star files in a given directory.
+    Checks for duplicates in files in a given directory.
 
     Parameters
     ----------
@@ -884,6 +884,7 @@ def prep_fluxstd_data(
     output_dir,
     version,
     input_catalog_id,
+    input_catalog_name,
     rename_cols=None,
     format="parquet",
 ):
@@ -898,8 +899,10 @@ def prep_fluxstd_data(
         The directory where the output files will be saved.
     version : str
         The version string to be added to the dataframe.
-    input_catalog_id : str
+    input_catalog_id : int
         The input catalog ID to be added to the dataframe.
+    input_catalog_name : str
+        The input catalog ID name to be added to the dataframe.
     rename_cols : dict, optional
         A dictionary mapping old column names to new ones. Defaults to None.
     format : str, optional
@@ -908,7 +911,20 @@ def prep_fluxstd_data(
     Returns
     -------
     None
+
+    Notes
+    -----
+    Either of input_catalog_id or input_catalog_name must be provided.
+    If both are provided, input_catalog_name will be used.
     """
+
+    if (input_catalog_name is None) and (input_catalog_id is None):
+        logger.error(
+            "Either of input_catalog_id or input_catalog_name must be provided."
+        )
+        raise ValueError(
+            "Either of input_catalog_id or input_catalog_name must be provided."
+        )
 
     # Check if output directory exists, if not, create it
     if not os.path.exists(output_dir):
@@ -932,9 +948,20 @@ def prep_fluxstd_data(
                 logger.info(f"\tRenaming columns: {rename_cols}")
                 df.rename(columns=rename_cols, inplace=True)
 
-            # add input_catalog_id
-            logger.info(f"\tAdding input_catalog_id: {input_catalog_id}")
-            df["input_catalog_id"] = input_catalog_id
+            # add input_catalog_id if input_catalog_name is not provided
+            if input_catalog_id is not None:
+                if input_catalog_name is None:
+                    logger.info(f"\tAdding input_catalog_id: {input_catalog_id}")
+                    df["input_catalog_id"] = input_catalog_id
+                else:
+                    logger.warning(
+                        "\tBoth input_catalog_id and input_catalog_name are provided. "
+                        "Using input_catalog_name."
+                    )
+
+            if input_catalog_name is not None:
+                logger.info(f"\tAdding input_catalog_name: {input_catalog_name}")
+                df["input_catalog_name"] = input_catalog_name
 
             # add version column to df as strings
             logger.info(f"\tAdding version string: {version}")
