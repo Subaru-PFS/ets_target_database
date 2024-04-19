@@ -40,6 +40,7 @@ Additionally, the following tools may be useful for testing and development.
 - [md-to-pdf](https://github.com/simonhaenisch/md-to-pdf)
 - [Docker](https://www.docker.com/)
 - [DBeaver](https://dbeaver.io/)
+- [tbls](https://github.com/k1LoW/tbls)
 
 ## Installation
 
@@ -108,7 +109,7 @@ pfs-targetdb-cli create-schema -c dbconf.toml
 pfs-targetdb-cli diagram -c dbconf.toml
 ```
 
-An ER diagram will be generated as `erdiagram_targetdb-YYYYMMDDHHmmss.pdf` in the current directory.
+An ER diagram will be generated as `erdiagram_targetdb-YYYYMMDDHHmmss.pdf` in the current directory. Note that SchemaCrawler must be installed and the directory must be set in the `dbconf.toml` file.
 
 ### Python example
 

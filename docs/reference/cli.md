@@ -91,7 +91,8 @@ pfs-targetdb-cli create-schema [OPTIONS]
 - `--help`, `-h`: Show this message and exit.
 
 ### `diagram`
-Generate an ER diagram of a database.
+Generate an ER diagram of a database. You can choose between SchemaCrawler and tbls to generate the diagram.
+The chosen program must be installed.
 
 **Usage:**
 
