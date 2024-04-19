@@ -22,8 +22,9 @@ nav:
     - sky: schema/sky.md
     - target: schema/target.md
     - target_type: schema/target_type.md
-  - CLI Tools: cli_tools.md
-  # - API Reference: api.md
+  - Reference:
+    - CLI Reference: reference/cli.md
+    - API Reference: reference/api.md
   - Examples:
     - examples/index.md
     - Operating targetdb: examples/operation.md
@@ -51,14 +52,15 @@ theme:
   name: material
   palette:
     primary: blue grey
+    accent: indigo
   icon:
     logo: material/database
     repo: fontawesome/brands/github
   font:
     text: Lato
-    code: Intel One Mono
+    # code: Intel One Mono
     # text: Lato
-    # code: Fira Code
+    code: Fira Code
   features:
     - navigation.tabs
     - navigation.tabs.sticky
@@ -66,7 +68,7 @@ theme:
     # - navigation.sections
     - navigation.indexes
     - toc.follow
-    - toc.integrate
+    # - toc.integrate
     - search.highlight
     - search.suggest
     - content.code.copy
@@ -79,6 +81,8 @@ markdown_extensions:
   - attr_list
   - def_list
   - md_in_html
+  - toc:
+       permalink: true
   - pymdownx.tasklist:
       custom_checkbox: true
   - pymdownx.arithmatex:

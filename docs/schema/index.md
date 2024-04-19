@@ -1,5 +1,7 @@
 # Tables in the PFS Target Database
 
+## Overview
+
 The PFS Target Database contains the following tables:
 
 - [filter_name](filter_name.md)
@@ -14,5 +16,5 @@ The PFS Target Database contains the following tables:
 ## Schema information by tbls
 
 You can also look at the schema information generated
-by the [tbls](https://github.com/k1LoW/tbls) package in the [tbls](../tbls/) section.
+by the [tbls](https://github.com/k1LoW/tbls) package in the [tbls](../tbls/README.md) section.
 They also contain the entity-relationship diagram (ERD) of the database.

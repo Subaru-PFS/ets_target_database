@@ -165,7 +165,7 @@ def get_url_object(config):
     return url_object
 
 
-def generate_schema_markdown(schema_md=sys.stdout):
+def generate_schema_markdown(output_file=None):
 
     out_md = ""
 
@@ -204,22 +204,35 @@ def generate_schema_markdown(schema_md=sys.stdout):
 
         # print(df.to_markdown(index=False))
 
-    try:
-        with open(schema_md, "w") as f:
-            f.write(out_md)
-    except TypeError:
-        print(out_md)
+    # try:
+    #     with open(output_file, "w") as f:
+    #         f.write(out_md)
+    # except TypeError:
+    #     print(out_md)
+
+    import rich
+
+    if output_file is not None:
+        try:
+            with open(output_file, "w") as f:
+                f.write(out_md)
+        except TypeError:
+            rich.print(out_md)
+    else:
+        rich.print(out_md)
 
     # return out_md
 
 
 def draw_diagram(
     config,
+    generator="schemacrawler",
+    output_dir="diagram",
+    title="PFS Target Database",
     sc_info_level="maximum",
     sc_log_level="SEVERE",
-    sc_outdir=".",
     sc_outprefix="erdiagram_targetdb",
-    sc_title="PFS Target Database",
+    tbls_format="mermaid",
     logger=logger,
 ):
 
@@ -227,30 +240,66 @@ def draw_diagram(
 
     time_string = datetime.now().strftime("%Y%m%d%H%M%S")
 
-    outfile = os.path.join(sc_outdir, f"{sc_outprefix}-{time_string}.pdf")
+    if generator == "schemacrawler":
+        outfile = os.path.join(output_dir, f"{sc_outprefix}-{time_string}.pdf")
 
-    comm = [
-        f"{os.path.join(config['schemacrawler']['SCHEMACRAWLERDIR'],'_schemacrawler/bin/schemacrawler.sh')}",
-        "--command=schema",
-        "--server=postgresql",
-        f"--host={config['targetdb']['db']['host']}",
-        f"--port={config['targetdb']['db']['port']}",
-        f"--database={config['targetdb']['db']['dbname']}",
-        "--schemas=public",
-        f"--user={config['targetdb']['db']['user']}",
-        f"--password={config['targetdb']['db']['password']}",
-        f"--info-level={sc_info_level}",
-        f"--log-level={sc_log_level}",
-        "--portable-names",
-        f"--title={sc_title}",
-        "--output-format=pdf",
-        f"--output-file={outfile}",
-        "--no-remarks",
-    ]
+        comm = [
+            f"{os.path.join(config['schemacrawler']['SCHEMACRAWLERDIR'],'_schemacrawler/bin/schemacrawler.sh')}",
+            "--command=schema",
+            "--server=postgresql",
+            f"--host={config['targetdb']['db']['host']}",
+            f"--port={config['targetdb']['db']['port']}",
+            f"--database={config['targetdb']['db']['dbname']}",
+            "--schemas=public",
+            f"--user={config['targetdb']['db']['user']}",
+            f"--password={config['targetdb']['db']['password']}",
+            f"--info-level={sc_info_level}",
+            f"--log-level={sc_log_level}",
+            "--portable-names",
+            f"--title={title}",
+            "--output-format=pdf",
+            f"--output-file={outfile}",
+            "--no-remarks",
+        ]
+        logger.debug(f"{comm}")
+        subprocess.run(comm, shell=False)
+    elif generator == "tbls":
+        url_object = get_url_object(config)
+        url_object_tbls = (
+            url_object.render_as_string(hide_password=False).replace(
+                "postgresql", "postgres", 1
+            )
+            + "?sslmode=disable"
+        )
 
-    logger.debug(f"{comm}")
+        import tempfile
 
-    subprocess.run(comm, shell=False)
+        with tempfile.NamedTemporaryFile("w") as tmpf:
+            tmpf.write(
+                f"""
+dsn: {url_object_tbls}
+docPath: {output_dir}
+name: {title}
+
+er:
+  format: {tbls_format}
+
+disableOutputSchema: true"""
+            )
+            tmpf.seek(0)
+
+            comm = [
+                "tbls",
+                "doc",
+                "-c",
+                f"{tmpf.name}",
+                "--force",  # force create
+            ]
+            logger.debug(f"{comm}")
+            subprocess.run(comm, shell=False)
+    else:
+        logger.error(f"Unsupported generator: {generator}")
+        raise ValueError(f"Unsupported generator: {generator}")
 
 
 def join_backref_values(df, db=None, table=None, key=None, check_key=None):
