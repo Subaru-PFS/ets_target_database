@@ -37,7 +37,7 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
-dev = ["ipython"]
+dev = ["ipython", "pytest"]
 doc = ["mkdocs", "mkdocs-material[imaging]", "mkdocstrings-python"]
 
 [project.urls]
