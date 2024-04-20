@@ -6,6 +6,7 @@ import subprocess
 import sys
 import time
 from datetime import datetime, timezone
+from pathlib import Path
 
 import pandas as pd
 from astropy.table import Table
@@ -124,6 +125,38 @@ def load_input_data(input_file, logger=logger):
         logger.error(f"Unsupported file extension: {ext}")
         raise ValueError(f"Unsupported file extension: {ext}")
     return df
+
+
+def read_excel(input_file, sheetnames=["Proposals", "Allocation"]):
+    """
+    Load data from an Excel file and return it as a dictionary of pandas DataFrames.
+
+    Parameters
+    ----------
+    input_file : str
+        Path to the input Excel file.
+
+    Returns
+    -------
+    dict
+        Dictionary containing two pandas DataFrames, 'proposal' and 'allocation',
+        corresponding to the "Proposals" and "Allocation" sheets in the input Excel file.
+
+    """
+
+    dataframes = {}
+
+    for sheetname in sheetnames:
+        try:
+            df = pd.read_excel(input_file, sheet_name=sheetname)
+            dataframes[sheetname.lower()] = df
+        except Exception as e:
+            logger.error(f"Error reading sheet {sheetname}: {e}")
+            raise e
+    return dataframes
+    # df_proposal = pd.read_excel(input_file, sheet_name="Proposals")
+    # df_allocation = pd.read_excel(input_file, sheet_name="Allocation")
+    # return {"proposal": df_proposal, "allocation": df_allocation}
 
 
 def get_url_object(config):
@@ -985,3 +1018,210 @@ def prep_fluxstd_data(
             logger.warning(
                 f"Skipping... {filename} does not end with one of .csv, .feather, and .parquet"
             )
+
+
+def make_proposal_data(
+    dfs, sheetname_proposal="proposals", sheetname_allocation="allocation"
+):
+    """
+    Create a new DataFrame from the 'proposals' and 'allocation' DataFrames.
+
+    Parameters
+    ----------
+    dfs : dict
+        Dictionary containing two pandas DataFrames, 'proposals' and 'allocation',
+        corresponding to the "Proposals" and "Allocation" sheets in the input Excel file.
+
+    Returns
+    -------
+    DataFrame
+        A new DataFrame with selected columns from the 'proposals' and 'allocation' DataFrames.
+
+    """
+
+    df_proposals = pd.DataFrame(
+        {
+            "proposal_id": dfs[sheetname_proposal]["proposal_id"],
+            "group_id": dfs[sheetname_proposal]["group_id"],
+            "pi_first_name": dfs[sheetname_proposal]["pi_first_name"],
+            "pi_last_name": dfs[sheetname_proposal]["pi_last_name"],
+            "pi_middle_name": dfs[sheetname_proposal]["pi_middle_name"],
+            "rank": dfs[sheetname_allocation]["rank"],
+            "grade": dfs[sheetname_allocation]["grade"],
+            "allocated_time_total": dfs[sheetname_allocation]["allocated_time_total"],
+            "allocated_time_lr": dfs[sheetname_allocation]["allocated_time_lr"],
+            "allocated_time_mr": dfs[sheetname_allocation]["allocated_time_mr"],
+            "proposal_category_name": dfs[sheetname_proposal]["proposal_category_name"],
+        }
+    )
+    return df_proposals.dropna(how="all")
+
+
+def make_input_catalog_data(
+    dfs, sheetname_proposal="proposals", sheetname_allocation="allocation"
+):
+    """
+    Create a new DataFrame from the 'proposal' DataFrame for input catalog data.
+
+    Parameters
+    ----------
+    dfs : dict
+        Dictionary containing a pandas DataFrame, 'proposal',
+        corresponding to the "Proposals" sheet in the input Excel file.
+
+    Returns
+    -------
+    DataFrame
+        A new DataFrame with selected columns from the 'proposal' DataFrame related to input catalog data.
+
+    """
+    df_input_catalog = pd.DataFrame(
+        {
+            "input_catalog_name": dfs[sheetname_proposal]["input_catalog_name"],
+            "input_catalog_description": dfs[sheetname_proposal][
+                "input_catalog_description"
+            ],
+            "upload_id": dfs[sheetname_proposal]["upload_id"],
+            "proposal_id": dfs[sheetname_proposal]["proposal_id"],
+        }
+    )
+    return df_input_catalog.dropna(how="all")
+
+
+def parse_allocation_file(input_file, output_dir=Path("."), outfile_prefix=None):
+
+    dataframes = read_excel(input_file)
+
+    try:
+        logger.info(f"\n{dataframes['proposals']}")
+        logger.info(f"\n{dataframes['allocation']}")
+    except KeyError as e:
+        logger.error(f"KeyError: {e}")
+        raise e
+
+    # create a proposal list
+    df_proposals = make_proposal_data(dataframes)
+
+    # create a input_catalog list
+    df_input_catalog = make_input_catalog_data(dataframes)
+
+    logger.info(f"\n{df_proposals}")
+    logger.info(f"\n{df_input_catalog}")
+
+    # save the dataframes to csv files
+    if outfile_prefix is not None:
+        outfile_proposals = output_dir / f"{outfile_prefix}_proposals.csv"
+        outfile_input_catalog = output_dir / f"{outfile_prefix}_input_catalogs.csv"
+    else:
+        outfile_proposals = output_dir / "proposals.csv"
+        outfile_input_catalog = output_dir / "input_catalogs.csv"
+
+    df_proposals.to_csv(outfile_proposals, index=False)
+    df_input_catalog.to_csv(outfile_input_catalog, index=False)
+
+
+def transfer_data_from_uploader(df, config, local_dir=Path("."), force=False):
+    for upload_id in df["upload_id"]:
+        # datadirs = glob.glob(local_dir / f"????????-??????-{upload_id}")
+        datadirs = list(local_dir.cwd().glob(f"????????-??????-{upload_id}"))
+        skip_transfer = False
+        if len(datadirs) == 1:
+            skip_transfer = True if not force else False
+            if skip_transfer:
+                logger.info(
+                    f"Data directory, {datadirs[0]}, is found locally. Skip transfer"
+                )
+            else:
+                logger.info(
+                    f"Data directory, {datadirs[0]}, is found locally, but force transfer"
+                )
+        elif len(datadirs) > 1:
+            logger.error(f"Multiple data directories are found locally: {datadirs}")
+            raise ValueError("Multiple data directories are found locally")
+        else:
+            logger.info(
+                f"Data directory for upload_id: {upload_id} is not found locally. Try transfer"
+            )
+
+        if not skip_transfer:
+            logger.info(
+                f"Transferring data for upload_id: {upload_id} from the uploader server"
+            )
+
+            # Define the source and destination directories
+            source_dir = os.path.join(
+                config["uploader"]["data_dir"], f"????/??/????????-??????-{upload_id}"
+            )
+            dest_dir = local_dir
+            logger.info(
+                f"Searching for the source directory on the remote host: {source_dir}"
+            )
+
+            # Construct the rsync command
+            rsync_command = [
+                "rsync",
+                "-avz",
+                "-e",
+                "ssh",
+                f"{config['uploader']['host']}:{source_dir}",
+                dest_dir,
+            ]
+
+            # Execute the rsync command
+            try:
+                subprocess.run(rsync_command, check=True)
+            except subprocess.CalledProcessError as e:
+                logger.error(f"Failed to transfer data for upload_id: {upload_id}")
+                logger.error(e)
+
+
+def insert_targets_from_uploader(
+    df_input_catalogs,
+    config,
+    data_dir=Path("."),
+    file_prefix="target",
+    commit=False,
+    fetch=False,
+    verbose=False,
+):
+
+    for _, row in df_input_catalogs.iterrows():
+        proposal_id = row["proposal_id"]
+        upload_id = row["upload_id"]
+
+        input_file = list(
+            data_dir.cwd().glob(
+                f"????????-??????-{upload_id}/{file_prefix}_{upload_id}.ecsv"
+            )
+        )
+
+        if len(input_file) == 0:
+            logger.error(f"Input file for upload_id: {upload_id} is not found.")
+            raise FileNotFoundError(
+                f"Input file for upload_id: {upload_id} is not found."
+            )
+        elif len(input_file) > 1:
+            logger.error(f"Multiple input files are found for upload_id: {upload_id}")
+            raise ValueError(
+                f"Multiple input files are found for upload_id: {upload_id}"
+            )
+
+        logger.info(f"Loading input data from {input_file} into a DataFrame")
+        t_begin = time.time()
+        df = load_input_data(input_file[0])
+        t_end = time.time()
+        logger.info(f"Loaded input data in {t_end - t_begin:.2f} seconds")
+
+        add_database_rows(
+            input_file=input_file[0],
+            table="target",
+            commit=commit,
+            fetch=fetch,
+            verbose=verbose,
+            config=config,
+            df=df,
+            from_uploader=True,
+            proposal_id=proposal_id,
+            upload_id=upload_id,
+            insert=True,
+        )

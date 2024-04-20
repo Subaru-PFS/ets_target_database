@@ -9,6 +9,7 @@ dependencies = [
     "astropy",
     "loguru",
     "numpy",
+    "openpyxl",
     "pandas",
     "psycopg2-binary",
     "pyarrow",
