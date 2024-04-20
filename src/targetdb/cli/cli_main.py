@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-
 import json
 import time
 from enum import Enum
+from pathlib import Path
 from typing import List
 
 import rich
@@ -18,9 +18,12 @@ from ..utils import (
     draw_diagram,
     generate_schema_markdown,
     get_url_object,
+    insert_targets_from_uploader,
     load_config,
     load_input_data,
+    parse_allocation_file,
     prep_fluxstd_data,
+    transfer_data_from_uploader,
 )
 
 app = typer.Typer(
@@ -28,6 +31,30 @@ app = typer.Typer(
     context_settings={"help_option_names": ["--help", "-h"]},
     add_completion=False,
 )
+
+
+class DiagramGenerator(str, Enum):
+    schemacrawler = "schemacrawler"
+    tbls = "tbls"
+
+
+class PyArrowFileFormat(str, Enum):
+    feather = "feather"
+    parquet = "parquet"
+
+
+class TargetdbTable(str, Enum):
+    filter_name = "filter_name"
+    fluxstd = "fluxstd"
+    input_catalog = "input_catalog"
+    proposal = "proposal"
+    proposal_category = "proposal_category"
+    sky = "sky"
+    target = "target"
+    target_type = "target_type"
+
+
+config_help_msg = "Database configuration file in the TOML format."
 
 
 @app.command(help="Create a database on a PostgreSQL server.")
@@ -38,7 +65,7 @@ def create_db(
             "-c",
             "--config",
             show_default=False,
-            help="Database configuration file (.toml)",
+            help=config_help_msg,
         ),
     ],
 ):
@@ -61,7 +88,7 @@ def drop_db(
             "-c",
             "--config",
             show_default=False,
-            help="Database configuration file (.toml)",
+            help=config_help_msg,
         ),
     ],
 ):
@@ -90,14 +117,14 @@ def create_schema(
             "-c",
             "--config",
             show_default=False,
-            help="Database configuration file (.toml)",
+            help=config_help_msg,
         ),
     ],
     drop_all: Annotated[
         bool,
         typer.Option(
             "--drop-all",
-            help="Drop all tables before creating schema. (Default: False)",
+            help="Flag to drop all tables before creating schema.",
         ),
     ] = False,
 ):
@@ -124,27 +151,20 @@ def checkdups(
         str,
         typer.Argument(
             show_default=False,
-            help="Directory path containing input files",
+            help="Directory path containing input files.",
         ),
     ],
-    file_format: Annotated[
-        str,
-        typer.Option(
-            "--format",
-            help="File format of the merged data file, feather or parquet",
-        ),
-    ] = "parquet",
     output_dir: Annotated[
         str,
         typer.Option(
             "-o",
             "--outdir",
-            help="Path to output directory.",
+            help="Directory path to save output files.",
         ),
     ] = ".",
     skip_save_merged: Annotated[
         bool,
-        typer.Option("--skip-save-merged", help="Do not save the merged DataFrame"),
+        typer.Option("--skip-save-merged", help="Do not save the merged DataFrame."),
     ] = False,
     additional_columns: Annotated[
         List[str],
@@ -152,16 +172,23 @@ def checkdups(
             "--additional-columns",
             help="Additional columns to output for the merged file.  (e.g., 'psf_mag_g' 'psf_mag_r'). "
             "The following columns are saved by default: "
-            '"obj_id", "ra", "dec", "input_catalog_id", "version", "input_file", "is_fstar_gaia", "prob_f_star"',
+            '"obj_id", "ra", "dec", "input_catalog_id", "version", "input_file", "is_fstar_gaia", "prob_f_star".',
         ),
     ] = [],
     check_columns: Annotated[
         List[str],
         typer.Option(
             "--check-columns",
-            help="Columns used to check for duplicates. (default: obj_id, input_catalog_id, version)",
+            help="Columns used to check for duplicates.",
         ),
     ] = ["obj_id", "input_catalog_id", "version"],
+    file_format: Annotated[
+        PyArrowFileFormat,
+        typer.Option(
+            "--format",
+            help="File format of the merged data file.",
+        ),
+    ] = "parquet",
 ):
 
     check_duplicates(
@@ -198,7 +225,7 @@ def prep_fluxstd(
         typer.Option(
             "--version",
             show_default=False,
-            help="Version **string** for the F-star candidate catalog (e.g., '3.3')",
+            help="Version **string** for the F-star candidate catalog (e.g., '3.3').",
         ),
     ],
     input_catalog_id: Annotated[
@@ -206,7 +233,7 @@ def prep_fluxstd(
         typer.Option(
             "--input_catalog_id",
             show_default=False,
-            help="Input catalog ID for the F-star candidate catalog",
+            help="Input catalog ID for the flux standard star catalog.",
         ),
     ] = None,
     input_catalog_name: Annotated[
@@ -214,21 +241,21 @@ def prep_fluxstd(
         typer.Option(
             "--input_catalog_name",
             show_default=False,
-            help="Input catalog name for the F-star candidate catalog",
+            help="Input catalog name for the flux standard star catalog.",
         ),
     ] = None,
     rename_cols: Annotated[
         str,
         typer.Option(
             "--rename-cols",
-            help='Dictionary to rename columns (e.g., \'{"fstar_gaia": "is_fstar_gaia"}\')',
+            help='Dictionary to rename columns (e.g., \'{"fstar_gaia": "is_fstar_gaia"}\').',
         ),
     ] = None,
     file_format: Annotated[
-        str,
+        PyArrowFileFormat,
         typer.Option(
             "--format",
-            help="File format of the output data file, feather or parquet",
+            help="File format of the output data file.",
         ),
     ] = "parquet",
 ):
@@ -252,11 +279,6 @@ def prep_fluxstd(
     )
 
 
-class DiagramGenerator(str, Enum):
-    schemacrawler = "schemacrawler"
-    tbls = "tbls"
-
-
 @app.command(help="Generate an ER diagram of a database.")
 def diagram(
     config_file: Annotated[
@@ -265,7 +287,7 @@ def diagram(
             "-c",
             "--config",
             show_default=False,
-            help="Database configuration file (.toml)",
+            help=config_help_msg,
         ),
     ],
     generator: Annotated[
@@ -273,26 +295,26 @@ def diagram(
         typer.Option(
             "--generator",
             case_sensitive=False,
-            help="Program to generate ER diagram (schemacrawler or tbls)",
+            help="Program to generate ER diagram.",
         ),
     ] = DiagramGenerator.schemacrawler,
     output_dir: Annotated[
-        str, typer.Option("--output-dir", help="Output directory")
+        str, typer.Option("--output-dir", help="Directory path to save output files.")
     ] = "diagram",
     title: Annotated[
-        str, typer.Option("--title", help="Title of the ER diagram")
+        str, typer.Option("--title", help="Title of the ER diagram.")
     ] = "PFS Target Database",
     sc_info_level: Annotated[
-        str, typer.Option("--sc-info-level", help="SchemaCrawler info level")
+        str, typer.Option("--sc-info-level", help="SchemaCrawler info level.")
     ] = "maximum",
     sc_log_level: Annotated[
-        str, typer.Option("--sc-level-level", help="SchemaCrawler log level")
+        str, typer.Option("--sc-level-level", help="SchemaCrawler log level.")
     ] = "SEVERE",
     sc_outprefix: Annotated[
-        str, typer.Option("--sc-outprefix", help="Output file prefix")
+        str, typer.Option("--sc-outprefix", help="Output file prefix.")
     ] = "erdiagram_targetdb",
     tbls_format: Annotated[
-        str, typer.Option("--tbls-format", help="tbls format")
+        str, typer.Option("--tbls-format", help="tbls format for ER diagrams.")
     ] = "mermaid",
 ):
 
@@ -315,7 +337,7 @@ def diagram(
 )
 def mdtable(
     output_file: Annotated[
-        Optional[str], typer.Option("--output-file", "-o", help="Output file")
+        Optional[str], typer.Option("--output-file", "-o", help="Output file.")
     ] = None
 ):
     generate_schema_markdown(output_file=output_file)
@@ -327,7 +349,7 @@ def insert(
         str,
         typer.Argument(
             show_default=False,
-            help="Input file to be inserted to targetdb (CSV, ECSV, Feather, or Parquet format)",
+            help="Input file to be inserted to targetdb (CSV, ECSV, Feather, or Parquet format).",
         ),
     ],
     config_file: Annotated[
@@ -336,27 +358,27 @@ def insert(
             "-c",
             "--config",
             show_default=False,
-            help="Database configuration file (.toml)",
+            help=config_help_msg,
         ),
     ],
     table: Annotated[
-        str,
+        TargetdbTable,
         typer.Option(
-            "-t", "--table", show_default=False, help="Table name to insert data"
+            "-t", "--table", show_default=False, help="Table name to insert rows."
         ),
     ],
     commit: Annotated[
         bool,
-        typer.Option("--commit", help="Commit changes to the database"),
+        typer.Option("--commit", help="Commit changes to the database."),
     ] = False,
     fetch: Annotated[
-        bool, typer.Option("--fetch", help="Fetch data from database a the end")
+        bool, typer.Option("--fetch", help="Fetch data from database a the end.")
     ] = False,
     from_uploader: Annotated[
         bool,
         typer.Option(
             "--from_uploader",
-            help="Flag to indicate the data is coming from the PFS Target Uploader. Only required for the target table",
+            help="Flag to indicate the data is coming from the PFS Target Uploader. Only required for the `target` table.",
         ),
     ] = False,
     upload_id: Annotated[
@@ -364,7 +386,7 @@ def insert(
         typer.Option(
             "--upload_id",
             show_default=False,
-            help="Upload ID issued by the PFS Target Uploader. Only required for the target table",
+            help="Upload ID issued by the PFS Target Uploader. Only required for the `target` table.",
         ),
     ] = None,
     proposal_id: Annotated[
@@ -372,11 +394,11 @@ def insert(
         typer.Option(
             "--proposal_id",
             show_default=False,
-            help="Proposal ID (e.g., S24B-QT001). Only required for the target table",
+            help="Proposal ID (e.g., S24B-QT001). Only required for the `target` table.",
         ),
     ] = None,
     verbose: Annotated[
-        bool, typer.Option("-v", "--verbose", help="Verbose output")
+        bool, typer.Option("-v", "--verbose", help="Verbose output.")
     ] = False,
 ):
     logger.info(f"Loading config file: {config_file}")
@@ -409,7 +431,7 @@ def update(
         str,
         typer.Argument(
             show_default=False,
-            help="Input file containing data to update records in the PFS Target Database (CSV, ECSV, or Feather formats) (required)",
+            help="Input file containing data to update records in the PFS Target Database (CSV, ECSV, or Feather formats).",
         ),
     ],
     config_file: Annotated[
@@ -418,27 +440,27 @@ def update(
             "-c",
             "--config",
             show_default=False,
-            help="Database configuration file (.toml)",
+            help=config_help_msg,
         ),
     ],
     table: Annotated[
-        str,
+        TargetdbTable,
         typer.Option(
-            "-t", "--table", show_default=False, help="Table name to insert data"
+            "-t", "--table", show_default=False, help="Table name to update rows."
         ),
     ],
     commit: Annotated[
         bool,
-        typer.Option("--commit", help="Commit changes to the database"),
+        typer.Option("--commit", help="Commit changes to the database."),
     ] = False,
     fetch: Annotated[
-        bool, typer.Option("--fetch", help="Fetch data from database a the end")
+        bool, typer.Option("--fetch", help="Fetch data from database a the end.")
     ] = False,
     from_uploader: Annotated[
         bool,
         typer.Option(
             "--from_uploader",
-            help="Flag to indicate the data is coming from the PFS Target Uploader. Only required for the target table",
+            help="Flag to indicate the data is coming from the PFS Target Uploader. Only required for the `target` table.",
         ),
     ] = False,
     upload_id: Annotated[
@@ -446,7 +468,7 @@ def update(
         typer.Option(
             "--upload_id",
             show_default=False,
-            help="Upload ID issued by the PFS Target Uploader. Only required for the target table",
+            help="Upload ID issued by the PFS Target Uploader. Only required for the `target` table",
         ),
     ] = None,
     proposal_id: Annotated[
@@ -454,10 +476,10 @@ def update(
         typer.Option(
             "--proposal_id",
             show_default=False,
-            help="Proposal ID (e.g., S24B-QT001). Only required for the target table",
+            help="Proposal ID (e.g., S24B-QT001). Only required for the `target` table",
         ),
     ] = None,
-    verbose: Annotated[bool, typer.Option("--verbose", help="Verbose output")] = False,
+    verbose: Annotated[bool, typer.Option("--verbose", help="Verbose output.")] = False,
 ):
     logger.info(f"Loading config file: {config_file}")
     config = load_config(config_file)
@@ -483,15 +505,140 @@ def update(
     )
 
 
-# Placeholders
-@app.command(help="wip: Parse a spreadsheet with TAC allocations.")
-def parse_ph2():
-    pass
+@app.command(help="Parse an Excel file containing time allocation information.")
+def parse_alloc(
+    input_file: Annotated[
+        Path,
+        typer.Argument(
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            show_default=False,
+            help='Path to the Excel file containing time allocation information (e.g., "allocations.xlsx").',
+        ),
+    ],
+    output_dir: Annotated[
+        Path,
+        typer.Option(
+            exists=True,
+            dir_okay=True,
+            writable=True,
+            help="Directory path to save output files.",
+        ),
+    ] = ".",
+    outfile_prefix: Annotated[
+        str,
+        typer.Option(
+            show_default=False,
+            help="Prefix to the output files.",
+        ),
+    ] = None,
+):
+    parse_allocation_file(
+        input_file, output_dir=output_dir, outfile_prefix=outfile_prefix
+    )
 
 
-@app.command(help="wip: Download data from the uploader to the local machine.")
-def download():
-    pass
+@app.command(help="Download target lists from the uploader to the local machine.")
+def transfer_targets(
+    input_file: Annotated[
+        Path,
+        typer.Argument(
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            show_default=False,
+            help="Input catalog list file (csv).",
+        ),
+    ],
+    config_file: Annotated[
+        str,
+        typer.Option(
+            "-c",
+            "--config",
+            show_default=False,
+            help=config_help_msg,
+        ),
+    ],
+    local_dir: Annotated[
+        Path,
+        typer.Option(
+            exists=True,
+            dir_okay=True,
+            writable=True,
+            help="Path to the data directory in the local machine",
+        ),
+    ] = ".",
+    force: Annotated[bool, typer.Option("--force", help="Force download.")] = False,
+):
+
+    logger.info(f"Loading config file: {config_file}")
+    config = load_config(config_file)
+
+    logger.info(f"Loading input data from {input_file} into a DataFrame")
+    df = load_input_data(input_file)
+
+    transfer_data_from_uploader(df, config, local_dir=local_dir, force=force)
+
+
+@app.command(help="Insert targets using a list of input catalogs and upload IDs.")
+def insert_targets(
+    input_catalogs: Annotated[
+        Path,
+        typer.Argument(
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            show_default=False,
+            help="Input catalog list to insert (csv).",
+        ),
+    ],
+    config_file: Annotated[
+        str,
+        typer.Option(
+            "-c",
+            "--config",
+            show_default=False,
+            help=config_help_msg,
+        ),
+    ],
+    data_dir: Annotated[
+        Path,
+        typer.Option(
+            exists=True,
+            dir_okay=True,
+            readable=True,
+            help="Path to the data directory.",
+        ),
+    ] = ".",
+    commit: Annotated[
+        bool,
+        typer.Option("--commit", help="Commit changes to the database."),
+    ] = False,
+    fetch: Annotated[
+        bool, typer.Option("--fetch", help="Fetch data from database a the end.")
+    ] = False,
+    verbose: Annotated[
+        bool, typer.Option("-v", "--verbose", help="Verbose output.")
+    ] = False,
+):
+    logger.info(f"Loading config file: {config_file}")
+    config = load_config(config_file)
+
+    logger.info(f"Loading input catalog data from {input_catalogs} into a DataFrame")
+    df_input_catalogs = load_input_data(input_catalogs)
+
+    insert_targets_from_uploader(
+        df_input_catalogs,
+        config,
+        data_dir=data_dir,
+        commit=commit,
+        fetch=fetch,
+        verbose=verbose,
+    )
 
 
 if __name__ == "__main__":

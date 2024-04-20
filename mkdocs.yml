@@ -28,9 +28,10 @@ nav:
   - Examples:
     - examples/index.md
     - Operating targetdb: examples/operation.md
-    - Preparing input data: examples/preparation.md
+    - Preparing Input Data: examples/preparation.md
     - Useful Queries: examples/queries.md
-    - Docker tutorial: examples/docker.md
+    - Docker Tutorial: examples/docker.md
+    - Obsproc Tutorial: examples/obsproc.md
   - Contact: contact.md
   - tbls:
     - tbls/README.md
