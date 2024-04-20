@@ -21,7 +21,7 @@ password = "admin"
 dialect = "postgresql"
 
 [schemacrawler]
-SCHEMACRAWLERDIR = "/Users/monodera/Dropbox/NAOJ/PFS/Subaru-PFS/schemacrawler-16.16.14-distribution/"
+SCHEMACRAWLERDIR = "<path to SchemaCrawler directory>"
 
 # The following parameters for the uploader will be used to rsync as follows.
 # $ rsync -avz -e ssh host:data_dir/????/??/????????-??????-{upload_id}
