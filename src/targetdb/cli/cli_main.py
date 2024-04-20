@@ -3,14 +3,13 @@ import json
 import time
 from enum import Enum
 from pathlib import Path
-from typing import List
+from typing import Annotated, List, Optional
 
 import rich
 import typer
 from loguru import logger
 from sqlalchemy import create_engine
 from sqlalchemy_utils import create_database, database_exists, drop_database
-from typing_extensions import Annotated, Optional
 
 from ..utils import (
     add_database_rows,
