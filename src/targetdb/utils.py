@@ -114,7 +114,7 @@ def load_input_data(input_file, logger=logger):
 
     _, ext = os.path.splitext(input_file)
     if ext == ".csv":
-        #
+        # set keep_default_na=False to keep empty strings as empty strings
         df = pd.read_csv(input_file, keep_default_na=False)
     elif ext == ".feather":
         df = pd.read_feather(input_file)
@@ -972,7 +972,6 @@ def prep_fluxstd_data(
             logger.info(f"\tConverting {filename} to the {format} format")
 
             # Read the CSV file
-            # df = pd.read_csv(os.path.join(input_dir, filename))
             df = load_input_data(os.path.join(input_dir, filename), logger=logger)
 
             # rename fstar_gaia to is_fstar_gaia
