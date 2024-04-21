@@ -21,12 +21,13 @@ The command-line interface (CLI) tool `pfs-targetdb-cli` is provided to work wit
     # "_schemacrawler/bin/schemacrawler.sh" under the path will be used
     SCHEMACRAWLERDIR = "<path to the schemacrawler package>"
 
-
     # The following parameters for the uploader will be used to rsync as follows.
-    # $ rsync -avz -e ssh host:data_dir/????/??/????????-??????-{upload_id}
+    # $ rsync -avz -e ssh user@host:data_dir/????/??/????????-??????-{upload_id}
+    # user can be omitted or blank ("") if the user name is the same as the local user name or an alias is defined in ~/.ssh/config.
     [uploader]
-    host = "<uploader host name>"
-    data_dir = "<uploader data directory>"
+    host = "<hostname of uploader>"
+    user = "<user name of uploader>"
+    data_dir = "<path to the data directory on the uploader>"
     ```
 
     The `schemacrawler` section is required only if you want to draw an ER diagram of the database schema with SchemaCrawler.
