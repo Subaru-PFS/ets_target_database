@@ -85,12 +85,12 @@ def read_conf(config_file):
 
 def load_input_data(input_file, logger=logger):
     """
-    Load input data from a file.
+    Load input data from a file into a pandas DataFrame.
 
     Parameters
     ----------
     input_file : str
-        The path to the input file.
+        The path to the input file (CSV, Feather, Parquet, or ECSV).
     logger : loguru.logger, optional
         The logger to use for logging messages. Defaults to the root logger.
 
@@ -114,7 +114,8 @@ def load_input_data(input_file, logger=logger):
 
     _, ext = os.path.splitext(input_file)
     if ext == ".csv":
-        df = pd.read_csv(input_file)
+        #
+        df = pd.read_csv(input_file, keep_default_na=False)
     elif ext == ".feather":
         df = pd.read_feather(input_file)
     elif ext == ".parquet":
@@ -124,6 +125,7 @@ def load_input_data(input_file, logger=logger):
     else:
         logger.error(f"Unsupported file extension: {ext}")
         raise ValueError(f"Unsupported file extension: {ext}")
+
     return df
 
 
