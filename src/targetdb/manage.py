@@ -5,7 +5,7 @@ from sqlalchemy import create_engine
 from .models import Base
 
 
-def create_schema(url_object, drop_all=False):
+def create_database_schema(url_object, drop_all=False):
     """
     Create a database schema from the SQLAlchemy models.
 

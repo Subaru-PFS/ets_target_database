@@ -127,7 +127,7 @@ def create_schema(
         ),
     ] = False,
 ):
-    from ..manage import create_schema
+    from ..manage import create_database_schema
 
     config = load_config(config_file)
 
@@ -141,7 +141,9 @@ def create_schema(
             "Are you sure you want to drop all the tabls in the database before creating the schema?",
             abort=True,
         )
-        create_schema(url_object, drop_all=drop_all)
+
+    logger.info(f"Creating schema in the database: {url_object.render_as_string()}")
+    create_database_schema(url_object, drop_all=drop_all)
 
 
 @app.command(help="Check for duplicates in data files in a directory.")

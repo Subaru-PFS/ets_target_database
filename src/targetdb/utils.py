@@ -410,32 +410,43 @@ def add_backref_values(df, db=None, table=None):
     backref_tables, backref_keys, backref_check_keys = [], [], []
 
     if table == "target":
+        backref_tables = ["proposal"]
+        backref_keys = ["proposal_id"]
+        backref_check_keys = ["proposal_id"]
+
         if "target_type_id" in df_tmp.columns:
             logger.info(
                 "target_type_id is found in the DataFrame. Skip back reference detection."
             )
+        elif "target_type_name" in df_tmp.columns:
+            backref_tables.append("target_type")
+            backref_keys.append("target_type_name")
+            backref_check_keys.append("target_type_id")
         elif "target_type_name" not in df_tmp.columns:
             logger.error("target_type_name is not found in the DataFrame.")
             raise KeyError("target_type_name is not found in the DataFrame.")
+
+        if "upload_id" in df_tmp.columns:
+            logger.info(
+                "upload_id is found in the DataFrame. Use it for back reference for input_catalog"
+            )
+            backref_tables.append("input_catalog")
+            backref_keys.append("upload_id")
+            backref_check_keys.append("input_catalog_id")
+        elif "input_catalog_name" in df_tmp.columns:
+            logger.info(
+                "upload_id is not found in the DataFrame. Use input_catalog_name instead"
+            )
+            backref_tables.append("input_catalog")
+            backref_keys.append("input_catalog_name")
+            backref_check_keys.append("input_catalog_id")
         else:
-            if "upload_id" in df_tmp.columns:
-                logger.info(
-                    "upload_id is found in the DataFrame. Use it for back reference for input_catalog"
-                )
-                backref_tables = ["proposal", "input_catalog", "target_type"]
-                backref_keys = ["proposal_id", "upload_id", "target_type_name"]
-                backref_check_keys = ["proposal_id", "upload_id", "target_type_id"]
-            else:
-                logger.info(
-                    "upload_id is not found in the DataFrame. Use input_catalog_name instead"
-                )
-                backref_tables = ["proposal", "input_catalog", "target_type"]
-                backref_keys = ["proposal_id", "input_catalog_name", "target_type_name"]
-                backref_check_keys = [
-                    "proposal_id",
-                    "input_catalog_id",
-                    "target_type_id",
-                ]
+            logger.error(
+                "upload_id and input_catalog_name are not found in the DataFrame."
+            )
+            raise KeyError(
+                "upload_id and input_catalog_name are not found in the DataFrame."
+            )
 
     elif table == "fluxstd":
         if "input_catalog_id" in df_tmp.columns:
@@ -486,13 +497,22 @@ def add_backref_values(df, db=None, table=None):
             check_key=backref_check_keys[i],
         )
 
+    # raise an error if the number of rows is different before and after the foreign key lookup
+    if df.index.size != df_tmp.index.size:
+        logger.error(
+            "The number of rows in the DataFrame is different before and after the foreign key lookup."
+        )
+        raise ValueError(
+            "The number of rows in the DataFrame is different before and after the foreign key lookup."
+        )
+
     return df_tmp
 
 
 def make_target_df_from_uploader(
     df,
     db=None,
-    table=None,
+    table="target",
     proposal_id=None,
     upload_id=None,
     target_type_name="SCIENCE",
@@ -509,7 +529,7 @@ def make_target_df_from_uploader(
     db : Database, optional
         The database object that contains the table. Defaults to None.
     table : str, optional
-        The name of the table to use for back reference values. Defaults to None.
+        The name of the table to use for back reference values. Defaults to "target".
     proposal_id : str, optional
         The proposal id to be used. Defaults to None.
     upload_id : str, optional
@@ -607,36 +627,13 @@ def make_target_df_from_uploader(
                 f"The number of targets are different before and after the table lookup. {n_target=}, {n_target_lookup=}"
             )
 
-    df_tmp = df.copy()
-    backref_tables, backref_keys, backref_check_keys = [], [], []
-
-    if "upload_id" in df_tmp.columns:
-        logger.info(
-            "upload_id is found in the DataFrame. Use it for back reference for input_catalog"
-        )
-        backref_tables = ["proposal", "input_catalog", "target_type"]
-        backref_keys = ["proposal_id", "upload_id", "target_type_name"]
-        backref_check_keys = ["proposal_id", "upload_id", "target_type_id"]
-    elif "input_catalog_name" in df.columns:
-        logger.info("upload_id is not provided. Use input_catalog_name instead")
-        backref_tables = ["proposal", "input_catalog", "target_type"]
-        backref_keys = ["proposal_id", "input_catalog_name", "target_type_name"]
-        backref_check_keys = ["proposal_id", "input_catalog_id", "target_type_id"]
-
-    # Join referenced values
-    for i in range(len(backref_tables)):
-        df_tmp = join_backref_values(
-            df_tmp,
-            db=db,
-            table=backref_tables[i],
-            key=backref_keys[i],
-            check_key=backref_check_keys[i],
-        )
+    n_target = df.index.size
+    df_backref = add_backref_values(df, db=db, table=table)
 
     # add the is_medium_resolution column by looking at the resolution column
-    df_tmp["is_medium_resolution"] = df["resolution"] == "M"
+    df_backref["is_medium_resolution"] = df["resolution"] == "M"
 
-    return df_tmp
+    return df_backref
 
 
 def check_input_catalog(
