@@ -24,10 +24,12 @@ dialect = "postgresql"
 SCHEMACRAWLERDIR = "<path to SchemaCrawler directory>"
 
 # The following parameters for the uploader will be used to rsync as follows.
-# $ rsync -avz -e ssh host:data_dir/????/??/????????-??????-{upload_id}
+# $ rsync -avz -e ssh user@host:data_dir/????/??/????????-??????-{upload_id}
+# user can be omitted or blank ("") if the user name is the same as the local user name or an alias is defined in ~/.ssh/config.
 [uploader]
-host = "<uploader host name>"
-data_dir = "<uploader data directory>"
+host = "<hostname of uploader>"
+user = "<user name of uploader>"
+data_dir = "<path to the data directory on the uploader>"
 ```
 
 ## Working with filter names, proposal categories, and target types

@@ -1155,12 +1155,17 @@ def transfer_data_from_uploader(df, config, local_dir=Path("."), force=False):
             )
 
             # Construct the rsync command
+            if "user" in config["uploader"].keys() and config["uploader"]["user"] != "":
+                rsync_remote = f"{config['uploader']['user']}@{config['uploader']['host']}:{source_dir}"
+            else:
+                rsync_remote = f"{config['uploader']['host']}:{source_dir}"
+
             rsync_command = [
                 "rsync",
                 "-avz",
                 "-e",
                 "ssh",
-                f"{config['uploader']['host']}:{source_dir}",
+                rsync_remote,
                 dest_dir,
             ]
 
