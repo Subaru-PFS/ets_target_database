@@ -6,6 +6,8 @@ import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+from loguru import logger
+
 from . import models
 
 
@@ -16,11 +18,16 @@ class TargetDB(object):
         self,
         host="localhost",
         port: int = 5432,
-        dbname="testdb",
-        user="admin",
-        password="ask someone",
+        dbname=None,
+        user=None,
+        password=None,
         dialect="postgresql",
     ):
+        for param in [dbname, user, password]:
+            if param is None:
+                logger.error(f"{param} is not provided")
+                raise ValueError(f"{param} is not provided")
+
         self.dbinfo = f"{dialect}://{user}:{password}@{host}:{port}/{dbname}"
 
     def connect(self):
@@ -66,11 +73,7 @@ class TargetDB(object):
     def rollback(self):
         self.session.rollback()
 
-    """
-        ############################################################
-        functionality to insert/update information into the database
-        ############################################################
-    """
+    # functionality to insert/update information into the database
 
     def insert_mappings(
         self, tablename, mappings, return_defaults=False, dry_run=False
@@ -105,9 +108,9 @@ class TargetDB(object):
             else:
                 return None
             # print(mappings)
-        except:
+        except Exception as e:
             self.session.rollback()
-            raise
+            raise e
 
     def insert(self, tablename, dataframe, return_defaults=False, dry_run=False):
         """

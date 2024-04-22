@@ -175,7 +175,7 @@ def checkdups(
             "The following columns are saved by default: "
             '"obj_id", "ra", "dec", "input_catalog_id", "version", "input_file", "is_fstar_gaia", "prob_f_star".',
         ),
-    ] = [],
+    ] = None,
     check_columns: Annotated[
         List[str],
         typer.Option(
@@ -191,11 +191,13 @@ def checkdups(
         ),
     ] = "parquet",
 ):
+    if additional_columns is None:
+        additional_columns = []
 
     check_duplicates(
         indir=directory,
         outdir=output_dir,
-        format=file_format,
+        file_format=file_format,
         skip_save_merged=skip_save_merged,
         additional_columns=additional_columns,
         check_columns=check_columns,
@@ -276,7 +278,7 @@ def prep_fluxstd(
         input_catalog_id,
         input_catalog_name,
         rename_cols=rename_cols,
-        format=file_format,
+        file_format=file_format,
     )
 
 

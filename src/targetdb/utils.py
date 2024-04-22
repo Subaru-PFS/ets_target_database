@@ -3,7 +3,6 @@
 import glob
 import os
 import subprocess
-import sys
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -129,7 +128,7 @@ def load_input_data(input_file, logger=logger):
     return df
 
 
-def read_excel(input_file, sheetnames=["Proposals", "Allocation"]):
+def read_excel(input_file, sheetnames=None):
     """
     Load data from an Excel file and return it as a dictionary of pandas DataFrames.
 
@@ -145,6 +144,9 @@ def read_excel(input_file, sheetnames=["Proposals", "Allocation"]):
         corresponding to the "Proposals" and "Allocation" sheets in the input Excel file.
 
     """
+
+    if sheetnames is None:
+        sheetnames = ["Proposals", "Allocation"]
 
     dataframes = {}
 
@@ -214,7 +216,7 @@ def generate_schema_markdown(output_file=None):
 
         for c in t.columns:
 
-            if c.autoincrement == True:
+            if c.autoincrement is True:
                 autoincrement = True
             else:
                 autoincrement = False
@@ -420,13 +422,14 @@ def add_backref_values(df, db=None, table=None):
             logger.info(
                 "target_type_id is found in the DataFrame. Skip back reference detection."
             )
-        elif "target_type_name" in df_tmp.columns:
-            backref_tables.append("target_type")
-            backref_keys.append("target_type_name")
-            backref_check_keys.append("target_type_id")
-        elif "target_type_name" not in df_tmp.columns:
-            logger.error("target_type_name is not found in the DataFrame.")
-            raise KeyError("target_type_name is not found in the DataFrame.")
+        else:
+            if "target_type_name" in df_tmp.columns:
+                backref_tables.append("target_type")
+                backref_keys.append("target_type_name")
+                backref_check_keys.append("target_type_id")
+            else:  # "target_type_name" not in df_tmp.columns:
+                logger.error("target_type_name is not found in the DataFrame.")
+                raise KeyError("target_type_name is not found in the DataFrame.")
 
         if "upload_id" in df_tmp.columns:
             logger.info(
@@ -435,59 +438,63 @@ def add_backref_values(df, db=None, table=None):
             backref_tables.append("input_catalog")
             backref_keys.append("upload_id")
             backref_check_keys.append("input_catalog_id")
-        elif "input_catalog_name" in df_tmp.columns:
-            logger.info(
-                "upload_id is not found in the DataFrame. Use input_catalog_name instead"
-            )
-            backref_tables.append("input_catalog")
-            backref_keys.append("input_catalog_name")
-            backref_check_keys.append("input_catalog_id")
         else:
-            logger.error(
-                "upload_id and input_catalog_name are not found in the DataFrame."
-            )
-            raise KeyError(
-                "upload_id and input_catalog_name are not found in the DataFrame."
-            )
+            if "input_catalog_name" in df_tmp.columns:
+                logger.info(
+                    "upload_id is not found in the DataFrame. Use input_catalog_name instead"
+                )
+                backref_tables.append("input_catalog")
+                backref_keys.append("input_catalog_name")
+                backref_check_keys.append("input_catalog_id")
+            else:
+                logger.error(
+                    "upload_id and input_catalog_name are not found in the DataFrame."
+                )
+                raise KeyError(
+                    "upload_id and input_catalog_name are not found in the DataFrame."
+                )
 
     elif table == "fluxstd":
         if "input_catalog_id" in df_tmp.columns:
             logger.info(
                 "input_catalog_id is found in the DataFrame. Skip back reference detection."
             )
-        elif "input_catalog_name" not in df_tmp.columns:
-            logger.error("input_catalog_name is not found in the DataFrame.")
-            raise KeyError("input_catalog_name is not found in the DataFrame.")
         else:
-            backref_tables = ["input_catalog"]
-            backref_keys = ["input_catalog_name"]
-            backref_check_keys = ["input_catalog_id"]
+            if "input_catalog_name" in df_tmp.columns:
+                backref_tables = ["input_catalog"]
+                backref_keys = ["input_catalog_name"]
+                backref_check_keys = ["input_catalog_id"]
+            else:
+                logger.error("input_catalog_name is not found in the DataFrame.")
+                raise KeyError("input_catalog_name is not found in the DataFrame.")
 
     elif table == "sky":
         if "input_catalog_id" in df_tmp.columns:
             logger.info(
                 "input_catalog_id is found in the DataFrame. Skip back reference detection."
             )
-        elif "input_catalog_name" not in df_tmp.columns:
-            logger.error("input_catalog_name is not found in the DataFrame.")
-            raise KeyError("input_catalog_name is not found in the DataFrame.")
         else:
-            backref_tables = ["input_catalog"]
-            backref_keys = ["input_catalog_name"]
-            backref_check_keys = ["input_catalog_id"]
+            if "input_catalog_name" in df_tmp.columns:
+                backref_tables = ["input_catalog"]
+                backref_keys = ["input_catalog_name"]
+                backref_check_keys = ["input_catalog_id"]
+            else:
+                logger.error("input_catalog_name is not found in the DataFrame.")
+                raise KeyError("input_catalog_name is not found in the DataFrame.")
 
     elif table == "proposal":
         if "proposal_category_id" in df_tmp.columns:
             logger.info(
                 "proposal_category_id is found in the DataFrame. Skip back reference detection."
             )
-        elif "proposal_category_name" not in df_tmp.columns:
-            logger.error("proposal_category_name is not found in the DataFrame.")
-            raise KeyError("proposal_category_name is not found in the DataFrame.")
         else:
-            backref_tables = ["proposal_category"]
-            backref_keys = ["proposal_category_name"]
-            backref_check_keys = ["proposal_category_id"]
+            if "proposal_category_name" in df_tmp.columns:
+                backref_tables = ["proposal_category"]
+                backref_keys = ["proposal_category_name"]
+                backref_check_keys = ["proposal_category_id"]
+            else:
+                logger.error("proposal_category_name is not found in the DataFrame.")
+                raise KeyError("proposal_category_name is not found in the DataFrame.")
 
     # Join referenced values
     for i in range(len(backref_tables)):
@@ -804,10 +811,10 @@ def add_database_rows(
 def check_duplicates(
     indir=None,
     outdir=None,
-    format="parquet",
+    file_format="parquet",
     skip_save_merged=False,
-    additional_columns=[],
-    check_columns=["obj_id", "input_catalog_id", "version"],
+    additional_columns=None,
+    check_columns=None,
 ):
     """
     Checks for duplicates in files in a given directory.
@@ -818,7 +825,7 @@ def check_duplicates(
         The directory containing the input files. Defaults to None.
     outdir : str
         The directory where the output files will be saved. Defaults to None.
-    format : str, optional
+    file_format : str, optional
         The format of the input files. The Feather or Parquet formats are supported.
         Defaults to "parquet".
     skip_save_merged : bool, optional
@@ -829,11 +836,17 @@ def check_duplicates(
     None
     """
 
+    if additional_columns is None:
+        additional_columns = []
+
+    if check_columns is None:
+        check_columns = ["obj_id", "input_catalog_id", "version"]
+
     if not os.path.exists(outdir):
         os.makedirs(outdir)
 
     # Get a list of all feather files in the directory
-    input_files = glob.glob(os.path.join(indir, f"*.{format}"))
+    input_files = glob.glob(os.path.join(indir, f"*.{file_format}"))
 
     if len(input_files) == 0:
         logger.error(f"No files found in the directory: {indir}")
@@ -848,7 +861,7 @@ def check_duplicates(
         logger.info(f"Reading file {i+1}/{len(input_files)}: {f}")
         # Read the input file into a DataFrame
         file_df = load_input_data(f, logger=logger)
-        file_df["input_file"] = f.rsplit("/")[-1].replace(f".{format}", "")
+        file_df["input_file"] = f.rsplit("/")[-1].replace(f".{file_format}", "")
 
         # only selected columns are included because of the memory limit
         dataframes.append(
@@ -901,14 +914,14 @@ def check_duplicates(
         )
         output_file = os.path.join(
             f"{outdir}",
-            f"all_merged_nodups.{format}",
+            f"all_merged_nodups.{file_format}",
         )
-        if format == "feather":
+        if file_format == "feather":
             df_cleaned.to_feather(output_file)
-        elif format == "parquet":
+        elif file_format == "parquet":
             df_cleaned.to_parquet(output_file)
         else:
-            logger.error(f"Unsupported file format: {format}")
+            logger.error(f"Unsupported file format: {file_format}")
 
 
 def prep_fluxstd_data(
@@ -918,7 +931,7 @@ def prep_fluxstd_data(
     input_catalog_id,
     input_catalog_name,
     rename_cols=None,
-    format="parquet",
+    file_format="parquet",
 ):
     """
     Prepare flux standard data ready to be inserted to the target database.
@@ -937,7 +950,7 @@ def prep_fluxstd_data(
         The input catalog ID name to be added to the dataframe.
     rename_cols : dict, optional
         A dictionary mapping old column names to new ones. Defaults to None.
-    format : str, optional
+    file_format : str, optional
         The format of the output files, "feather" or "parquet". Defaults to "parquet".
 
     Returns
@@ -969,7 +982,7 @@ def prep_fluxstd_data(
         logger.info(f"Processing... {i+1}/{len(input_files)}: {filename}")
         if filename.endswith((".csv", ".feather", ".parquet")):
             t1 = time.time()
-            logger.info(f"\tConverting {filename} to the {format} format")
+            logger.info(f"\tConverting {filename} to the {file_format} format")
 
             # Read the CSV file
             df = load_input_data(os.path.join(input_dir, filename), logger=logger)
@@ -1000,11 +1013,11 @@ def prep_fluxstd_data(
 
             # Convert the filename from .csv to pyarrow formats
             filename_body = f"{os.path.splitext(filename)[0]}"
-            if format == "parquet":
+            if file_format == "parquet":
                 parquet_filename = f"{filename_body}.parquet"
                 # Write the DataFrame to a Parquet file
                 df.to_parquet(os.path.join(output_dir, parquet_filename), index=False)
-            elif format == "feather":
+            elif file_format == "feather":
                 feather_filename = f"{filename_body}.feather"
                 # Write the DataFrame to a Feather file
                 df.to_feather(os.path.join(output_dir, feather_filename))
@@ -1192,10 +1205,13 @@ def insert_targets_from_uploader(
         proposal_id = row["proposal_id"]
         upload_id = row["upload_id"]
 
+        # input_file = list(
+        #     data_dir.cwd().glob(
+        #         f"????????-??????-{upload_id}/{file_prefix}_{upload_id}.ecsv"
+        #     )
+        # )
         input_file = list(
-            data_dir.cwd().glob(
-                f"????????-??????-{upload_id}/{file_prefix}_{upload_id}.ecsv"
-            )
+            data_dir.glob(f"????????-??????-{upload_id}/{file_prefix}_{upload_id}.ecsv")
         )
 
         if len(input_file) == 0:
