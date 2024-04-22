@@ -152,6 +152,7 @@ $ pfs-targetdb-cli insert fluxstd/feather/ra354.8_354.9_dec-40.0_90.0.feather \
 WIP
 
 ## Working with target lists
+
 ### Parse an allocation summary file
 
 Suppose you have an Excel file named `pfs_allocation_summary.xlsx` with 2 sheets, `Proposals` and `Allocation`, as shown below.

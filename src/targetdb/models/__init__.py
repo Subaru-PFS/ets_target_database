@@ -13,16 +13,16 @@ comment_updated_at: str = "The date and time in UTC when the record was last upd
 Base = declarative_base()
 
 # Note: Order of import is important!
-from .filter_name import filter_name  # isort:skip
-from .proposal_category import proposal_category  # isort:skip
-from .input_catalog import input_catalog  # isort:skip
-from .target_type import target_type  # isort:skip
-from .proposal import proposal  # isort:skip
-from .sky import sky  # isort:skip
-from .fluxstd import fluxstd  # isort:skip
-from .target import target  # isort:skip
+from .filter_name import filter_name  # noqa E402
+from .proposal_category import proposal_category  # noqa E402
+from .input_catalog import input_catalog  # noqa E402
+from .target_type import target_type  # noqa E402
+from .proposal import proposal  # noqa E402
+from .sky import sky  # noqa E402
+from .fluxstd import fluxstd  # noqa E402
+from .target import target  # noqa E402
 
-from .cluster import cluster  # isort:skip
+from .cluster import cluster  # noqa E402
 
 
 __all__ = [

@@ -37,7 +37,7 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
-dev = ["ipython", "pytest"]
+dev = ["ipython", "pytest", "black", "ruff"]
 doc = ["mkdocs", "mkdocs-material[imaging]", "mkdocstrings-python"]
 
 [project.urls]
@@ -66,6 +66,8 @@ line-length = 88
 
 [tool.ruff.lint]
 ignore = [
+    "F401", # module imported but unused
+    "F841", # local variable is assigned to but never used
     "E501", # line too long, handled by black
     "B008", # do not perform function calls in argument defaults
     "C901", # too complex
@@ -79,10 +81,6 @@ ignore = [
 #     "C4", # flake8-comprehensions
 #     "UP", # pyupgrade
 # ]
-unfixable = [
-    "F401", # module imported but unused
-    "F841", # local variable is assigned to but never used
-]
 
 [tool.black]
 line-length = 88
