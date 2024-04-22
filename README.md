@@ -33,8 +33,13 @@ Newer (and somewhat older) versions should also work.
 | [alembic](https://alembic.sqlalchemy.org/en/latest/)                   |  1.13.1 |
 | [pyarrow](https://arrow.apache.org/docs/python/)                       |  15.0.2 |
 | [Typer](https://typer.tiangolo.com/)                                   |  0.12.3 |
+| [openpyxl](https://openpyxl.readthedocs.io/en/stable/)                 |   3.1.2 |
 
 If you are using Python 3.10 or earlier, you may need to install [tomli](https://github.com/hukkin/tomli) package.
+
+| Package                                  | Version |
+|------------------------------------------|--------:|
+| [tomli](https://github.com/hukkin/tomli) |   2.0.1 |
 
 For building the documentation, the following packages are required.
 
@@ -49,12 +54,14 @@ Additionally, the following tools may be useful for testing and development.
 - [md-to-pdf](https://github.com/simonhaenisch/md-to-pdf)
 - [Docker](https://www.docker.com/)
 - [DBeaver](https://dbeaver.io/)
+- [tbls](https://github.com/k1LoW/tbls)
+
 
 ## Getting Started
 
 ### Installation
 
-```sh
+```console
 # Clone the repository and go to the cloned directory.
 git clone https://github.com/Subaru-PFS/ets_target_database.git
 cd ets_target_database
@@ -81,10 +88,10 @@ Here, we show a few examples of how to use the `targetdb` package.
 
 If a postgres database server to create `targetdb` is not running, you can easily make one as a Docker container.
 
-```sh
+```console
 cd example/docker/
-docker-compose build
-docker-compose -up -d
+docker compose build
+docker compose -up -d
 ```
 
 In this example, the local port 15432 is mapped to the port 5432 inside the container.
@@ -94,16 +101,16 @@ The database data will be stored in the `examples/docker/db-data` directory and 
 
 Following commands create a database and tables as configured in the `dbconf.toml` file.
 
-```bash
+```console
 # create a database
-pfs_targetdb_create_database -c dbconf.toml
+pfs-targetdb-cli create-db -c dbconf.toml
 
 # install the Q3C extension
 psql -h localhost -U admin -d targetdb -c "CREATE EXTENSION q3c;"
 Password for user admin: (enter the password)
 
 # create tables in the database
-pfs_targetdb_create_schema -c dbconf.toml
+pfs-targetdb-cli create_schema -c dbconf.toml
 ```
 
 
@@ -111,9 +118,9 @@ pfs_targetdb_create_schema -c dbconf.toml
 
 Using SchemaCrawler, you can make an Entity Relationship diagram (ERD) of the `targetdb`.
 
-```
+```console
 # draw the ER diagram
-pfs_targetdb_draw_diagram dbconf.toml
+pfs-targetdb-cli diagram -c dbconf.toml
 ```
 
 ### Insert test data into tables
@@ -121,11 +128,11 @@ pfs_targetdb_draw_diagram dbconf.toml
 In the `examples/data` directory, example data files are located. You can insert them into the database by the following commands.
 
 ```bash
-pfs_targetdb_insert -c dbconf.toml -t proposal_category examples/data/proposal_category.csv
-pfs_targetdb_insert -c dbconf.toml -t proposal examples/data/proposals.csv
-pfs_targetdb_insert -c dbconf.toml -t input_catalog examples/data/input_catalogs.csv
-pfs_targetdb_insert -c dbconf.toml -t target_type examples/data/target_types.csv
-pfs_targetdb_insert -c dbconf.toml -t filter_name examples/data/filter_names.csv
+pfs-targetdb-cli insert -c dbconf.toml -t proposal_category examples/data/proposal_category.csv --commit
+pfs-targetdb-cli insert -c dbconf.toml -t proposal examples/data/proposals.csv --commit
+pfs-targetdb-cli insert -c dbconf.toml -t input_catalog examples/data/input_catalogs.csv --commit
+pfs-targetdb-cli insert -c dbconf.toml -t target_type examples/data/target_types.csv --commit
+pfs-targetdb-cli insert -c dbconf.toml -t filter_name examples/data/filter_names.csv --commit
 ```
 
 ## License

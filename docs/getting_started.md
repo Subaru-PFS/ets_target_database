@@ -35,6 +35,10 @@ Newer (and somewhat older) versions should also work.
 
 If you are using Python 3.10 or earlier, you may need to install [tomli](https://github.com/hukkin/tomli) package.
 
+| Package                                  | Version |
+|------------------------------------------|--------:|
+| [tomli](https://github.com/hukkin/tomli) |   2.0.1 |
+
 For building the documentation, the following packages are required.
 
 | Package                                                         | Version |
