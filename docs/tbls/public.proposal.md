@@ -7,12 +7,12 @@
 | Name | Type | Default | Nullable | Children | Parents | Comment |
 | ---- | ---- | ------- | -------- | -------- | ------- | ------- |
 | proposal_id | varchar |  | false | [public.target](public.target.md) |  | Unique identifier for proposal (e.g, S21B-OT06?) |
-| group_id | varchar |  | true |  |  | Group ID in STARS (e.g., o21195?) |
+| group_id | varchar |  | false |  |  | Group ID in STARS (e.g., o21195?) |
 | pi_first_name | varchar |  | true |  |  | PI's first name |
-| pi_last_name | varchar |  | true |  |  | PI's last name |
+| pi_last_name | varchar |  | false |  |  | PI's last name |
 | pi_middle_name | varchar |  | true |  |  | PI's middle name |
-| rank | double precision |  | true |  |  | TAC score |
-| grade | varchar |  | true |  |  | TAC grade (A/B/C/F in the case of HSC queue) |
+| rank | double precision |  | false |  |  | TAC score |
+| grade | varchar |  | false |  |  | TAC grade (A/B/C/F in the case of HSC queue) |
 | allocated_time_total | double precision |  | true |  |  | Total fiberhours allocated by TAC (hour) |
 | allocated_time_lr | double precision |  | true |  |  | Total fiberhours for the low-resolution mode allocated by TAC (hour) |
 | allocated_time_mr | double precision |  | true |  |  | Total fiberhours for the medium-resolution mode allocated by TAC (hour) |
