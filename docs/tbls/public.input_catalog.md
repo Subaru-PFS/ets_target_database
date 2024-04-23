@@ -10,7 +10,7 @@
 | input_catalog_name | varchar |  | true |  |  | Name of the input catalog (e.g., Gaia DR2, HSC-SSP PDR3, etc.) |
 | input_catalog_description | varchar |  | true |  |  | Description of the input catalog |
 | upload_id | varchar(16) |  | true |  |  | A 8-bit hex string (16 characters) assigned at the submission of the target list (default: empty string) |
-| created_at | timestamp without time zone |  | true |  |  | The date and time in UTC when the record was created |
+| created_at | timestamp without time zone | timezone('utc'::text, CURRENT_TIMESTAMP) | true |  |  | The date and time in UTC when the record was created |
 | updated_at | timestamp without time zone |  | true |  |  | The date and time in UTC when the record was last updated |
 
 ## Constraints

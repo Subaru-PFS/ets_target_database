@@ -8,7 +8,7 @@
 | ---- | ---- | ------- | -------- | -------- | ------- | ------- |
 | filter_name | varchar |  | false | [public.fluxstd](public.fluxstd.md) [public.target](public.target.md) |  | Filter name (e.g., g_ps1) |
 | filter_name_description | varchar |  | true |  |  | Description of the filter |
-| created_at | timestamp without time zone |  | true |  |  | The date and time in UTC when the record was created |
+| created_at | timestamp without time zone | timezone('utc'::text, CURRENT_TIMESTAMP) | true |  |  | The date and time in UTC when the record was created |
 | updated_at | timestamp without time zone |  | true |  |  | The date and time in UTC when the record was last updated |
 
 ## Constraints
