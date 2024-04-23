@@ -23,10 +23,12 @@ class proposal_category(Base):
     proposal_category_name = Column(
         String,
         unique=True,
+        nullable=False,
         comment="Proposal category name (e.g., Openuse, Keck, Gemini, and UH)",
     )
     proposal_category_description = Column(
         String,
+        default="",
         comment="Proposal category description (e.g., Openuse, Time exchange, etc.",
     )
     created_at = Column(

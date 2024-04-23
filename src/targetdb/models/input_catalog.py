@@ -34,15 +34,16 @@ class input_catalog(Base):
     )
     input_catalog_name = Column(
         String,
+        nullable=False,
         comment="Name of the input catalog (e.g., Gaia DR2, HSC-SSP PDR3, etc.)",
     )
     input_catalog_description = Column(
-        String, comment="Description of the input catalog"
+        String, default="", comment="Description of the input catalog"
     )
     upload_id = Column(
         String(16),
-        comment="A 8-bit hex string (16 characters) assigned at the submission of the target list (default: empty string)",
         default="",
+        comment="A 8-bit hex string (16 characters) assigned at the submission of the target list (default: empty string)",
     )
     created_at = Column(
         DateTime,

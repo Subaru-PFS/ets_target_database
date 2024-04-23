@@ -30,23 +30,28 @@ class proposal(Base):
         String,
         # primary_key=True,
         # unique=True,
+        nullable=False,
         autoincrement=False,
         comment="Group ID in STARS (e.g., o21195?)",
     )
-    pi_first_name = Column(String, comment="PI's first name")
-    pi_last_name = Column(String, comment="PI's last name")
-    pi_middle_name = Column(String, comment="PI's middle name")
-    rank = Column(Float, comment="TAC score")
-    grade = Column(String, comment="TAC grade (A/B/C/F in the case of HSC queue)")
+    pi_first_name = Column(String, default="", comment="PI's first name")
+    pi_last_name = Column(String, nullable=False, comment="PI's last name")
+    pi_middle_name = Column(String, default="", comment="PI's middle name")
+    rank = Column(Float, nullable=False, comment="TAC score")
+    grade = Column(
+        String, nullable=False, comment="TAC grade (A/B/C/F in the case of HSC queue)"
+    )
     allocated_time_total = Column(
-        Float, comment="Total fiberhours allocated by TAC (hour)"
+        Float, default=0.0, comment="Total fiberhours allocated by TAC (hour)"
     )
     allocated_time_lr = Column(
         Float,
+        default=0.0,
         comment="Total fiberhours for the low-resolution mode allocated by TAC (hour)",
     )
     allocated_time_mr = Column(
         Float,
+        default=0.0,
         comment="Total fiberhours for the medium-resolution mode allocated by TAC (hour)",
     )
     proposal_category_id = Column(

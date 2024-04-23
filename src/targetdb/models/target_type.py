@@ -38,7 +38,9 @@ class target_type(Base):
         nullable=False,
         comment="Name for the target type.",
     )
-    target_type_description = Column(String, comment="Description of the target type")
+    target_type_description = Column(
+        String, default="", comment="Description of the target type"
+    )
     created_at = Column(
         DateTime,
         comment=comment_created_at,
