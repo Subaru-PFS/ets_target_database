@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 
-# from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import declarative_base
+from sqlalchemy.sql import expression
+from sqlalchemy.ext.compiler import compiles
+from sqlalchemy.types import DateTime
 
 input_catalog_id_start: int = 10000
 input_catalog_id_max: int = 89999
@@ -11,6 +13,17 @@ comment_created_at: str = "The date and time in UTC when the record was created"
 comment_updated_at: str = "The date and time in UTC when the record was last updated"
 
 Base = declarative_base()
+
+
+class utcnow(expression.FunctionElement):
+    type = DateTime()
+    inherit_cache = True
+
+
+@compiles(utcnow, "postgresql")
+def pg_utcnow(element, compiler, **kw):
+    return "TIMEZONE('utc', CURRENT_TIMESTAMP)"
+
 
 # Note: Order of import is important!
 from .filter_name import filter_name  # noqa E402

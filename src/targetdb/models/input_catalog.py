@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-
 from sqlalchemy import (
     Column,
     DateTime,
@@ -15,6 +14,7 @@ from . import (
     comment_updated_at,
     input_catalog_id_max,
     input_catalog_id_start,
+    utcnow,
 )
 
 
@@ -44,8 +44,16 @@ class input_catalog(Base):
         comment="A 8-bit hex string (16 characters) assigned at the submission of the target list (default: empty string)",
         default="",
     )
-    created_at = Column(DateTime, comment=comment_created_at)
-    updated_at = Column(DateTime, comment=comment_updated_at)
+    created_at = Column(
+        DateTime,
+        comment=comment_created_at,
+        server_default=utcnow(),
+    )
+    updated_at = Column(
+        DateTime,
+        comment=comment_updated_at,
+        onupdate=utcnow(),
+    )
 
     def __init__(
         self,

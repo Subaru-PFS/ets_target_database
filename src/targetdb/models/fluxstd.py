@@ -14,10 +14,8 @@ from sqlalchemy import (
     UniqueConstraint,
 )
 
-# from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import backref, relationship
 
-# from . import proposal
 from . import (
     Base,
     comment_created_at,
@@ -25,6 +23,7 @@ from . import (
     filter_name,
     input_catalog,
     target_type,
+    utcnow,
 )
 
 
@@ -220,8 +219,16 @@ class fluxstd(Base):
     )
 
     # timestamp
-    created_at = Column(DateTime, comment=comment_created_at)
-    updated_at = Column(DateTime, comment=comment_updated_at)
+    created_at = Column(
+        DateTime,
+        comment=comment_created_at,
+        server_default=utcnow(),
+    )
+    updated_at = Column(
+        DateTime,
+        comment=comment_updated_at,
+        onupdate=utcnow(),
+    )
 
     # relations to other tables
     target_types = relationship(target_type, backref=backref("fluxstd"))

@@ -14,7 +14,14 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import backref, relationship
 
-from . import Base, comment_created_at, comment_updated_at, input_catalog, target_type
+from . import (
+    Base,
+    comment_created_at,
+    comment_updated_at,
+    input_catalog,
+    target_type,
+    utcnow,
+)
 
 
 class sky(Base):
@@ -107,8 +114,16 @@ class sky(Base):
     )
 
     # timestamp
-    created_at = Column(DateTime, comment=comment_created_at)
-    updated_at = Column(DateTime, comment=comment_updated_at)
+    created_at = Column(
+        DateTime,
+        comment=comment_created_at,
+        server_default=utcnow(),
+    )
+    updated_at = Column(
+        DateTime,
+        comment=comment_updated_at,
+        onupdate=utcnow(),
+    )
 
     # relations to other tables
     target_types = relationship(target_type, backref=backref("sky"))

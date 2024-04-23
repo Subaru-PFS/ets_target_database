@@ -11,7 +11,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import backref, relationship
 
-from . import Base, input_catalog, target
+from . import Base, input_catalog, target, utcnow
 
 
 class cluster(Base):
@@ -53,8 +53,16 @@ class cluster(Base):
         comment="Input catalog ID from the input_catalog table",
     )
 
-    created_at = Column(DateTime, comment="UTC")
-    updated_at = Column(DateTime, comment="UTC")
+    created_at = Column(
+        DateTime,
+        comment="UTC",
+        server_default=utcnow(),
+    )
+    updated_at = Column(
+        DateTime,
+        comment="UTC",
+        onupdate=utcnow(),
+    )
 
     targets = relationship(target, backref=backref("cluster"))
     input_catalogs = relationship(input_catalog, backref=backref("cluster"))
