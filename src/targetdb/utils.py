@@ -647,13 +647,33 @@ def make_target_df_from_uploader(
 
 def check_input_catalog(
     df,
+    db=None,
     input_catalog_id_start=input_catalog_id_start,
     input_catalog_id_max=input_catalog_id_max,
 ):
+    df_in_db = db.fetch_all("input_catalog")
 
-    if "input_catalog_id" in df.columns:
+    is_input_catalog_id = "input_catalog_id" in df.columns
+    if is_input_catalog_id:
         logger.info("input_catalog_id is found in the DataFrame. Check values.")
-        for i in range(df.index.size):
+    else:
+        logger.info("input_catalog_id is not found in the DataFrame. Proceed.")
+
+    for i in range(df.index.size):
+        # TODO: upgrade PostgreSQL to 12 or later
+        # NOTE: Since partial indexing is not supported on targetdb
+        # by thePostgreSQL version 10.6, we need to check if the upload_id
+        # is already in the input_catalog table manually.
+        if (df["upload_id"][i] != "") and (
+            df["upload_id"][i] in df_in_db["upload_id"].values
+        ):
+            logger.error(
+                f"upload_id {df['upload_id'][i]} is already in the input_catalog table."
+            )
+            raise ValueError(
+                f"upload_id {df['upload_id'][i]} is already in the input_catalog table."
+            )
+        if is_input_catalog_id:
             if (df["input_catalog_id"][i] >= input_catalog_id_start) and (
                 df["input_catalog_id"][i] <= input_catalog_id_max
             ):
@@ -668,8 +688,6 @@ def check_input_catalog(
                     "input_catalog_id must be less than 100000 due to datamodel constraint."
                 )
                 raise ValueError("input_catalog_id is too large")
-    else:
-        logger.info("input_catalog_id is not found in the DataFrame. Proceed.")
 
 
 def add_database_rows(
@@ -762,6 +780,7 @@ def add_database_rows(
     elif table in ["input_catalog"]:
         check_input_catalog(
             df,
+            db=db,
             input_catalog_id_start=input_catalog_id_start,
             input_catalog_id_max=input_catalog_id_max,
         )
