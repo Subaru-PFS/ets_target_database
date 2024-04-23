@@ -7,7 +7,7 @@ from sqlalchemy import (
     String,
 )
 
-from . import Base, comment_created_at, comment_updated_at
+from . import Base, comment_created_at, comment_updated_at, utcnow
 
 
 class proposal_category(Base):
@@ -29,8 +29,16 @@ class proposal_category(Base):
         String,
         comment="Proposal category description (e.g., Openuse, Time exchange, etc.",
     )
-    created_at = Column(DateTime, comment=comment_created_at)
-    updated_at = Column(DateTime, comment=comment_updated_at)
+    created_at = Column(
+        DateTime,
+        comment=comment_created_at,
+        server_default=utcnow(),
+    )
+    updated_at = Column(
+        DateTime,
+        comment=comment_updated_at,
+        onupdate=utcnow(),
+    )
 
     def __init__(
         self,

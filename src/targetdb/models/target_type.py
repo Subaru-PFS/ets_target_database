@@ -7,9 +7,7 @@ from sqlalchemy import (
     String,
 )
 
-# from sqlalchemy.exc import OperationalError
-# from sqlalchemy.orm import backref, relation
-from . import Base, comment_created_at, comment_updated_at
+from . import Base, comment_created_at, comment_updated_at, utcnow
 
 
 class target_type(Base):
@@ -41,8 +39,16 @@ class target_type(Base):
         comment="Name for the target type.",
     )
     target_type_description = Column(String, comment="Description of the target type")
-    created_at = Column(DateTime, comment=comment_created_at)
-    updated_at = Column(DateTime, comment=comment_updated_at)
+    created_at = Column(
+        DateTime,
+        comment=comment_created_at,
+        server_default=utcnow(),
+    )
+    updated_at = Column(
+        DateTime,
+        comment=comment_updated_at,
+        onupdate=utcnow(),
+    )
 
     def __init__(
         self,

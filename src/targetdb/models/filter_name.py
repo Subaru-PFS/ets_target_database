@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 
-
 from sqlalchemy import (
     Column,
     DateTime,
     String,
 )
 
-from . import Base, comment_created_at, comment_updated_at
+from . import Base, comment_created_at, comment_updated_at, utcnow
 
 
 class filter_name(Base):
@@ -27,8 +26,16 @@ class filter_name(Base):
         comment="Description of the filter",
     )
 
-    created_at = Column(DateTime, comment=comment_created_at)
-    updated_at = Column(DateTime, comment=comment_updated_at)
+    created_at = Column(
+        DateTime,
+        comment=comment_created_at,
+        server_default=utcnow(),
+    )
+    updated_at = Column(
+        DateTime,
+        comment=comment_updated_at,
+        onupdate=utcnow(),
+    )
 
     def __init__(
         self,

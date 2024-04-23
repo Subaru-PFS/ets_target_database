@@ -768,10 +768,8 @@ def add_database_rows(
     t_end = time.time()
     logger.info(f"Added back reference values in {t_end - t_begin:.2f} s")
 
-    utcnow = datetime.now(timezone.utc)
-    if insert:
-        df["created_at"] = utcnow
-    df["updated_at"] = utcnow
+    if verbose:
+        logger.debug(f"{df.columns=}")
 
     if verbose:
         logger.debug(f"Working on the following DataFrame: \n{df}")

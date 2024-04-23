@@ -23,6 +23,7 @@ from . import (
     input_catalog,
     proposal,
     target_type,
+    utcnow,
 )
 
 
@@ -205,8 +206,16 @@ class target(Base):
     )
 
     # timestamp
-    created_at = Column(DateTime, comment=comment_created_at)
-    updated_at = Column(DateTime, comment=comment_updated_at)
+    created_at = Column(
+        DateTime,
+        comment=comment_created_at,
+        server_default=utcnow(),
+    )
+    updated_at = Column(
+        DateTime,
+        comment=comment_updated_at,
+        onupdate=utcnow(),
+    )
 
     # unique_objects = relation(unique_object, backref=backref("target"))
     proposals = relationship(proposal, backref=backref("target"))
