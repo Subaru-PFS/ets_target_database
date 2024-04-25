@@ -18,6 +18,7 @@ from ..utils import (
     generate_schema_markdown,
     get_url_object,
     insert_targets_from_uploader,
+    install_q3c_extension,
     load_config,
     load_input_data,
     parse_allocation_file,
@@ -106,6 +107,23 @@ def drop_db(
             drop_database(engine.url)
     else:
         logger.info("Database does not exist: {url_object.render_as_string()}")
+
+
+@app.command(help="Insert the Q3C extension.")
+def install_q3c(
+    config_file: Annotated[
+        str,
+        typer.Option(
+            "-c",
+            "--config",
+            show_default=False,
+            help=config_help_msg,
+        ),
+    ],
+):
+    config = load_config(config_file)
+
+    install_q3c_extension(config)
 
 
 @app.command(help="Create tables of the PFS tartedb in a database.")

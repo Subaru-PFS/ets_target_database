@@ -32,6 +32,7 @@ The command-line interface (CLI) tool `pfs-targetdb-cli` is provided to work wit
 
     The `schemacrawler` section is required only if you want to draw an ER diagram of the database schema with SchemaCrawler.
 
+
 ## `pfs-targetdb-cli`
 
 PFS Target Database CLI Tool
@@ -55,6 +56,7 @@ $ pfs-targetdb-cli [OPTIONS] COMMAND [ARGS]...
 * `drop-db`: Drop a database on a PostgreSQL server.
 * `insert`: Insert rows into a table in the PFS Target...
 * `insert-targets`: Insert targets using a list of input...
+* `install-q3c`: Insert the Q3C extension.
 * `mdtable`: Generate a Markdown output of the schema...
 * `parse-alloc`: Parse an Excel file containing time...
 * `prep-fluxstd`: Prepare flux standard data for the target...
@@ -217,6 +219,23 @@ $ pfs-targetdb-cli insert-targets [OPTIONS] INPUT_CATALOGS
 
 ---
 
+### `install-q3c`
+
+Insert the Q3C extension.
+
+**Usage**:
+
+```console
+$ pfs-targetdb-cli install-q3c [OPTIONS]
+```
+
+**Options**:
+
+* `-c, --config TEXT`: Database configuration file in the TOML format.  [required]
+* `--help`: Show this message and exit.
+
+---
+
 ### `mdtable`
 
 Generate a Markdown output of the schema of the PFS Target Database.
@@ -330,3 +349,5 @@ $ pfs-targetdb-cli update [OPTIONS] INPUT_FILE
 * `--proposal_id TEXT`: Proposal ID (e.g., S24B-QT001). Only required for the `target` table
 * `--verbose`: Verbose output.
 * `--help`: Show this message and exit.
+
+

@@ -10,6 +10,8 @@ You need a [PostgreSQL](https://www.postgresql.org/) server to host the database
 If you do not have a PostgreSQL server, you can use a Docker container to host a database for testing without affecting the host environment.
 To set up a PostgreSQL Docker container, you need to install Docker from [Docker Hub](https://hub.docker.com/search?type=edition&offering=community). See the [examples](examples/index.md) for more details.
 
+#### Q3C extension
+
 The Q3C extension is required for the database. You can install it by the following instruction in the [q3c repository](https://github.com/segasai/q3c)
 
 ### Python environment
@@ -107,8 +109,7 @@ create tables, and generate an entity-relationship diagram of the database.
 pfs-targetdb-cli create-db -c dbconf.toml
 
 # install the Q3C extension
-psql -h localhost -U admin -d targetdb -c "CREATE EXTENSION q3c;"
-Password for user admin: (enter the password)
+pfs-targetdb-cli install-q3c -c dbconf.toml
 
 # create tables in the database
 pfs-targetdb-cli create-schema -c dbconf.toml

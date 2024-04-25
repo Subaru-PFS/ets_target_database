@@ -12,6 +12,8 @@ Please see [the documentation](https://pfs-etc.naoj.hawaii.edu/targetdb/) for mo
 
 You need a PostgreSQL server to host the database. If you do not have a PostgreSQL server, you can use a Docker container to host a database for testing without affecting the host environment. To set up a PostgreSQL Docker container, you need to install Docker from [Docker Hub](https://hub.docker.com/search?type=edition&offering=community).
 
+#### Q3C extension
+
 The Q3C extension is required for the database. You can install it by the following instruction in the [q3c repository](https://github.com/segasai/q3c)
 
 ### Python environment
@@ -106,8 +108,7 @@ Following commands create a database and tables as configured in the `dbconf.tom
 pfs-targetdb-cli create-db -c dbconf.toml
 
 # install the Q3C extension
-psql -h localhost -U admin -d targetdb -c "CREATE EXTENSION q3c;"
-Password for user admin: (enter the password)
+pfs-targetdb-cli install-q3c -c dbconf.toml
 
 # create tables in the database
 pfs-targetdb-cli create_schema -c dbconf.toml

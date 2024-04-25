@@ -4,7 +4,7 @@ import glob
 import os
 import subprocess
 import time
-from datetime import datetime, timezone
+from datetime import datetime
 from pathlib import Path
 
 import pandas as pd
@@ -200,6 +200,23 @@ def get_url_object(config):
     )
 
     return url_object
+
+
+def install_q3c_extension(config, dry_run=False):
+
+    # connect to the targetDB
+    db = TargetDB(**config["targetdb"]["db"])
+    db.connect()
+
+    logger.info("Installing q3c extension.")
+    try:
+        db.execute_query("CREATE EXTENSION IF NOT EXISTS q3c", dry_run=dry_run)
+    except Exception as e:
+        logger.error(f"Error installing q3c extension: {e}")
+        raise e
+
+    # close the connection
+    db.close()
 
 
 def generate_schema_markdown(output_file=None):
