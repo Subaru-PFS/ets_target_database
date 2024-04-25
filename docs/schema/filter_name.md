@@ -9,9 +9,9 @@ The `filter_name` table is used to store the information on astronomical filters
 Here are the columns in the `filter_name` table:
 
 | Column Name             | Type     | Description                                                | Required[^1] | Default |
-| ----------------------- | -------- | ---------------------------------------------------------- | ------------ | ------- |
+|-------------------------|----------|------------------------------------------------------------|--------------|---------|
 | filter_name             | str      | The name of the filter.                                    | \*           |         |
-| filter_name_description | str      | A brief description of the filter.                         |              |         |
+| filter_name_description | str      | A brief description of the filter.                         |              | ""      |
 | created_at              | datetime | The date and time in UTC when the record was created.      |              |         |
 | updated_at              | datetime | The date and time in UTC when the record was last updated. |              |         |
 
@@ -31,7 +31,7 @@ Please ask the data reduction pipeline team for the list of filters before addin
 The fillowing `filter_name`s are available:
 
 | filter_name | filter_name_description     |
-| ----------- | --------------------------- |
+|-------------|-----------------------------|
 | g_hsc       | HSC g filter                |
 | r_old_hsc   | HSC r filter (old r filter) |
 | r2_hsc      | HSC r2 filter               |
