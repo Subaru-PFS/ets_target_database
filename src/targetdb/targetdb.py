@@ -5,6 +5,7 @@ import io
 import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.sql import text
 
 from loguru import logger
 
@@ -293,3 +294,27 @@ class TargetDB(object):
         conn.close()
         data.seek(0)
         return data
+
+    def execute_query(self, query, dry_run=False):
+        """
+        Description
+        -----------
+            Execute a SQL query
+        Parameters
+        ----------
+            query : `string`
+        Returns
+        -------
+            None
+        Note
+        ----
+        """
+        try:
+            self.session.execute(text(query))
+            if dry_run:
+                self.session.rollback()
+            else:
+                self.session.commit()
+        except Exception as e:
+            self.session.rollback()
+            raise e
