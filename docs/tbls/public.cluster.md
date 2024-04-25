@@ -14,7 +14,7 @@
 | d_ra | double precision |  | true |  |  | RA(target) - RA(cluster) (degree) |
 | d_dec | double precision |  | true |  |  | Dec(target) - Dec(cluster) (degree) |
 | input_catalog_id | integer |  | true |  | [public.input_catalog](public.input_catalog.md) | Input catalog ID from the input_catalog table |
-| created_at | timestamp without time zone |  | true |  |  | UTC |
+| created_at | timestamp without time zone | timezone('utc'::text, CURRENT_TIMESTAMP) | true |  |  | UTC |
 | updated_at | timestamp without time zone |  | true |  |  | UTC |
 
 ## Constraints

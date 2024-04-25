@@ -175,7 +175,9 @@ class target(Base):
         default=1.0,
         comment="Priority of the target specified by the observer within the proposal",
     )
-    effective_exptime = Column(Float, comment="Requested effective exposure time (s)")
+    effective_exptime = Column(
+        Float, nullable=False, comment="Requested effective exposure time (s)"
+    )
 
     is_medium_resolution = Column(
         Boolean,

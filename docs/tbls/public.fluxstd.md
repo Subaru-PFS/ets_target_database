@@ -65,7 +65,7 @@
 | teff_gspphot_upper | double precision |  | true |  |  | Upper confidence level (84%) of effective temperature inferred by GSP-phot Aeneas [K] |
 | is_fstar_gaia | boolean |  | true |  |  | Flag for F-star from Gaia (Teff=6000-7500K if True) |
 | version | varchar |  | false |  |  | Version string of the F-star selection |
-| created_at | timestamp without time zone |  | true |  |  | The date and time in UTC when the record was created |
+| created_at | timestamp without time zone | timezone('utc'::text, CURRENT_TIMESTAMP) | true |  |  | The date and time in UTC when the record was created |
 | updated_at | timestamp without time zone |  | true |  |  | The date and time in UTC when the record was last updated |
 
 ## Constraints

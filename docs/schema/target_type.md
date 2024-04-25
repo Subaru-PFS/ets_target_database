@@ -5,10 +5,10 @@ The `target_type` table contains information about the different types of target
 ## Columns
 
 | Column Name             | Data Type | Description                                                | Unit | Required[^1] | Default |
-|-------------------------|-----------|------------------------------------------------------------|------|--------------|---------|
-| target_type_id          | int       | The unique identifier of the target type                   |      | *            |         |
-| target_type_name        | str       | The name of the target type                                |      | *            |         |
-| target_type_description | str       | A detailed description of the target type                  |      |              |         |
+| ----------------------- | --------- | ---------------------------------------------------------- | ---- | ------------ | ------- |
+| target_type_id          | int       | The unique identifier of the target type                   |      | \*           |         |
+| target_type_name        | str       | The name of the target type                                |      | \*           |         |
+| target_type_description | str       | A detailed description of the target type                  |      |              | ""      |
 | created_at              | datetime  | The date and time in UTC when the record was created.      |      |              |         |
 | updated_at              | datetime  | The date and time in UTC when the record was last updated. |      |              |         |
 
@@ -25,7 +25,7 @@ The `target_type` table contains information about the different types of target
 ## Available target types
 
 | target_type_id | target_type_name | target_type_description                                                       |
-|---------------:|------------------|-------------------------------------------------------------------------------|
+| -------------: | ---------------- | ----------------------------------------------------------------------------- |
 |              1 | SCIENCE          | the fiber is intended to be on a science target                               |
 |              2 | SKY              | the fiber is intended to be on blank sky, and used for sky subtraction        |
 |              3 | FLUXSTD          | the fiber is intended to be on a flux standard, and used for flux calibration |

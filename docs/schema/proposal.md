@@ -9,18 +9,18 @@ The `proposal` table is used to store the information on proposals.
 Here are the columns in the `proposal` table:
 
 | Column Name          | Type     | Description                                                | Unit | Required[^1] | Default |
-|----------------------|----------|------------------------------------------------------------|------|--------------|---------|
-| proposal_id          | str      | Proposal-ID (e.g, S23B-QN901)                              |      | *            |         |
-| group_id             | str      | Group ID issued by STARS (e.g., o21195)                    |      |              |         |
-| pi_first_name        | str      | PI's first name                                            |      |              |         |
-| pi_last_name         | str      | PI's last name                                             |      |              |         |
-| pi_middle_name       | str      | PI's middle name                                           |      |              |         |
-| rank                 | float    | TAC score (0 to 10, higher is better)                      |      |              |         |
-| grade                | str      | TAC grade (A, B, C, D, F)                                  |      |              |         |
+| -------------------- | -------- | ---------------------------------------------------------- | ---- | ------------ | ------- |
+| proposal_id          | str      | Proposal-ID (e.g, S23B-QN901)                              |      | \*           |         |
+| group_id             | str      | Group ID issued by STARS (e.g., o21195)                    |      | \*           |         |
+| pi_first_name        | str      | PI's first name                                            |      |              | ""      |
+| pi_last_name         | str      | PI's last name                                             |      | \*           |         |
+| pi_middle_name       | str      | PI's middle name                                           |      |              | ""      |
+| rank                 | float    | TAC score (0 to 10, higher is better)                      |      | \*           |         |
+| grade                | str      | TAC grade (A, B, C, D, F)                                  |      | \*           |         |
 | allocated_time       | float    | Total allocated fiberhours                                 | h    |              |         |
-| allocated_time_lr    | float    | Allocated fiberhours for low-resolution mode               | h    |              |         |
-| allocated_time_mr    | float    | Allocated fiberhours for medium-resolution mode            | h    |              |         |
-| proposal_category_id | int      | `proposal_category_id` in the `proposal_category` table    |      |              |         |
+| allocated_time_lr    | float    | Allocated fiberhours for low-resolution mode               | h    |              | 0       |
+| allocated_time_mr    | float    | Allocated fiberhours for medium-resolution mode            | h    |              | 0       |
+| proposal_category_id | int      | `proposal_category_id` in the `proposal_category` table    |      |              | 0       |
 | created_at           | datetime | The date and time in UTC when the record was created.      |      |              |         |
 | updated_at           | datetime | The date and time in UTC when the record was last updated. |      |              |         |
 

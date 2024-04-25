@@ -23,6 +23,7 @@ class filter_name(Base):
     )
     filter_name_description = Column(
         String,
+        default="",
         comment="Description of the filter",
     )
 

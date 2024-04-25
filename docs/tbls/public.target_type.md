@@ -9,7 +9,7 @@
 | target_type_id | integer |  | false | [public.sky](public.sky.md) [public.fluxstd](public.fluxstd.md) [public.target](public.target.md) |  | Unique identifier for target types |
 | target_type_name | varchar |  | false |  |  | Name for the target type. |
 | target_type_description | varchar |  | true |  |  | Description of the target type |
-| created_at | timestamp without time zone |  | true |  |  | The date and time in UTC when the record was created |
+| created_at | timestamp without time zone | timezone('utc'::text, CURRENT_TIMESTAMP) | true |  |  | The date and time in UTC when the record was created |
 | updated_at | timestamp without time zone |  | true |  |  | The date and time in UTC when the record was last updated |
 
 ## Constraints

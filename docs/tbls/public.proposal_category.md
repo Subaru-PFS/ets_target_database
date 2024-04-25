@@ -7,9 +7,9 @@
 | Name | Type | Default | Nullable | Children | Parents | Comment |
 | ---- | ---- | ------- | -------- | -------- | ------- | ------- |
 | proposal_category_id | integer |  | false | [public.proposal](public.proposal.md) |  | Unique identifier of proposal category |
-| proposal_category_name | varchar |  | true |  |  | Proposal category name (e.g., Openuse, Keck, Gemini, and UH) |
+| proposal_category_name | varchar |  | false |  |  | Proposal category name (e.g., Openuse, Keck, Gemini, and UH) |
 | proposal_category_description | varchar |  | true |  |  | Proposal category description (e.g., Openuse, Time exchange, etc. |
-| created_at | timestamp without time zone |  | true |  |  | The date and time in UTC when the record was created |
+| created_at | timestamp without time zone | timezone('utc'::text, CURRENT_TIMESTAMP) | true |  |  | The date and time in UTC when the record was created |
 | updated_at | timestamp without time zone |  | true |  |  | The date and time in UTC when the record was last updated |
 
 ## Constraints
