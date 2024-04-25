@@ -9,7 +9,7 @@ The `proposal` table is used to store the information on proposals.
 Here are the columns in the `proposal` table:
 
 | Column Name          | Type     | Description                                                | Unit | Required[^1] | Default |
-| -------------------- | -------- | ---------------------------------------------------------- | ---- | ------------ | ------- |
+|----------------------|----------|------------------------------------------------------------|------|--------------|---------|
 | proposal_id          | str      | Proposal-ID (e.g, S23B-QN901)                              |      | \*           |         |
 | group_id             | str      | Group ID issued by STARS (e.g., o21195)                    |      | \*           |         |
 | pi_first_name        | str      | PI's first name                                            |      |              | ""      |
@@ -29,6 +29,7 @@ Here are the columns in the `proposal` table:
 ## Unique constraint
 
 - `proposal_id` is the primary key of the table and must be unique.
+- `group_id` is not set as a unique constraint, but will be checked when inserting by using the CLI tool.
 
 ## Foreign key constraints
 
