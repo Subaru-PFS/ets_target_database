@@ -398,7 +398,7 @@ def insert(
     from_uploader: Annotated[
         bool,
         typer.Option(
-            "--from_uploader",
+            "--from-uploader",
             help="Flag to indicate the data is coming from the PFS Target Uploader. Only required for the `target` table.",
         ),
     ] = False,
@@ -480,7 +480,7 @@ def update(
     from_uploader: Annotated[
         bool,
         typer.Option(
-            "--from_uploader",
+            "--from-uploader",
             help="Flag to indicate the data is coming from the PFS Target Uploader. Only required for the `target` table.",
         ),
     ] = False,

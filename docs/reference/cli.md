@@ -32,7 +32,6 @@ The command-line interface (CLI) tool `pfs-targetdb-cli` is provided to work wit
 
     The `schemacrawler` section is required only if you want to draw an ER diagram of the database schema with SchemaCrawler.
 
-
 ## `pfs-targetdb-cli`
 
 PFS Target Database CLI Tool
@@ -186,7 +185,7 @@ $ pfs-targetdb-cli insert [OPTIONS] INPUT_FILE
 * `-t, --table [filter_name|fluxstd|input_catalog|proposal|proposal_category|sky|target|target_type]`: Table name to insert rows.  [required]
 * `--commit`: Commit changes to the database.
 * `--fetch`: Fetch data from database a the end.
-* `--from_uploader`: Flag to indicate the data is coming from the PFS Target Uploader. Only required for the `target` table.
+* `--from-uploader`: Flag to indicate the data is coming from the PFS Target Uploader. Only required for the `target` table.
 * `--upload_id TEXT`: Upload ID issued by the PFS Target Uploader. Only required for the `target` table.
 * `--proposal_id TEXT`: Proposal ID (e.g., S24B-QT001). Only required for the `target` table.
 * `-v, --verbose`: Verbose output.
@@ -344,10 +343,8 @@ $ pfs-targetdb-cli update [OPTIONS] INPUT_FILE
 * `-t, --table [filter_name|fluxstd|input_catalog|proposal|proposal_category|sky|target|target_type]`: Table name to update rows.  [required]
 * `--commit`: Commit changes to the database.
 * `--fetch`: Fetch data from database a the end.
-* `--from_uploader`: Flag to indicate the data is coming from the PFS Target Uploader. Only required for the `target` table.
+* `--from-uploader`: Flag to indicate the data is coming from the PFS Target Uploader. Only required for the `target` table.
 * `--upload_id TEXT`: Upload ID issued by the PFS Target Uploader. Only required for the `target` table
 * `--proposal_id TEXT`: Proposal ID (e.g., S24B-QT001). Only required for the `target` table
 * `--verbose`: Verbose output.
 * `--help`: Show this message and exit.
-
-
