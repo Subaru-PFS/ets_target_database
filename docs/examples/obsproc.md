@@ -233,7 +233,7 @@ $ pfs-targetdb-cli insert-targets ./input_catalogs.csv -c db_config.toml --commi
 You can also insert individual target lists into the database using the following command:
 
 ```
-$ pfs-targetdb-cli insert 20240221-001431-d6e94eae259faf4e/target_d6e94eae259faf4e.csv -c db_config.toml -t target --from-uploader --upload_id d6e94eae259faf4e --proposal_id S99A-QT001 --commit
-$ pfs-targetdb-cli insert 20240228-050253-5f695375c60f34c7/target_5f695375c60f34c7.csv -c db_config.toml -t target --from-uploader --upload_id 5f695375c60f34c7 --proposal_id S99A-QT002 --commit
-$ pfs-targetdb-cli insert 20240229-013729-ba59115da8084653/target_ba59115da8084653.csv -c db_config.toml -t target --from-uploader --upload_id ba59115da8084653 --proposal_id S99A-QT003 --commit
+$ pfs-targetdb-cli insert 20240221-001431-d6e94eae259faf4e/target_d6e94eae259faf4e.ecsv -c db_config.toml -t target --from-uploader --upload_id d6e94eae259faf4e --proposal_id S99A-QT001 --commit
+$ pfs-targetdb-cli insert 20240228-050253-5f695375c60f34c7/target_5f695375c60f34c7.ecsv -c db_config.toml -t target --from-uploader --upload_id 5f695375c60f34c7 --proposal_id S99A-QT002 --commit
+$ pfs-targetdb-cli insert 20240229-013729-ba59115da8084653/target_ba59115da8084653.ecsv -c db_config.toml -t target --from-uploader --upload_id ba59115da8084653 --proposal_id S99A-QT003 --commit
 ```
