@@ -210,7 +210,7 @@ $ pfs-targetdb-cli insert input_catalogs.csv -c db_config.toml --table input_cat
 You need to transfer the target lists from the uploader to the local storage.
 
 ```console
-$ pfs-targetdb-cli transfer-target input_catalogs.csv -c db_config.toml
+$ pfs-targetdb-cli transfer-targets input_catalogs.csv -c db_config.toml
 ```
 
 This command will transfer the target lists from the uploader to the local storage.
