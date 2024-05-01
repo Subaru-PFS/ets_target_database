@@ -532,6 +532,7 @@ def add_backref_values(df, db=None, table=None):
             "The number of rows in the DataFrame is different before and after the foreign key lookup."
         )
 
+    df_tmp.drop(columns=["created_at", "updated_at"], inplace=True)
     return df_tmp
 
 
