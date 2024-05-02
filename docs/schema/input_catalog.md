@@ -14,7 +14,7 @@ Here are the columns in the `input_catalog` table:
 | input_catalog_name        | str      | The name of the input catalog                                       | \*           |         |
 | input_catalog_description | str      | A brief description of the input catalog                            |              | ""      |
 | upload_id                 | str      | A 16-character string assigned at the submission of the target list |              | ""      |
-| active                    | boolean  | A flag to indicate if the catalog is active                         |              | True    |
+| active                    | bool     | A flag to indicate if the catalog is active                         |              | True    |
 | created_at                | datetime | The date and time in UTC when the record was created.               |              |         |
 | updated_at                | datetime | The date and time in UTC when the record was last updated.          |              |         |
 
