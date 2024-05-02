@@ -6,7 +6,7 @@
 | ---- | ------- | ------- | ---- |
 | [public.filter_name](public.filter_name.md) | 4 |  | BASE TABLE |
 | [public.proposal_category](public.proposal_category.md) | 5 |  | BASE TABLE |
-| [public.input_catalog](public.input_catalog.md) | 6 |  | BASE TABLE |
+| [public.input_catalog](public.input_catalog.md) | 7 |  | BASE TABLE |
 | [public.target_type](public.target_type.md) | 5 |  | BASE TABLE |
 | [public.proposal](public.proposal.md) | 13 |  | BASE TABLE |
 | [public.sky](public.sky.md) | 14 |  | BASE TABLE |
@@ -43,13 +43,13 @@
 | public.q3c_in_poly | bool | double precision, double precision, polygon | FUNCTION |
 | public.q3c_join | bool | leftra double precision, leftdec double precision, rightra double precision, rightdec double precision, radius double precision | FUNCTION |
 | public.q3c_join | bool | leftra double precision, leftdec double precision, rightra real, rightdec real, radius double precision | FUNCTION |
-| public.q3c_poly_query | bool | real, real, double precision[] | FUNCTION |
 | public.q3c_join_pm | bool | left_ra double precision, left_dec double precision, left_pmra double precision, left_pmdec double precision, cosdec_flag integer, left_epoch double precision, right_ra double precision, right_dec double precision, right_epoch double precision, max_epoch_delta double precision, radius double precision | FUNCTION |
 | public.q3c_ellipse_join | bool | leftra double precision, leftdec double precision, rightra double precision, rightdec double precision, semimajoraxis double precision, axisratio double precision, pa double precision | FUNCTION |
 | public.q3c_radial_query | bool | real, real, double precision, double precision, double precision | FUNCTION |
 | public.q3c_radial_query | bool | double precision, double precision, double precision, double precision, double precision | FUNCTION |
 | public.q3c_ellipse_query | bool | ra_col double precision, dec_col double precision, ra_ell double precision, dec_ell double precision, semimajax double precision, axis_ratio double precision, pa double precision | FUNCTION |
 | public.q3c_poly_query | bool | double precision, double precision, double precision[] | FUNCTION |
+| public.q3c_poly_query | bool | real, real, double precision[] | FUNCTION |
 | public.q3c_poly_query | bool | double precision, double precision, polygon | FUNCTION |
 | public.q3c_poly_query | bool | real, real, polygon | FUNCTION |
 
@@ -99,6 +99,7 @@ erDiagram
   varchar input_catalog_name
   varchar input_catalog_description
   varchar_16_ upload_id
+  boolean active
   timestamp_without_time_zone created_at
   timestamp_without_time_zone updated_at
 }

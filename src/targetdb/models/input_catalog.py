@@ -1,11 +1,6 @@
 #!/usr/bin/env python
 
-from sqlalchemy import (
-    Column,
-    DateTime,
-    Integer,
-    String,
-)
+from sqlalchemy import Boolean, Column, DateTime, Integer, String
 from sqlalchemy.schema import Identity
 
 from . import (
@@ -45,6 +40,11 @@ class input_catalog(Base):
         default="",
         comment="A 8-bit hex string (16 characters) assigned at the submission of the target list (default: empty string)",
     )
+    active = Column(
+        Boolean,
+        default=True,
+        comment="Flag to indicate if the input catalog is active (default: True)",
+    )
     created_at = Column(
         DateTime,
         comment=comment_created_at,
@@ -62,6 +62,7 @@ class input_catalog(Base):
         input_catalog_name,
         input_catalog_description,
         upload_id,
+        active,
         created_at,
         updated_at,
     ):
@@ -69,5 +70,6 @@ class input_catalog(Base):
         self.input_catalog_name = input_catalog_name
         self.input_catalog_description = input_catalog_description
         self.upload_id = upload_id
+        self.active = active
         self.created_at = created_at
         self.updated_at = updated_at
