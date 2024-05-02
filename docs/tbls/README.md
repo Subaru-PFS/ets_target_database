@@ -6,7 +6,7 @@
 | ---- | ------- | ------- | ---- |
 | [public.filter_name](public.filter_name.md) | 4 |  | BASE TABLE |
 | [public.proposal_category](public.proposal_category.md) | 5 |  | BASE TABLE |
-| [public.input_catalog](public.input_catalog.md) | 6 |  | BASE TABLE |
+| [public.input_catalog](public.input_catalog.md) | 7 |  | BASE TABLE |
 | [public.target_type](public.target_type.md) | 5 |  | BASE TABLE |
 | [public.proposal](public.proposal.md) | 13 |  | BASE TABLE |
 | [public.sky](public.sky.md) | 14 |  | BASE TABLE |
@@ -99,6 +99,7 @@ erDiagram
   varchar input_catalog_name
   varchar input_catalog_description
   varchar_16_ upload_id
+  boolean active
   timestamp_without_time_zone created_at
   timestamp_without_time_zone updated_at
 }
