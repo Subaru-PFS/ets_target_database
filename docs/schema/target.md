@@ -9,7 +9,7 @@ The `target` table is used to store the information on flux standard stars.
 Here are the columns in the `target` table:
 
 | Column Name            | Data Type | Description                                                                                      | Unit   | Required[^1] | Default |
-| ---------------------- | --------- | ------------------------------------------------------------------------------------------------ | ------ | ------------ | ------- |
+|------------------------|-----------|--------------------------------------------------------------------------------------------------|--------|--------------|---------|
 | target_id              | int64     | The unique identifier of the target.                                                             |        | \*           |         |
 | proposal_id            | str       | `proposal_id` in the `proposal` table.                                                           |        | \*           |         |
 | ob_code                | str       | The unique identifier to describe a combination of the object, observing mode, and exposure time |        | \*           |         |
@@ -75,7 +75,8 @@ Here are the columns in the `target` table:
 ## Unique constraints
 
 - `target_id` is set as the primary key with auto-increment.
-- Set of `(obj_id, input_catalog_id, ob_code, obj_id)` must be unique.
+- Set of `(proposal_id, ob_code, input_catalog_id, obj_id, is_medium_resolution)` must be unique.
+- Set of `(proposal_id, ob_code)` must be unique.
 
 ## Foreign keys
 
