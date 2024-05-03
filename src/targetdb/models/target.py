@@ -30,12 +30,20 @@ from . import (
 class target(Base):
     __tablename__ = "target"
     __table_args__ = (
+        # all combined
         UniqueConstraint(
             "proposal_id",
             "ob_code",
             "input_catalog_id",
             "obj_id",
-            name="uq_proposal_id_ob_code_input_catalog_id_obj_id",
+            "is_medium_resolution",
+            name="target_propid_obcode_catid_objid_resolution_key",
+        ),
+        # requirement by the OCS team to track the progress
+        UniqueConstraint(
+            "proposal_id",
+            "ob_code",
+            name="target_propid_obcode_key",
         ),
         Index("target_q3c_ang2ipix_idx", sqlalchemy.text("q3c_ang2ipix(ra, dec)")),
         {},
