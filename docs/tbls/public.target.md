@@ -80,14 +80,16 @@
 | target_target_type_id_fkey | FOREIGN KEY | FOREIGN KEY (target_type_id) REFERENCES target_type(target_type_id) |
 | target_proposal_id_fkey | FOREIGN KEY | FOREIGN KEY (proposal_id) REFERENCES proposal(proposal_id) |
 | target_pkey | PRIMARY KEY | PRIMARY KEY (target_id) |
-| uq_proposal_id_ob_code_input_catalog_id_obj_id | UNIQUE | UNIQUE (proposal_id, ob_code, input_catalog_id, obj_id) |
+| target_propid_obcode_catid_objid_resolution_key | UNIQUE | UNIQUE (proposal_id, ob_code, input_catalog_id, obj_id, is_medium_resolution) |
+| target_propid_obcode_key | UNIQUE | UNIQUE (proposal_id, ob_code) |
 
 ## Indexes
 
 | Name | Definition |
 | ---- | ---------- |
 | target_pkey | CREATE UNIQUE INDEX target_pkey ON public.target USING btree (target_id) |
-| uq_proposal_id_ob_code_input_catalog_id_obj_id | CREATE UNIQUE INDEX uq_proposal_id_ob_code_input_catalog_id_obj_id ON public.target USING btree (proposal_id, ob_code, input_catalog_id, obj_id) |
+| target_propid_obcode_catid_objid_resolution_key | CREATE UNIQUE INDEX target_propid_obcode_catid_objid_resolution_key ON public.target USING btree (proposal_id, ob_code, input_catalog_id, obj_id, is_medium_resolution) |
+| target_propid_obcode_key | CREATE UNIQUE INDEX target_propid_obcode_key ON public.target USING btree (proposal_id, ob_code) |
 | target_q3c_ang2ipix_idx | CREATE INDEX target_q3c_ang2ipix_idx ON public.target USING btree (q3c_ang2ipix(ra, "dec")) |
 
 ## Relations
