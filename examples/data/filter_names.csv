@@ -1,21 +1,21 @@
-filter_name,filter_name_description,created_at,updated_at
-g_hsc,HSC g filter,2022-12-07 05:58:23.560891,2022-12-07 05:58:23.560891
-r_old_hsc,HSC r filter (old r filter),2022-12-07 05:58:23.560891,2022-12-07 05:58:23.560891
-r2_hsc,HSC r2 filter,2022-12-07 05:58:23.560891,2022-12-07 05:58:23.560891
-i_old_hsc,HSC i filter (old i filter),2022-12-07 05:58:23.560891,2022-12-07 05:58:23.560891
-i2_hsc,HSC i2 filter,2022-12-07 05:58:23.560891,2022-12-07 05:58:23.560891
-z_hsc,HSC z filter,2022-12-07 05:58:23.560891,2022-12-07 05:58:23.560891
-y_hsc,HSC Y filter,2022-12-07 05:58:23.560891,2022-12-07 05:58:23.560891
-g_ps1,Pan-STARRS1 g filter,2022-12-07 05:58:23.560891,2022-12-07 05:58:23.560891
-r_ps1,Pan-STARRS1 r filter,2022-12-07 05:58:23.560891,2022-12-07 05:58:23.560891
-i_ps1,Pan-STARRS1 i filter,2022-12-07 05:58:23.560891,2022-12-07 05:58:23.560891
-z_ps1,Pan-STARRS1 z filter,2022-12-07 05:58:23.560891,2022-12-07 05:58:23.560891
-y_ps1,Pan-STARRS1 y filter,2022-12-07 05:58:23.560891,2022-12-07 05:58:23.560891
-bp_gaia,Gaia BP filter,2022-12-07 05:58:23.560891,2022-12-07 05:58:23.560891
-rp_gaia,Gaia RP filter,2022-12-07 05:58:23.560891,2022-12-07 05:58:23.560891
-g_gaia,Gaia G filter,2022-12-07 05:58:23.560891,2022-12-07 05:58:23.560891
-u_sdss,SDSS u filter,2022-12-07 05:58:23.560891,2022-12-07 05:58:23.560891
-g_sdss,SDSS g filter,2022-12-07 05:58:23.560891,2022-12-07 05:58:23.560891
-r_sdss,SDSS r filter,2022-12-07 05:58:23.560891,2022-12-07 05:58:23.560891
-i_sdss,SDSS i filter,2022-12-07 05:58:23.560891,2022-12-07 05:58:23.560891
-z_sdss,SDSS z filter,2022-12-07 05:58:23.560891,2022-12-07 05:58:23.560891
+filter_name,filter_name_description
+g_hsc,HSC g filter
+r_old_hsc,HSC r filter (old r filter)
+r2_hsc,HSC r2 filter
+i_old_hsc,HSC i filter (old i filter)
+i2_hsc,HSC i2 filter
+z_hsc,HSC z filter
+y_hsc,HSC Y filter
+g_ps1,Pan-STARRS1 g filter
+r_ps1,Pan-STARRS1 r filter
+i_ps1,Pan-STARRS1 i filter
+z_ps1,Pan-STARRS1 z filter
+y_ps1,Pan-STARRS1 y filter
+bp_gaia,Gaia BP filter
+rp_gaia,Gaia RP filter
+g_gaia,Gaia G filter
+u_sdss,SDSS u filter
+g_sdss,SDSS g filter
+r_sdss,SDSS r filter
+i_sdss,SDSS i filter
+z_sdss,SDSS z filter
