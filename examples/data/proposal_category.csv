@@ -1,5 +1,5 @@
-proposal_category_id,proposal_category_name,proposal_category_description,created_at,updated_at
-1,openuse,Subaru openuse proposal,2022-04-30 02:07:08.383631,2022-04-30 02:07:08.383631
-2,keck,Subaru/Keck time exchange proposal,2022-04-30 02:07:08.383631,2022-04-30 02:07:08.383631
-3,gemini,Subaru/Gemini time exchange proposal,2022-04-30 02:07:08.383631,2022-04-30 02:07:08.383631
-4,uh,University of Hawaii proposal,2022-04-30 02:07:08.383631,2022-04-30 02:07:08.383631
+proposal_category_id,proposal_category_name,proposal_category_description
+1,openuse,Subaru openuse proposal
+2,keck,Subaru/Keck time exchange proposal
+3,gemini,Subaru/Gemini time exchange proposal
+4,uh,University of Hawaii proposal
