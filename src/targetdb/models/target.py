@@ -187,6 +187,13 @@ class target(Base):
         Float, nullable=False, comment="Requested effective exposure time (s)"
     )
 
+    single_exptime = Column(
+        Float,
+        nullable=False,
+        default=900,
+        comment="Individual exposure time (s)",
+    )
+
     is_medium_resolution = Column(
         Boolean,
         default=False,
@@ -298,6 +305,7 @@ class target(Base):
         #
         priority,
         effective_exptime,
+        single_exptime,
         is_medium_resolution,
         #
         qa_relative_throughput,
@@ -364,6 +372,7 @@ class target(Base):
         #
         self.priority = priority
         self.effective_exptime = effective_exptime
+        self.single_exptime = single_exptime
         self.is_medium_resolution = is_medium_resolution
         #
         self.qa_relative_throughput = qa_relative_throughput

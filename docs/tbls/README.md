@@ -11,7 +11,7 @@
 | [public.proposal](public.proposal.md) | 13 |  | BASE TABLE |
 | [public.sky](public.sky.md) | 14 |  | BASE TABLE |
 | [public.fluxstd](public.fluxstd.md) | 61 |  | BASE TABLE |
-| [public.target](public.target.md) | 59 |  | BASE TABLE |
+| [public.target](public.target.md) | 60 |  | BASE TABLE |
 | [public.cluster](public.cluster.md) | 10 |  | BASE TABLE |
 
 ## Stored procedures and functions
@@ -257,6 +257,7 @@ erDiagram
   varchar filter_j FK
   double_precision priority
   double_precision effective_exptime
+  double_precision single_exptime
   boolean is_medium_resolution
   double_precision qa_relative_throughput
   double_precision qa_relative_noise

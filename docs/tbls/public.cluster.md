@@ -104,6 +104,7 @@ erDiagram
   varchar filter_j FK
   double_precision priority
   double_precision effective_exptime
+  double_precision single_exptime
   boolean is_medium_resolution
   double_precision qa_relative_throughput
   double_precision qa_relative_noise

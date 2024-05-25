@@ -62,6 +62,7 @@ Here are the columns in the `target` table:
 | filter_j               | str       | Photometric band used to measure the PSF flux in _j_-band                                        |        | (\*)         |         |
 | priority               | float     | Priority of the target for observation.                                                          |        |              | 1.0     |
 | effective_exptime      | float     | Effective exposure time required to complete the target                                          | s      | \*           |         |
+| single_exptime         | float     | Individual exposure time                                                                         | s      |              | 900     |
 | is_medium_resolution   | bool      | `True` if the target is observed with the medium-resolution mode                                 |        |              | False   |
 | qa_relative_throughput | float     | Quality assurance metric for relative throughput.                                                |        |              | 1.0     |
 | qa_relative_noise      | float     | Quality assurance metric for relative noise.                                                     |        |              | 1.0     |
