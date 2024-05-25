@@ -58,6 +58,7 @@
 | filter_j | varchar |  | true |  | [public.filter_name](public.filter_name.md) | j-band filter (j_mko, etc.) |
 | priority | double precision |  | true |  |  | Priority of the target specified by the observer within the proposal |
 | effective_exptime | double precision |  | false |  |  | Requested effective exposure time (s) |
+| single_exptime | double precision |  | false |  |  | Individual exposure time (s) |
 | is_medium_resolution | boolean |  | true |  |  | True if the medium resolution mode is requested |
 | qa_relative_throughput | double precision |  | true |  |  | Relative throughput to the reference value requested by the observer (default: 1.0) |
 | qa_relative_noise | double precision |  | true |  |  | Relative noise to the reference value requested by the observer (default: 1.0) |
@@ -161,6 +162,7 @@ erDiagram
   varchar filter_j FK
   double_precision priority
   double_precision effective_exptime
+  double_precision single_exptime
   boolean is_medium_resolution
   double_precision qa_relative_throughput
   double_precision qa_relative_noise
