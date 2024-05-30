@@ -9,7 +9,7 @@ dependencies = [
     "alembic",
     "astropy",
     "loguru",
-    "numpy",
+    "numpy<2.0",
     "openpyxl",
     "pandas",
     "psycopg2-binary",
