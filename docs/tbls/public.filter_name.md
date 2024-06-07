@@ -168,6 +168,7 @@ erDiagram
   double_precision qa_relative_throughput
   double_precision qa_relative_noise
   double_precision qa_reference_lambda
+  varchar qa_reference_arm FK
   boolean is_cluster
   timestamp_without_time_zone created_at
   timestamp_without_time_zone updated_at

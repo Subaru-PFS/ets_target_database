@@ -1,4 +1,4 @@
-# public.proposal
+# public.pfs_arm
 
 ## Description
 
@@ -6,17 +6,8 @@
 
 | Name | Type | Default | Nullable | Children | Parents | Comment |
 | ---- | ---- | ------- | -------- | -------- | ------- | ------- |
-| proposal_id | varchar |  | false | [public.target](public.target.md) |  | Unique identifier for proposal (e.g, S21B-OT06?) |
-| group_id | varchar |  | false |  |  | Group ID in STARS (e.g., o21195?) |
-| pi_first_name | varchar |  | true |  |  | PI's first name |
-| pi_last_name | varchar |  | false |  |  | PI's last name |
-| pi_middle_name | varchar |  | true |  |  | PI's middle name |
-| rank | double precision |  | false |  |  | TAC score |
-| grade | varchar |  | false |  |  | TAC grade (A/B/C/F in the case of HSC queue) |
-| allocated_time_total | double precision |  | true |  |  | Total fiberhours allocated by TAC (hour) |
-| allocated_time_lr | double precision |  | true |  |  | Total fiberhours for the low-resolution mode allocated by TAC (hour) |
-| allocated_time_mr | double precision |  | true |  |  | Total fiberhours for the medium-resolution mode allocated by TAC (hour) |
-| proposal_category_id | integer |  | true |  | [public.proposal_category](public.proposal_category.md) |  |
+| name | varchar |  | false | [public.target](public.target.md) |  | Arm name (e.g., 'b', 'r', 'n', and 'm') |
+| description | varchar |  | true |  |  | Arm description |
 | created_at | timestamp without time zone | timezone('utc'::text, CURRENT_TIMESTAMP) | true |  |  | The date and time in UTC when the record was created |
 | updated_at | timestamp without time zone |  | true |  |  | The date and time in UTC when the record was last updated |
 
@@ -24,35 +15,24 @@
 
 | Name | Type | Definition |
 | ---- | ---- | ---------- |
-| proposal_proposal_category_id_fkey | FOREIGN KEY | FOREIGN KEY (proposal_category_id) REFERENCES proposal_category(proposal_category_id) |
-| proposal_pkey | PRIMARY KEY | PRIMARY KEY (proposal_id) |
+| pfs_arm_pkey | PRIMARY KEY | PRIMARY KEY (name) |
 
 ## Indexes
 
 | Name | Definition |
 | ---- | ---------- |
-| proposal_pkey | CREATE UNIQUE INDEX proposal_pkey ON public.proposal USING btree (proposal_id) |
+| pfs_arm_pkey | CREATE UNIQUE INDEX pfs_arm_pkey ON public.pfs_arm USING btree (name) |
 
 ## Relations
 
 ```mermaid
 erDiagram
 
-"public.target" }o--o| "public.proposal" : "FOREIGN KEY (proposal_id) REFERENCES proposal(proposal_id)"
-"public.proposal" }o--o| "public.proposal_category" : "FOREIGN KEY (proposal_category_id) REFERENCES proposal_category(proposal_category_id)"
+"public.target" }o--o| "public.pfs_arm" : "FOREIGN KEY (qa_reference_arm) REFERENCES pfs_arm(name)"
 
-"public.proposal" {
-  varchar proposal_id
-  varchar group_id
-  varchar pi_first_name
-  varchar pi_last_name
-  varchar pi_middle_name
-  double_precision rank
-  varchar grade
-  double_precision allocated_time_total
-  double_precision allocated_time_lr
-  double_precision allocated_time_mr
-  integer proposal_category_id FK
+"public.pfs_arm" {
+  varchar name
+  varchar description
   timestamp_without_time_zone created_at
   timestamp_without_time_zone updated_at
 }
@@ -116,13 +96,6 @@ erDiagram
   double_precision qa_reference_lambda
   varchar qa_reference_arm FK
   boolean is_cluster
-  timestamp_without_time_zone created_at
-  timestamp_without_time_zone updated_at
-}
-"public.proposal_category" {
-  integer proposal_category_id
-  varchar proposal_category_name
-  varchar proposal_category_description
   timestamp_without_time_zone created_at
   timestamp_without_time_zone updated_at
 }

@@ -17,6 +17,7 @@ nav:
     - filter_name: schema/filter_name.md
     - fluxstd: schema/fluxstd.md
     - input_catalog: schema/input_catalog.md
+    - pfs_arm: schema/pfs_arm.md
     - proposal: schema/proposal.md
     - proposal_category: schema/proposal_category.md
     - sky: schema/sky.md
@@ -38,6 +39,7 @@ nav:
     - tbls/public.filter_name.md
     - tbls/public.fluxstd.md
     - tbls/public.input_catalog.md
+    - tbls/public.pfs_arm.md
     - tbls/public.proposal.md
     - tbls/public.proposal_category.md
     - tbls/public.sky.md
