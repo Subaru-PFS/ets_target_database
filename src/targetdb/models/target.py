@@ -219,7 +219,7 @@ class target(Base):
     qa_reference_arm = Column(
         String,
         ForeignKey("pfs_arm.name"),
-        comment="Reference arm to evaluate effective exposure time ['b'|'r'|'n'|'m']",
+        comment="Reference arm to evaluate effective exposure time ('b', 'r', 'n', 'm')",
     )
 
     is_cluster = Column(
