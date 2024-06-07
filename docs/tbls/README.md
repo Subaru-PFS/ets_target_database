@@ -5,13 +5,14 @@
 | Name | Columns | Comment | Type |
 | ---- | ------- | ------- | ---- |
 | [public.filter_name](public.filter_name.md) | 4 |  | BASE TABLE |
+| [public.pfs_arm](public.pfs_arm.md) | 4 |  | BASE TABLE |
 | [public.proposal_category](public.proposal_category.md) | 5 |  | BASE TABLE |
 | [public.input_catalog](public.input_catalog.md) | 7 |  | BASE TABLE |
 | [public.target_type](public.target_type.md) | 5 |  | BASE TABLE |
 | [public.proposal](public.proposal.md) | 13 |  | BASE TABLE |
 | [public.sky](public.sky.md) | 14 |  | BASE TABLE |
 | [public.fluxstd](public.fluxstd.md) | 61 |  | BASE TABLE |
-| [public.target](public.target.md) | 60 |  | BASE TABLE |
+| [public.target](public.target.md) | 61 |  | BASE TABLE |
 | [public.cluster](public.cluster.md) | 10 |  | BASE TABLE |
 
 ## Stored procedures and functions
@@ -75,6 +76,7 @@ erDiagram
 "public.target" }o--o| "public.filter_name" : "FOREIGN KEY (filter_r) REFERENCES filter_name(filter_name)"
 "public.target" }o--o| "public.filter_name" : "FOREIGN KEY (filter_y) REFERENCES filter_name(filter_name)"
 "public.target" }o--o| "public.filter_name" : "FOREIGN KEY (filter_z) REFERENCES filter_name(filter_name)"
+"public.target" }o--o| "public.pfs_arm" : "FOREIGN KEY (qa_reference_arm) REFERENCES pfs_arm(name)"
 "public.target" }o--|| "public.input_catalog" : "FOREIGN KEY (input_catalog_id) REFERENCES input_catalog(input_catalog_id)"
 "public.target" }o--o| "public.target_type" : "FOREIGN KEY (target_type_id) REFERENCES target_type(target_type_id)"
 "public.target" }o--o| "public.proposal" : "FOREIGN KEY (proposal_id) REFERENCES proposal(proposal_id)"
@@ -84,6 +86,12 @@ erDiagram
 "public.filter_name" {
   varchar filter_name
   varchar filter_name_description
+  timestamp_without_time_zone created_at
+  timestamp_without_time_zone updated_at
+}
+"public.pfs_arm" {
+  varchar name
+  varchar description
   timestamp_without_time_zone created_at
   timestamp_without_time_zone updated_at
 }
@@ -262,6 +270,7 @@ erDiagram
   double_precision qa_relative_throughput
   double_precision qa_relative_noise
   double_precision qa_reference_lambda
+  varchar qa_reference_arm FK
   boolean is_cluster
   timestamp_without_time_zone created_at
   timestamp_without_time_zone updated_at

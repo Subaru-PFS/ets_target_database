@@ -63,6 +63,7 @@
 | qa_relative_throughput | double precision |  | true |  |  | Relative throughput to the reference value requested by the observer (default: 1.0) |
 | qa_relative_noise | double precision |  | true |  |  | Relative noise to the reference value requested by the observer (default: 1.0) |
 | qa_reference_lambda | double precision |  | true |  |  | Reference wavelength to evaluate effective exposure time (angstrom or nm?) |
+| qa_reference_arm | varchar |  | true |  | [public.pfs_arm](public.pfs_arm.md) | Reference arm to evaluate effective exposure time ('b', 'r', 'n', 'm') |
 | is_cluster | boolean |  | true |  |  | True if it is a cluster of multiple targets. |
 | created_at | timestamp without time zone | timezone('utc'::text, CURRENT_TIMESTAMP) | true |  |  | The date and time in UTC when the record was created |
 | updated_at | timestamp without time zone |  | true |  |  | The date and time in UTC when the record was last updated |
@@ -77,6 +78,7 @@
 | target_filter_r_fkey | FOREIGN KEY | FOREIGN KEY (filter_r) REFERENCES filter_name(filter_name) |
 | target_filter_y_fkey | FOREIGN KEY | FOREIGN KEY (filter_y) REFERENCES filter_name(filter_name) |
 | target_filter_z_fkey | FOREIGN KEY | FOREIGN KEY (filter_z) REFERENCES filter_name(filter_name) |
+| target_qa_reference_arm_fkey | FOREIGN KEY | FOREIGN KEY (qa_reference_arm) REFERENCES pfs_arm(name) |
 | target_input_catalog_id_fkey | FOREIGN KEY | FOREIGN KEY (input_catalog_id) REFERENCES input_catalog(input_catalog_id) |
 | target_target_type_id_fkey | FOREIGN KEY | FOREIGN KEY (target_type_id) REFERENCES target_type(target_type_id) |
 | target_proposal_id_fkey | FOREIGN KEY | FOREIGN KEY (proposal_id) REFERENCES proposal(proposal_id) |
@@ -108,6 +110,7 @@ erDiagram
 "public.target" }o--o| "public.filter_name" : "FOREIGN KEY (filter_z) REFERENCES filter_name(filter_name)"
 "public.target" }o--o| "public.filter_name" : "FOREIGN KEY (filter_y) REFERENCES filter_name(filter_name)"
 "public.target" }o--o| "public.filter_name" : "FOREIGN KEY (filter_j) REFERENCES filter_name(filter_name)"
+"public.target" }o--o| "public.pfs_arm" : "FOREIGN KEY (qa_reference_arm) REFERENCES pfs_arm(name)"
 
 "public.target" {
   bigint target_id
@@ -167,6 +170,7 @@ erDiagram
   double_precision qa_relative_throughput
   double_precision qa_relative_noise
   double_precision qa_reference_lambda
+  varchar qa_reference_arm FK
   boolean is_cluster
   timestamp_without_time_zone created_at
   timestamp_without_time_zone updated_at
@@ -217,6 +221,12 @@ erDiagram
 "public.filter_name" {
   varchar filter_name
   varchar filter_name_description
+  timestamp_without_time_zone created_at
+  timestamp_without_time_zone updated_at
+}
+"public.pfs_arm" {
+  varchar name
+  varchar description
   timestamp_without_time_zone created_at
   timestamp_without_time_zone updated_at
 }

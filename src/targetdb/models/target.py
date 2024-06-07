@@ -21,6 +21,7 @@ from . import (
     comment_updated_at,
     filter_name,
     input_catalog,
+    pfs_arm,
     proposal,
     target_type,
     utcnow,
@@ -215,6 +216,11 @@ class target(Base):
         Float,
         comment="Reference wavelength to evaluate effective exposure time (angstrom or nm?)",
     )
+    qa_reference_arm = Column(
+        String,
+        ForeignKey("pfs_arm.name"),
+        comment="Reference arm to evaluate effective exposure time ('b', 'r', 'n', 'm')",
+    )
 
     is_cluster = Column(
         Boolean,
@@ -247,6 +253,9 @@ class target(Base):
     filter_z_rels = relationship(filter_name, foreign_keys=[filter_z])
     filter_y_rels = relationship(filter_name, foreign_keys=[filter_y])
     filter_j_rels = relationship(filter_name, foreign_keys=[filter_j])
+
+    # arm relationship
+    qa_reference_arm_rels = relationship(pfs_arm, foreign_keys=[qa_reference_arm])
 
     def __init__(
         self,
@@ -311,6 +320,7 @@ class target(Base):
         qa_relative_throughput,
         qa_relative_noise,
         qa_reference_lambda,
+        qa_reference_arm,
         #
         is_cluster,
         #
@@ -378,6 +388,7 @@ class target(Base):
         self.qa_relative_throughput = qa_relative_throughput
         self.qa_relative_noise = qa_relative_noise
         self.qa_reference_lambda = qa_reference_lambda
+        self.qa_reference_arm = qa_reference_arm
         #
         self.is_cluster = is_cluster
         #
