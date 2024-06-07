@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
+from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.sql import expression
-from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.types import DateTime
 
 input_catalog_id_start: int = 10000
@@ -27,6 +27,7 @@ def pg_utcnow(element, compiler, **kw):
 
 # Note: Order of import is important!
 from .filter_name import filter_name  # noqa E402
+from .pfs_arm import pfs_arm  # noqa E402
 from .proposal_category import proposal_category  # noqa E402
 from .input_catalog import input_catalog  # noqa E402
 from .target_type import target_type  # noqa E402
@@ -41,6 +42,7 @@ from .cluster import cluster  # noqa E402
 __all__ = [
     "Base",
     "filter_name",
+    "pfs_arm",
     "proposal_category",
     "input_catalog",
     "target_type",

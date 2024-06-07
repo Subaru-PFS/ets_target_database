@@ -9,7 +9,7 @@ The `target` table is used to store the information on flux standard stars.
 Here are the columns in the `target` table:
 
 | Column Name            | Data Type | Description                                                                                      | Unit   | Required[^1] | Default |
-|------------------------|-----------|--------------------------------------------------------------------------------------------------|--------|--------------|---------|
+| ---------------------- | --------- | ------------------------------------------------------------------------------------------------ | ------ | ------------ | ------- |
 | target_id              | int64     | The unique identifier of the target.                                                             |        | \*           |         |
 | proposal_id            | str       | `proposal_id` in the `proposal` table.                                                           |        | \*           |         |
 | ob_code                | str       | The unique identifier to describe a combination of the object, observing mode, and exposure time |        | \*           |         |
@@ -67,6 +67,7 @@ Here are the columns in the `target` table:
 | qa_relative_throughput | float     | Quality assurance metric for relative throughput.                                                |        |              | 1.0     |
 | qa_relative_noise      | float     | Quality assurance metric for relative noise.                                                     |        |              | 1.0     |
 | qa_reference_lambda    | float     | Quality assurance reference wavelength                                                           | nm     |              |         |
+| qa_reference_arm       | str       | Quality assurance reference arm [b\|r\|n\|m]                                                     |        | \*           |         |
 | is_cluster             | bool      | (Obsolete) `True` if the target is part of a cluster.                                            |        |              | False   |
 | created_at             | datetime  | The date and time in UTC when the record was created.                                            |        |              |         |
 | updated_at             | datetime  | The date and time in UTC when the record was last updated.                                       |        |              |         |
@@ -85,6 +86,7 @@ Here are the columns in the `target` table:
 - `target_type_id` references the `target_type_id` in the `target_type` table.
 - `input_catalog_id` references the `input_catalog_id` in the `input_catalog` table.
 - `filter_{g,r,i,z,y,j}` references the `filter_name` in the `filter_name` table.
+- `qa_reference_arm` references the `name` in the `pfs_arm` table.
 
 ## Notes
 
