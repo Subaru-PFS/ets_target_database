@@ -584,7 +584,8 @@ def make_target_df_from_uploader(
 
     Notes
     -----
-    This function renames the 'exptime' column to 'effective_exptime' if it exists in the DataFrame.
+    This function renames the 'exptime' column to 'effective_exptime' and
+    'reference_arm' to 'qa_reference_arm' if they exist in the DataFrame.
     """
 
     logger.info(f"The default target_type_name {target_type_name} is used.")
@@ -603,6 +604,9 @@ def make_target_df_from_uploader(
 
     if "exptime" in df.columns:
         df.rename(columns={"exptime": "effective_exptime"}, inplace=True)
+
+    if "reference_arm" in df.columns:
+        df.rename(columns={"reference_arm": "qa_reference_arm"}, inplace=True)
 
     # fill missing values with None or NaN for filters and fluxes
     for band in ["g", "r", "i", "z", "y", "j"]:
