@@ -8,15 +8,16 @@ The `input_catalog` table is used to store the information on catalogs for sourc
 
 Here are the columns in the `input_catalog` table:
 
-| Column Name               | Type     | Description                                                         | Required[^1] | Default |
-|---------------------------|----------|---------------------------------------------------------------------|--------------|---------|
-| input_catalog_id          | int      | The ID of the input catalog                                         | (\*)         |         |
-| input_catalog_name        | str      | The name of the input catalog                                       | \*           |         |
-| input_catalog_description | str      | A brief description of the input catalog                            |              | ""      |
-| upload_id                 | str      | A 16-character string assigned at the submission of the target list |              | ""      |
-| active                    | bool     | A flag to indicate if the catalog is active                         |              | True    |
-| created_at                | datetime | The date and time in UTC when the record was created.               |              |         |
-| updated_at                | datetime | The date and time in UTC when the record was last updated.          |              |         |
+| Column Name               | Type     | Description                                                           | Required[^1] | Default |
+|---------------------------|----------|-----------------------------------------------------------------------|--------------|---------|
+| input_catalog_id          | int      | The ID of the input catalog                                           | (\*)         |         |
+| input_catalog_name        | str      | The name of the input catalog                                         | \*           |         |
+| input_catalog_description | str      | A brief description of the input catalog                              |              | ""      |
+| upload_id                 | str      | A 16-character string assigned at the submission of the target list   |              | ""      |
+| active                    | bool     | A flag to indicate if the catalog is active                           |              | True    |
+| is_classical              | bool     | A flag to indicate if the catalog is for a classical-mode observation |              | False   |
+| created_at                | datetime | The date and time in UTC when the record was created.                 |              |         |
+| updated_at                | datetime | The date and time in UTC when the record was last updated.            |              |         |
 
 [^1]: Required when inserted by using the [CLI tool](../reference/cli.md) or equivalent functions.
 
