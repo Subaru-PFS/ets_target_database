@@ -201,6 +201,10 @@ class target(Base):
         comment="True if the medium resolution mode is requested",
     )
 
+    # is_classical = Column(
+    #     Boolean, default=False, comment="True if the classical mode is requested"
+    # )
+
     # QA information
     qa_relative_throughput = Column(
         Float,
@@ -316,6 +320,7 @@ class target(Base):
         effective_exptime,
         single_exptime,
         is_medium_resolution,
+        # is_classical,
         #
         qa_relative_throughput,
         qa_relative_noise,
@@ -384,6 +389,7 @@ class target(Base):
         self.effective_exptime = effective_exptime
         self.single_exptime = single_exptime
         self.is_medium_resolution = is_medium_resolution
+        # self.is_classical = is_classical
         #
         self.qa_relative_throughput = qa_relative_throughput
         self.qa_relative_noise = qa_relative_noise

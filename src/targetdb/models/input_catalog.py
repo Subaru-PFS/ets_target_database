@@ -45,6 +45,10 @@ class input_catalog(Base):
         default=True,
         comment="Flag to indicate if the input catalog is active (default: True)",
     )
+    is_classical = Column(
+        Boolean, default=False, comment="True if the classical mode is requested"
+    )
+
     created_at = Column(
         DateTime,
         comment=comment_created_at,
@@ -63,6 +67,7 @@ class input_catalog(Base):
         input_catalog_description,
         upload_id,
         active,
+        is_classical,
         created_at,
         updated_at,
     ):
@@ -71,5 +76,6 @@ class input_catalog(Base):
         self.input_catalog_description = input_catalog_description
         self.upload_id = upload_id
         self.active = active
+        self.is_classical = is_classical
         self.created_at = created_at
         self.updated_at = updated_at

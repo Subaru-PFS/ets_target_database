@@ -7,9 +7,9 @@
 | [public.filter_name](public.filter_name.md) | 4 |  | BASE TABLE |
 | [public.pfs_arm](public.pfs_arm.md) | 4 |  | BASE TABLE |
 | [public.proposal_category](public.proposal_category.md) | 5 |  | BASE TABLE |
-| [public.input_catalog](public.input_catalog.md) | 7 |  | BASE TABLE |
+| [public.input_catalog](public.input_catalog.md) | 8 |  | BASE TABLE |
 | [public.target_type](public.target_type.md) | 5 |  | BASE TABLE |
-| [public.proposal](public.proposal.md) | 13 |  | BASE TABLE |
+| [public.proposal](public.proposal.md) | 14 |  | BASE TABLE |
 | [public.sky](public.sky.md) | 14 |  | BASE TABLE |
 | [public.fluxstd](public.fluxstd.md) | 61 |  | BASE TABLE |
 | [public.target](public.target.md) | 61 |  | BASE TABLE |
@@ -108,6 +108,7 @@ erDiagram
   varchar input_catalog_description
   varchar_16_ upload_id
   boolean active
+  boolean is_classical
   timestamp_without_time_zone created_at
   timestamp_without_time_zone updated_at
 }
@@ -130,6 +131,7 @@ erDiagram
   double_precision allocated_time_lr
   double_precision allocated_time_mr
   integer proposal_category_id FK
+  boolean is_too
   timestamp_without_time_zone created_at
   timestamp_without_time_zone updated_at
 }

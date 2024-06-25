@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 
-from sqlalchemy import (
-    Column,
-    DateTime,
-    Float,
-    ForeignKey,
-    Integer,
-    String,
-)
+from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import backref, relationship
 
-from . import Base, comment_created_at, comment_updated_at, proposal_category, utcnow
+from . import (
+    Base,
+    comment_created_at,
+    comment_updated_at,
+    proposal_category,
+    # proposal_grade,
+    utcnow,
+)
 
 
 class proposal(Base):
@@ -39,7 +39,10 @@ class proposal(Base):
     pi_middle_name = Column(String, default="", comment="PI's middle name")
     rank = Column(Float, nullable=False, comment="TAC score")
     grade = Column(
-        String, nullable=False, comment="TAC grade (A/B/C/F in the case of HSC queue)"
+        String,
+        # ForeignKey("proposal_grade.name"),
+        nullable=False,
+        comment="TAC grade (A/B/C/F in the case of HSC queue)",
     )
     allocated_time_total = Column(
         Float, default=0.0, comment="Total fiberhours allocated by TAC (hour)"
@@ -58,6 +61,19 @@ class proposal(Base):
         Integer, ForeignKey("proposal_category.proposal_category_id")
     )
 
+    # is_queue = Column(
+    #     Boolean,
+    #     default=True,
+    #     comment="True when the proposal contains queue-mode allocation",
+    # )
+    # is_classical = Column(
+    #     Boolean,
+    #     default=False,
+    #     comment="True when the proposal contains classical-mode allocation",
+    # )
+
+    is_too = Column(Boolean, default=False, comment="True when the proposal is ToO")
+
     created_at = Column(
         DateTime,
         comment=comment_created_at,
@@ -70,6 +86,7 @@ class proposal(Base):
     )
 
     proposal_categories = relationship(proposal_category, backref=backref("proposal"))
+    # proposal_grades = relationship("proposal_grade", back_populates="proposal")
 
     def __init__(
         self,
@@ -84,6 +101,7 @@ class proposal(Base):
         allocated_time_lr,
         allocated_time_mr,
         proposal_category_id,
+        is_too,
         created_at,
         updated_at,
     ):
@@ -98,5 +116,6 @@ class proposal(Base):
         self.allocated_time_lr = allocated_time_lr
         self.allocated_time_mr = allocated_time_mr
         self.proposal_category_id = proposal_category_id
+        self.is_too = is_too
         self.created_at = created_at
         self.updated_at = updated_at
