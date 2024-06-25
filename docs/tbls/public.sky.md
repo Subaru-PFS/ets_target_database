@@ -36,9 +36,9 @@
 | ---- | ---------- |
 | sky_pkey | CREATE UNIQUE INDEX sky_pkey ON public.sky USING btree (sky_id) |
 | sky_obj_id_input_catalog_id_version_key | CREATE UNIQUE INDEX sky_obj_id_input_catalog_id_version_key ON public.sky USING btree (obj_id, input_catalog_id, version) |
+| sky_q3c_ang2ipix_idx | CREATE INDEX sky_q3c_ang2ipix_idx ON public.sky USING btree (q3c_ang2ipix(ra, "dec")) |
 | ix_sky_input_catalog_id | CREATE INDEX ix_sky_input_catalog_id ON public.sky USING btree (input_catalog_id) |
 | ix_sky_version | CREATE INDEX ix_sky_version ON public.sky USING btree (version) |
-| sky_q3c_ang2ipix_idx | CREATE INDEX sky_q3c_ang2ipix_idx ON public.sky USING btree (q3c_ang2ipix(ra, "dec")) |
 
 ## Relations
 
@@ -77,6 +77,7 @@ erDiagram
   varchar input_catalog_description
   varchar_16_ upload_id
   boolean active
+  boolean is_classical
   timestamp_without_time_zone created_at
   timestamp_without_time_zone updated_at
 }

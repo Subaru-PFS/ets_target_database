@@ -17,6 +17,7 @@
 | allocated_time_lr | double precision |  | true |  |  | Total fiberhours for the low-resolution mode allocated by TAC (hour) |
 | allocated_time_mr | double precision |  | true |  |  | Total fiberhours for the medium-resolution mode allocated by TAC (hour) |
 | proposal_category_id | integer |  | true |  | [public.proposal_category](public.proposal_category.md) |  |
+| is_too | boolean |  | true |  |  | True when the proposal is ToO |
 | created_at | timestamp without time zone | timezone('utc'::text, CURRENT_TIMESTAMP) | true |  |  | The date and time in UTC when the record was created |
 | updated_at | timestamp without time zone |  | true |  |  | The date and time in UTC when the record was last updated |
 
@@ -53,6 +54,7 @@ erDiagram
   double_precision allocated_time_lr
   double_precision allocated_time_mr
   integer proposal_category_id FK
+  boolean is_too
   timestamp_without_time_zone created_at
   timestamp_without_time_zone updated_at
 }

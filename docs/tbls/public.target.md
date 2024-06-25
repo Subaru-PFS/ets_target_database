@@ -199,6 +199,7 @@ erDiagram
   double_precision allocated_time_lr
   double_precision allocated_time_mr
   integer proposal_category_id FK
+  boolean is_too
   timestamp_without_time_zone created_at
   timestamp_without_time_zone updated_at
 }
@@ -215,6 +216,7 @@ erDiagram
   varchar input_catalog_description
   varchar_16_ upload_id
   boolean active
+  boolean is_classical
   timestamp_without_time_zone created_at
   timestamp_without_time_zone updated_at
 }

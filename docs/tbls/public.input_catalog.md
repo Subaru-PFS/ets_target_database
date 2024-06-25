@@ -11,6 +11,7 @@
 | input_catalog_description | varchar |  | true |  |  | Description of the input catalog |
 | upload_id | varchar(16) |  | true |  |  | A 8-bit hex string (16 characters) assigned at the submission of the target list (default: empty string) |
 | active | boolean |  | true |  |  | Flag to indicate if the input catalog is active (default: True) |
+| is_classical | boolean |  | true |  |  | True if the classical mode is requested |
 | created_at | timestamp without time zone | timezone('utc'::text, CURRENT_TIMESTAMP) | true |  |  | The date and time in UTC when the record was created |
 | updated_at | timestamp without time zone |  | true |  |  | The date and time in UTC when the record was last updated |
 
@@ -42,6 +43,7 @@ erDiagram
   varchar input_catalog_description
   varchar_16_ upload_id
   boolean active
+  boolean is_classical
   timestamp_without_time_zone created_at
   timestamp_without_time_zone updated_at
 }

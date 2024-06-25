@@ -89,8 +89,8 @@
 | ---- | ---------- |
 | fluxstd_pkey | CREATE UNIQUE INDEX fluxstd_pkey ON public.fluxstd USING btree (fluxstd_id) |
 | uq_obj_id_input_catalog_id_version | CREATE UNIQUE INDEX uq_obj_id_input_catalog_id_version ON public.fluxstd USING btree (obj_id, input_catalog_id, version) |
-| fluxstd_q3c_ang2ipix_idx | CREATE INDEX fluxstd_q3c_ang2ipix_idx ON public.fluxstd USING btree (q3c_ang2ipix(ra, "dec")) |
 | ix_fluxstd_version | CREATE INDEX ix_fluxstd_version ON public.fluxstd USING btree (version) |
+| fluxstd_q3c_ang2ipix_idx | CREATE INDEX fluxstd_q3c_ang2ipix_idx ON public.fluxstd USING btree (q3c_ang2ipix(ra, "dec")) |
 
 ## Relations
 
@@ -182,6 +182,7 @@ erDiagram
   varchar input_catalog_description
   varchar_16_ upload_id
   boolean active
+  boolean is_classical
   timestamp_without_time_zone created_at
   timestamp_without_time_zone updated_at
 }
