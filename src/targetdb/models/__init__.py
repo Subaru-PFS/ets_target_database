@@ -29,6 +29,8 @@ def pg_utcnow(element, compiler, **kw):
 from .filter_name import filter_name  # noqa E402
 from .pfs_arm import pfs_arm  # noqa E402
 from .proposal_category import proposal_category  # noqa E402
+
+# from .proposal_grade import proposal_grade  # noqa E402
 from .input_catalog import input_catalog  # noqa E402
 from .target_type import target_type  # noqa E402
 from .proposal import proposal  # noqa E402
@@ -44,6 +46,7 @@ __all__ = [
     "filter_name",
     "pfs_arm",
     "proposal_category",
+    # "proposal_grade",
     "input_catalog",
     "target_type",
     "proposal",
