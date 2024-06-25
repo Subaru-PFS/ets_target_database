@@ -1,0 +1,21 @@
+name: Deploy Documentation on a sever
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, pfs-etc]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          sparce-checkout: docs
+
+      - name: Install dependencies
+        run: pip install mkdocs "mkdocs-material[imaging]"
+
+      - name: Build and deploy documentation
+        run: mkdocs build --site-dir ${{ env.DOC_PATH }}
