@@ -11,8 +11,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          sparse-checkout: docs
 
       - name: Install dependencies
         run: pip install mkdocs "mkdocs-material[imaging]"
