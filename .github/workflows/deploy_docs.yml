@@ -12,14 +12,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set-up Python
+      - name: Run commands
         run: |
           pyenv local 3.11.9
           python3 -m venv .venv
           source .venv/bin/activate
-
-      - name: Install dependencies
-        run: python3 -m pip install -U mkdocs "mkdocs-material[imaging]"
-
-      - name: Build and deploy documentation
-        run: mkdocs build --site-dir ${{ vars.DOC_PATH }}
+          python3 -m pip install -U mkdocs "mkdocs-material[imaging]"
+          mkdocs build --site-dir ${{ vars.DOC_PATH }}
