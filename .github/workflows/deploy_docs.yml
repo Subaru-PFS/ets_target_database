@@ -13,12 +13,13 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set-up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11.9"
+        run: |
+          pyenv local 3.11.9
+          python3 -m venv .venv
+          source .venv/bin/activate
 
       - name: Install dependencies
-        run: pip install -U mkdocs "mkdocs-material[imaging]"
+        run: python3 -m pip install -U mkdocs "mkdocs-material[imaging]"
 
       - name: Build and deploy documentation
         run: mkdocs build --site-dir ${{ vars.DOC_PATH }}
