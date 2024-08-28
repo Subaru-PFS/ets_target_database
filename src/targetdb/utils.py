@@ -1206,29 +1206,44 @@ def transfer_data_from_uploader(df, config, local_dir=Path("."), force=False):
             source_dir = os.path.join(
                 config["uploader"]["data_dir"], f"????/??/????????-??????-{upload_id}"
             )
-            dest_dir = local_dir
+            dest_dir = local_dir.as_posix()
             logger.info(
                 f"Searching for the source directory on the remote host: {source_dir}"
             )
 
             # Construct the rsync command
-            if "user" in config["uploader"].keys() and config["uploader"]["user"] != "":
-                rsync_remote = f"{config['uploader']['user']}@{config['uploader']['host']}:{source_dir}"
+            if config["uploader"]["host"] == "localhost":
+                rsync_remote = f"{source_dir}"
+                # rsync_command = [
+                #     "rsync",
+                #     "-av",
+                #     rsync_remote,
+                #     dest_dir,
+                # ]
+                rsync_command = f"rsync -av {rsync_remote} {dest_dir}"
+                use_shell = True
             else:
-                rsync_remote = f"{config['uploader']['host']}:{source_dir}"
+                if (
+                    "user" in config["uploader"].keys()
+                    and config["uploader"]["user"] != ""
+                ):
+                    rsync_remote = f"{config['uploader']['user']}@{config['uploader']['host']}:{source_dir}"
+                else:
+                    rsync_remote = f"{config['uploader']['host']}:{source_dir}"
 
-            rsync_command = [
-                "rsync",
-                "-avz",
-                "-e",
-                "ssh",
-                rsync_remote,
-                dest_dir,
-            ]
+                rsync_command = [
+                    "rsync",
+                    "-avz",
+                    "-e",
+                    "ssh",
+                    rsync_remote,
+                    dest_dir,
+                ]
+                use_shell = False
 
             # Execute the rsync command
             try:
-                subprocess.run(rsync_command, check=True)
+                subprocess.run(rsync_command, shell=use_shell, check=True)
             except subprocess.CalledProcessError as e:
                 logger.error(f"Failed to transfer data for upload_id: {upload_id}")
                 logger.error(e)
