@@ -1260,10 +1260,10 @@ def transfer_data_from_uploader(df, config, local_dir=Path("."), force=False):
                     encoding="utf-8",
                 )
                 str_uploaded_dirs = [
-                    l
-                    for l in proc.stdout.splitlines()
-                    if upload_id in l
-                    if l.endswith("/")
+                    line
+                    for line in proc.stdout.splitlines()
+                    if upload_id in line
+                    if line.endswith("/")
                 ]
                 logger.info(f"Transferred directories: {str_uploaded_dirs}")
 
