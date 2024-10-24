@@ -53,6 +53,7 @@ class TargetdbTable(str, Enum):
     sky = "sky"
     target = "target"
     target_type = "target_type"
+    user_pointing = "user_pointing"
 
 
 config_help_msg = "Database configuration file in the TOML format."
@@ -593,16 +594,22 @@ def transfer_targets(
             help="Path to the data directory in the local machine",
         ),
     ] = ".",
-    force: Annotated[bool, typer.Option("--force", help="Force download.")] = False,
+    force: Annotated[bool, typer.Option(help="Force download.")] = False,
 ):
 
+    # print(check_ppc)
     logger.info(f"Loading config file: {config_file}")
     config = load_config(config_file)
 
     logger.info(f"Loading input data from {input_file} into a DataFrame")
     df = load_input_data(input_file)
 
-    transfer_data_from_uploader(df, config, local_dir=local_dir, force=force)
+    transfer_data_from_uploader(
+        df,
+        config,
+        local_dir=local_dir,
+        force=force,
+    )
 
 
 @app.command(help="Insert targets using a list of input catalogs and upload IDs.")

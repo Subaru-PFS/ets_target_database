@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+import enum
+
 from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.sql import expression
@@ -20,6 +22,11 @@ class utcnow(expression.FunctionElement):
     inherit_cache = True
 
 
+class ResolutionMode(enum.Enum):
+    LOW = "L"
+    MEDIUM = "M"
+
+
 @compiles(utcnow, "postgresql")
 def pg_utcnow(element, compiler, **kw):
     return "TIMEZONE('utc', CURRENT_TIMESTAMP)"
@@ -32,6 +39,7 @@ from .proposal_category import proposal_category  # noqa E402
 
 # from .proposal_grade import proposal_grade  # noqa E402
 from .input_catalog import input_catalog  # noqa E402
+from .user_pointing import user_pointing  # noqa E402
 from .target_type import target_type  # noqa E402
 from .proposal import proposal  # noqa E402
 from .sky import sky  # noqa E402
@@ -48,6 +56,7 @@ __all__ = [
     "proposal_category",
     # "proposal_grade",
     "input_catalog",
+    "user_pointing",
     "target_type",
     "proposal",
     "sky",
@@ -60,4 +69,5 @@ __all__ = [
     "comment_created_at",
     "comment_updated_at",
     "utcnow",
+    "ResolutionMode",
 ]
