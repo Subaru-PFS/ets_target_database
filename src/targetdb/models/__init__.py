@@ -23,8 +23,8 @@ class utcnow(expression.FunctionElement):
 
 
 class ResolutionMode(enum.Enum):
-    LOW = "L"
-    MEDIUM = "M"
+    L = "L"
+    M = "M"
 
 
 @compiles(utcnow, "postgresql")
