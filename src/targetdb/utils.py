@@ -83,7 +83,7 @@ def read_conf(config_file):
     return load_config(config_file)
 
 
-def load_input_data(input_file, metadata=True, logger=logger):
+def load_input_data(input_file, metadata=False, logger=logger):
     """
     Load input data from a file into a pandas DataFrame.
 
