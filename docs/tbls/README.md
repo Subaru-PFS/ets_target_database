@@ -7,8 +7,9 @@
 | [public.filter_name](public.filter_name.md) | 4 |  | BASE TABLE |
 | [public.pfs_arm](public.pfs_arm.md) | 4 |  | BASE TABLE |
 | [public.proposal_category](public.proposal_category.md) | 5 |  | BASE TABLE |
-| [public.input_catalog](public.input_catalog.md) | 8 |  | BASE TABLE |
+| [public.input_catalog](public.input_catalog.md) | 9 |  | BASE TABLE |
 | [public.target_type](public.target_type.md) | 5 |  | BASE TABLE |
+| [public.user_pointing](public.user_pointing.md) | 10 |  | BASE TABLE |
 | [public.proposal](public.proposal.md) | 14 |  | BASE TABLE |
 | [public.sky](public.sky.md) | 14 |  | BASE TABLE |
 | [public.fluxstd](public.fluxstd.md) | 61 |  | BASE TABLE |
@@ -54,11 +55,18 @@
 | public.q3c_poly_query | bool | double precision, double precision, polygon | FUNCTION |
 | public.q3c_poly_query | bool | real, real, polygon | FUNCTION |
 
+## Enums
+
+| Name | Values |
+| ---- | ------- |
+| public.resolutionmode | L, M |
+
 ## Relations
 
 ```mermaid
 erDiagram
 
+"public.user_pointing" }o--|| "public.input_catalog" : "FOREIGN KEY (input_catalog_id) REFERENCES input_catalog(input_catalog_id)"
 "public.proposal" }o--o| "public.proposal_category" : "FOREIGN KEY (proposal_category_id) REFERENCES proposal_category(proposal_category_id)"
 "public.sky" }o--|| "public.input_catalog" : "FOREIGN KEY (input_catalog_id) REFERENCES input_catalog(input_catalog_id)"
 "public.sky" }o--o| "public.target_type" : "FOREIGN KEY (target_type_id) REFERENCES target_type(target_type_id)"
@@ -109,6 +117,7 @@ erDiagram
   varchar_16_ upload_id
   boolean active
   boolean is_classical
+  boolean is_user_pointing
   timestamp_without_time_zone created_at
   timestamp_without_time_zone updated_at
 }
@@ -116,6 +125,18 @@ erDiagram
   integer target_type_id
   varchar target_type_name
   varchar target_type_description
+  timestamp_without_time_zone created_at
+  timestamp_without_time_zone updated_at
+}
+"public.user_pointing" {
+  bigint user_pointing_id
+  varchar ppc_code
+  double_precision ppc_ra
+  double_precision ppc_dec
+  double_precision ppc_pa
+  resolutionmode ppc_resolution
+  double_precision ppc_priority
+  integer input_catalog_id FK
   timestamp_without_time_zone created_at
   timestamp_without_time_zone updated_at
 }

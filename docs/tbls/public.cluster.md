@@ -121,6 +121,7 @@ erDiagram
   varchar_16_ upload_id
   boolean active
   boolean is_classical
+  boolean is_user_pointing
   timestamp_without_time_zone created_at
   timestamp_without_time_zone updated_at
 }
