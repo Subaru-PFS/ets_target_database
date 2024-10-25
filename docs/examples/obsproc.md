@@ -169,7 +169,7 @@ Suppose you have an Excel file named `pfs_allocation_summary.xlsx` with 2 sheets
 **`Proposals` Sheet**:
 
 | proposal_id | input_catalog_name | input_catalog_description | group_id | pi_first_name | pi_last_name | pi_middle_name | proposal_category_name | upload_id        | n_obj | fiberhour_total | fiberhour_lr | fiberhour_mr | rot_total | rot_lr | rot_mr |
-| ----------- | ------------------ | ------------------------- | -------- | ------------- | ------------ | -------------- | ---------------------- | ---------------- | ----- | --------------- | ------------ | ------------ | --------- | ------ | ------ |
+|-------------|--------------------|---------------------------|----------|---------------|--------------|----------------|------------------------|------------------|-------|-----------------|--------------|--------------|-----------|--------|--------|
 | S99A-QT001  | pfs_example_1      | Example target list 1     | o99101   | Eiichi        | Shibusawa    |                | openuse                | d6e94eae259faf4e | 1572  | 379.5           | 379.5        |              | 5.2       | 5.2    |        |
 | S99A-QT002  | pfs_example_2      | Example target list 2     | o99102   | Umeko         | Tsuda        |                | openuse                | 5f695375c60f34c7 | 9712  | 17504           | 17504        |              | 15.83     | 15.83  |        |
 | S99A-QT003  | pfs_example_3      | Example target list 3     | o99103   | Shibasaburo   | Kitasato     |                | openuse                | ba59115da8084653 | 2047  | 395.25          | 395.25       |              | 12.7      | 12.7   |        |
@@ -177,7 +177,7 @@ Suppose you have an Excel file named `pfs_allocation_summary.xlsx` with 2 sheets
 **`Allocation` Sheet**:
 
 | proposal_id | grade | rank | allocated_rot_total | allocated_rot_lr | allocated_rot_mr | allocated_time_total | allocated_time_lr | allocated_time_mr | n_ppc | allocation_rate_lr | allocation_rate_mr | completion_rate_lr | completion_rate_mr |
-| ----------- | ----- | ---- | ------------------- | ---------------- | ---------------- | -------------------- | ----------------- | ----------------- | ----- | ------------------ | ------------------ | ------------------ | ------------------ |
+|-------------|-------|------|---------------------|------------------|------------------|----------------------|-------------------|-------------------|-------|--------------------|--------------------|--------------------|--------------------|
 | S99A-QT001  | A     | 9    | 2.8                 |                  | 2.8              | 284.25               | 0                 | 284.25            | 9     | 0.749011858        |                    | 0.723              |                    |
 | S99A-QT002  | B     | 6.5  | 6.5                 | 6.5              |                  | 8140.5               | 8140.5            | 0                 | 21    | 0.465065128        |                    | 0.279              |                    |
 | S99A-QT003  | B     | 6    | 9.6                 | 9.6              |                  | 350.25               | 350.25            | 0                 | 31    | 0.886148008        |                    | 0.684              |                    |
@@ -198,10 +198,10 @@ S99A-QT003,o99103,Shibasaburo,Kitasato,,6.0,B,350.25,350.25,0.0,openuse,true
 ```
 
 ```csv title="input_catalogs.csv"
-input_catalog_name,input_catalog_description,upload_id,proposal_id,is_classical
-pfs_example_1,Example target list 1,d6e94eae259faf4e,S99A-QT001,false
-pfs_example_2,Example target list 2,5f695375c60f34c7,S99A-QT002,false
-pfs_example_3,Example target list 3,ba59115da8084653,S99A-QT003,true
+input_catalog_name,input_catalog_description,upload_id,proposal_id,is_classical,is_user_pointing
+pfs_example_1,Example target list 1,d6e94eae259faf4e,S99A-QT001,false,false
+pfs_example_2,Example target list 2,5f695375c60f34c7,S99A-QT002,false,false
+pfs_example_3,Example target list 3,ba59115da8084653,S99A-QT003,true,true
 ```
 
 ### Insert to the `proposal` and `input_catalog` tables for `target` data
@@ -258,3 +258,14 @@ $ pfs-targetdb-cli insert 20240221-001431-d6e94eae259faf4e/target_d6e94eae259faf
 $ pfs-targetdb-cli insert 20240228-050253-5f695375c60f34c7/target_5f695375c60f34c7.ecsv -c db_config.toml -t target --from-uploader --upload_id 5f695375c60f34c7 --proposal_id S99A-QT002 --commit
 $ pfs-targetdb-cli insert 20240229-013729-ba59115da8084653/target_ba59115da8084653.ecsv -c db_config.toml -t target --from-uploader --upload_id ba59115da8084653 --proposal_id S99A-QT003 --commit
 ```
+
+## Insert user-defined pointing lists into the user_pointing table
+
+When there is a user-defined pointing list, it can be inserted into the `user_pointing` table in the `targetdb` database.
+
+```bash
+pfs-targetdb-cli insert -c dbconf.toml -t user_pointing pointing_list.ecsv \
+    --commit --upload_id "aabbccddeeffgghh"
+```
+
+Currently, you need to insert the custom pointing list one by one. We are planning to support batch insertion in the future.

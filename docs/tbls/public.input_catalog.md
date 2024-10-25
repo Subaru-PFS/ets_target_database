@@ -6,12 +6,13 @@
 
 | Name | Type | Default | Nullable | Children | Parents | Comment |
 | ---- | ---- | ------- | -------- | -------- | ------- | ------- |
-| input_catalog_id | integer |  | false | [public.sky](public.sky.md) [public.fluxstd](public.fluxstd.md) [public.target](public.target.md) [public.cluster](public.cluster.md) |  | Unique identifier for input catalogs |
+| input_catalog_id | integer |  | false | [public.user_pointing](public.user_pointing.md) [public.sky](public.sky.md) [public.fluxstd](public.fluxstd.md) [public.target](public.target.md) [public.cluster](public.cluster.md) |  | Unique identifier for input catalogs |
 | input_catalog_name | varchar |  | false |  |  | Name of the input catalog (e.g., Gaia DR2, HSC-SSP PDR3, etc.) |
 | input_catalog_description | varchar |  | true |  |  | Description of the input catalog |
 | upload_id | varchar(16) |  | true |  |  | A 8-bit hex string (16 characters) assigned at the submission of the target list (default: empty string) |
 | active | boolean |  | true |  |  | Flag to indicate if the input catalog is active (default: True) |
 | is_classical | boolean |  | true |  |  | True if the classical mode is requested |
+| is_user_pointing | boolean |  | true |  |  | True if user-defined pointings are provided |
 | created_at | timestamp without time zone | timezone('utc'::text, CURRENT_TIMESTAMP) | true |  |  | The date and time in UTC when the record was created |
 | updated_at | timestamp without time zone |  | true |  |  | The date and time in UTC when the record was last updated |
 
@@ -32,6 +33,7 @@
 ```mermaid
 erDiagram
 
+"public.user_pointing" }o--|| "public.input_catalog" : "FOREIGN KEY (input_catalog_id) REFERENCES input_catalog(input_catalog_id)"
 "public.sky" }o--|| "public.input_catalog" : "FOREIGN KEY (input_catalog_id) REFERENCES input_catalog(input_catalog_id)"
 "public.fluxstd" }o--|| "public.input_catalog" : "FOREIGN KEY (input_catalog_id) REFERENCES input_catalog(input_catalog_id)"
 "public.target" }o--|| "public.input_catalog" : "FOREIGN KEY (input_catalog_id) REFERENCES input_catalog(input_catalog_id)"
@@ -44,6 +46,19 @@ erDiagram
   varchar_16_ upload_id
   boolean active
   boolean is_classical
+  boolean is_user_pointing
+  timestamp_without_time_zone created_at
+  timestamp_without_time_zone updated_at
+}
+"public.user_pointing" {
+  bigint user_pointing_id
+  varchar ppc_code
+  double_precision ppc_ra
+  double_precision ppc_dec
+  double_precision ppc_pa
+  resolutionmode ppc_resolution
+  double_precision ppc_priority
+  integer input_catalog_id FK
   timestamp_without_time_zone created_at
   timestamp_without_time_zone updated_at
 }

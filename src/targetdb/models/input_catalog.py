@@ -49,6 +49,10 @@ class input_catalog(Base):
         Boolean, default=False, comment="True if the classical mode is requested"
     )
 
+    is_user_pointing = Column(
+        Boolean, default=False, comment="True if user-defined pointings are provided"
+    )
+
     created_at = Column(
         DateTime,
         comment=comment_created_at,
@@ -68,6 +72,7 @@ class input_catalog(Base):
         upload_id,
         active,
         is_classical,
+        is_user_pointing,
         created_at,
         updated_at,
     ):
@@ -77,5 +82,6 @@ class input_catalog(Base):
         self.upload_id = upload_id
         self.active = active
         self.is_classical = is_classical
+        self.is_user_pointing = is_user_pointing
         self.created_at = created_at
         self.updated_at = updated_at

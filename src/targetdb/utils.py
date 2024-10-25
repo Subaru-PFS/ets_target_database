@@ -83,7 +83,7 @@ def read_conf(config_file):
     return load_config(config_file)
 
 
-def load_input_data(input_file, logger=logger):
+def load_input_data(input_file, metadata=False, logger=logger):
     """
     Load input data from a file into a pandas DataFrame.
 
@@ -116,15 +116,23 @@ def load_input_data(input_file, logger=logger):
     if ext == ".csv":
         # set keep_default_na=False to keep empty strings as empty strings
         df = pd.read_csv(input_file, keep_default_na=False)
+        meta = None
     elif ext == ".feather":
         df = pd.read_feather(input_file)
+        meta = None
     elif ext == ".parquet":
         df = pd.read_parquet(input_file)
+        meta = None
     elif ext == ".ecsv":
-        df = Table.read(input_file).to_pandas()
+        tb = Table.read(input_file)
+        df = tb.to_pandas()
+        meta = tb.meta
     else:
         logger.error(f"Unsupported file extension: {ext}")
         raise ValueError(f"Unsupported file extension: {ext}")
+
+    if metadata:
+        return df, meta
 
     return df
 
@@ -398,7 +406,7 @@ def join_backref_values(df, db=None, table=None, key=None, check_key=None):
     return df_joined
 
 
-def add_backref_values(df, db=None, table=None):
+def add_backref_values(df, db=None, table=None, upload_id=None):
     """
     Add back reference values to a DataFrame based on the specified table.
 
@@ -410,6 +418,8 @@ def add_backref_values(df, db=None, table=None):
         The database object that contains the table. Defaults to None.
     table : str, optional
         The name of the table to use for back reference values. Defaults to None.
+    upload_id : str, optional
+        The upload (16-character string) id to be used. Defaults to None.
 
     Returns
     -------
@@ -472,33 +482,37 @@ def add_backref_values(df, db=None, table=None):
                     "upload_id and input_catalog_name are not found in the DataFrame."
                 )
 
-    elif table == "fluxstd":
+    elif table in ["fluxstd", "sky", "user_pointing"]:
         if "input_catalog_id" in df_tmp.columns:
             logger.info(
                 "input_catalog_id is found in the DataFrame. Skip back reference detection."
             )
         else:
             if "input_catalog_name" in df_tmp.columns:
-                backref_tables = ["input_catalog"]
-                backref_keys = ["input_catalog_name"]
-                backref_check_keys = ["input_catalog_id"]
+                logger.info("input_catalog_name is found in the DataFrame.")
+                ref_key = "input_catalog_name"
+            elif "upload_id" in df_tmp.columns:
+                logger.info(
+                    "upload_id is found in the DataFrame. Use it for back reference for input_catalog"
+                )
+                ref_key = "upload_id"
+            elif upload_id is not None:
+                logger.info(
+                    f"upload_id is not found in the DataFrame. Use the provided upload_id {upload_id} instead."
+                )
+                df_tmp["upload_id"] = upload_id
+                ref_key = "upload_id"
             else:
-                logger.error("input_catalog_name is not found in the DataFrame.")
-                raise KeyError("input_catalog_name is not found in the DataFrame.")
+                logger.error(
+                    "Neither upload_id nor input_catalog_name is found in the DataFrame."
+                )
+                raise KeyError(
+                    "upload_id or input_catalog_name must exist in the input DataFrame."
+                )
 
-    elif table == "sky":
-        if "input_catalog_id" in df_tmp.columns:
-            logger.info(
-                "input_catalog_id is found in the DataFrame. Skip back reference detection."
-            )
-        else:
-            if "input_catalog_name" in df_tmp.columns:
-                backref_tables = ["input_catalog"]
-                backref_keys = ["input_catalog_name"]
-                backref_check_keys = ["input_catalog_id"]
-            else:
-                logger.error("input_catalog_name is not found in the DataFrame.")
-                raise KeyError("input_catalog_name is not found in the DataFrame.")
+            backref_tables = ["input_catalog"]
+            backref_keys = [ref_key]
+            backref_check_keys = ["input_catalog_id"]
 
     elif table == "proposal":
         if "proposal_category_id" in df_tmp.columns:
@@ -789,8 +803,8 @@ def add_database_rows(
     db.connect()
 
     t_begin = time.time()
-    if table in ["proposal", "fluxstd", "sky"]:
-        df = add_backref_values(df, db=db, table=table)
+    if table in ["proposal", "fluxstd", "sky", "user_pointing"]:
+        df = add_backref_values(df, db=db, table=table, upload_id=upload_id)
     elif table in ["target"]:
         if from_uploader:
             df = make_target_df_from_uploader(
@@ -844,9 +858,9 @@ def add_database_rows(
         raise
 
     if fetch:
-        logger.info("Fetching all table entries")
+        logger.info("Fetching the first 100 table entries")
         res = db.fetch_all(table)
-        logger.info(f"Fetched entries in the {table} table: \n{res}")
+        logger.info(f"Fetched the first 100 entries in the {table} table: \n{res}")
 
     logger.info("Closing targetDB")
     db.close()
@@ -1175,9 +1189,16 @@ def parse_allocation_file(input_file, output_dir=Path("."), outfile_prefix=None)
     df_input_catalog.to_csv(outfile_input_catalog, index=False)
 
 
-def transfer_data_from_uploader(df, config, local_dir=Path("."), force=False):
+def transfer_data_from_uploader(
+    df,
+    config,
+    local_dir=Path("."),
+    force=False,
+):
     status = []
     n_transfer = []
+    # is_user_ppc = []
+
     for upload_id in df["upload_id"]:
         # datadirs = glob.glob(local_dir / f"????????-??????-{upload_id}")
         # datadirs = list(local_dir.cwd().glob(f"????????-??????-{upload_id}"))
@@ -1229,7 +1250,7 @@ def transfer_data_from_uploader(df, config, local_dir=Path("."), force=False):
                 #     rsync_remote,
                 #     dest_dir,
                 # ]
-                rsync_command = f"rsync -av {rsync_remote} {dest_dir}"
+                rsync_command = f"rsync -av --ignore-times {rsync_remote} {dest_dir}"
                 use_shell = True
             else:
                 if (
@@ -1243,6 +1264,7 @@ def transfer_data_from_uploader(df, config, local_dir=Path("."), force=False):
                 rsync_command = [
                     "rsync",
                     "-avz",
+                    "--ignore-times",
                     "-e",
                     "ssh",
                     rsync_remote,
@@ -1259,6 +1281,8 @@ def transfer_data_from_uploader(df, config, local_dir=Path("."), force=False):
                     stdout=subprocess.PIPE,
                     encoding="utf-8",
                 )
+                logger.info(f"{source_dir=} {dest_dir=}")
+                logger.info(f"{proc.stdout}")
                 str_uploaded_dirs = [
                     line
                     for line in proc.stdout.splitlines()
@@ -1274,6 +1298,7 @@ def transfer_data_from_uploader(df, config, local_dir=Path("."), force=False):
                     status.append("success")
                 else:
                     status.append("WARNING")
+                # is_user_ppc.append(True)
             except subprocess.CalledProcessError as e:
                 logger.error(f"Failed to transfer data for upload_id: {upload_id}")
                 logger.error(e)
@@ -1281,13 +1306,20 @@ def transfer_data_from_uploader(df, config, local_dir=Path("."), force=False):
                 # raise
                 n_transfer.append(0)
                 status.append("FAILED")
+                # is_user_ppc.append(False)
         else:
             status.append("skipped")
             n_transfer.append(0)
+            # is_user_ppc.append(False)
 
     custom_status_dict = {"success": 0, "WARNING": 1, "FAILED": 3}
     df_status = pd.DataFrame(
-        {"upload_id": df["upload_id"], "status": status, "n_transfer": n_transfer}
+        {
+            "upload_id": df["upload_id"],
+            "status": status,
+            "n_transfer": n_transfer,
+            # "is_user_ppc": is_user_ppc,
+        }
     )
     df_status.sort_values(by=["status"], key=lambda x: x.map(custom_status_dict))
     df_status_out = df_status.sort_values(
