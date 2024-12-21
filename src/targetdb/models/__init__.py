@@ -55,6 +55,7 @@ __all__ = [
     "filter_name",
     "pfs_arm",
     "proposal_category",
+    "partner",
     # "proposal_grade",
     "input_catalog",
     "user_pointing",
