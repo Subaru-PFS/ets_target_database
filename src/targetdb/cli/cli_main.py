@@ -47,6 +47,7 @@ class TargetdbTable(str, Enum):
     filter_name = "filter_name"
     fluxstd = "fluxstd"
     input_catalog = "input_catalog"
+    partner = "partner"
     pfs_arm = "pfs_arm"
     proposal = "proposal"
     proposal_category = "proposal_category"
