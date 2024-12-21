@@ -17,6 +17,7 @@ nav:
     - filter_name: schema/filter_name.md
     - fluxstd: schema/fluxstd.md
     - input_catalog: schema/input_catalog.md
+    - partner: schema/partner.md
     - pfs_arm: schema/pfs_arm.md
     - proposal: schema/proposal.md
     - proposal_category: schema/proposal_category.md
@@ -40,6 +41,7 @@ nav:
     - tbls/public.filter_name.md
     - tbls/public.fluxstd.md
     - tbls/public.input_catalog.md
+    - tbls/public.partner.md
     - tbls/public.pfs_arm.md
     - tbls/public.proposal.md
     - tbls/public.proposal_category.md
@@ -87,7 +89,7 @@ markdown_extensions:
   - def_list
   - md_in_html
   - toc:
-       permalink: true
+      permalink: true
   - pymdownx.tasklist:
       custom_checkbox: true
   - pymdownx.arithmatex:
