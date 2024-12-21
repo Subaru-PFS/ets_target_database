@@ -9,7 +9,7 @@ The `proposal` table is used to store the information on proposals.
 Here are the columns in the `proposal` table:
 
 | Column Name          | Type     | Description                                                         | Unit | Required[^1] | Default |
-|----------------------|----------|---------------------------------------------------------------------|------|--------------|---------|
+| -------------------- | -------- | ------------------------------------------------------------------- | ---- | ------------ | ------- |
 | proposal_id          | str      | Proposal-ID (e.g, S23B-QN901)                                       |      | \*           |         |
 | group_id             | str      | Group ID issued by STARS (e.g., o21195)                             |      | \*           |         |
 | pi_first_name        | str      | PI's first name                                                     |      |              | ""      |
@@ -21,6 +21,7 @@ Here are the columns in the `proposal` table:
 | allocated_time_lr    | float    | Allocated fiberhours for low-resolution mode                        | h    |              | 0       |
 | allocated_time_mr    | float    | Allocated fiberhours for medium-resolution mode                     | h    |              | 0       |
 | proposal_category_id | int      | `proposal_category_id` in the `proposal_category` table             |      |              | 0       |
+| partner_id           | int      | `partner_id` in the `partner` table                                 |      |              |         |
 | is_too               | bool     | A flag to indicate if the proposal is a Target of Opportunity (ToO) |      |              | False   |
 | created_at           | datetime | The date and time in UTC when the record was created.               |      |              |         |
 | updated_at           | datetime | The date and time in UTC when the record was last updated.          |      |              |         |
@@ -35,6 +36,7 @@ Here are the columns in the `proposal` table:
 ## Foreign key constraints
 
 - `proposal_category_id` is a foreign key constraint that references the `proposal_category_id` in the `proposal_category` table.
+- `partner_id` is a foreign key constraint that references the `partner_id` in the `partner` table
 
 ## Notes
 

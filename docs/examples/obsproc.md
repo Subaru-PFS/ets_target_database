@@ -68,9 +68,14 @@ z_sdss,SDSS z filter
 ```csv title="proposal_categories.csv"
 proposal_category_id,proposal_category_name,proposal_category_description
 1,openuse,Subaru openuse proposal
-2,keck,Subaru/Keck time exchange proposal
-3,gemini,Subaru/Gemini time exchange proposal
-4,uh,University of Hawaii proposal
+```
+
+```csv title="partner.csv"
+partner_id,partner_name,partner_description
+1,subaru,Subaru Telescope
+2,keck,"W. M. Keck Observatory"
+3,gemini,Gemini Telescope
+4,uh,University of Hawaii
 ```
 
 ```csv title="pfs_arm.csv"
@@ -100,6 +105,7 @@ You can insert these data into the database using the following commands:
 ```console
 $ pfs-targetdb-cli insert filter_names.csv -c db_config.toml --table filter_name --commit
 $ pfs-targetdb-cli insert proposal_categories.csv -c db_config.toml --table proposal_category --commit
+$ pfs-targetdb-cli insert partner.csv -c db_config.toml --table partner --commit
 $ pfs-targetdb-cli insert pfs_arm.csv -c db_config.toml --table pfs_arm --commit
 $ pfs-targetdb-cli insert target_types.csv -c db_config.toml --table target_type --commit
 ```
@@ -169,7 +175,7 @@ Suppose you have an Excel file named `pfs_allocation_summary.xlsx` with 2 sheets
 **`Proposals` Sheet**:
 
 | proposal_id | input_catalog_name | input_catalog_description | group_id | pi_first_name | pi_last_name | pi_middle_name | proposal_category_name | upload_id        | n_obj | fiberhour_total | fiberhour_lr | fiberhour_mr | rot_total | rot_lr | rot_mr |
-|-------------|--------------------|---------------------------|----------|---------------|--------------|----------------|------------------------|------------------|-------|-----------------|--------------|--------------|-----------|--------|--------|
+| ----------- | ------------------ | ------------------------- | -------- | ------------- | ------------ | -------------- | ---------------------- | ---------------- | ----- | --------------- | ------------ | ------------ | --------- | ------ | ------ |
 | S99A-QT001  | pfs_example_1      | Example target list 1     | o99101   | Eiichi        | Shibusawa    |                | openuse                | d6e94eae259faf4e | 1572  | 379.5           | 379.5        |              | 5.2       | 5.2    |        |
 | S99A-QT002  | pfs_example_2      | Example target list 2     | o99102   | Umeko         | Tsuda        |                | openuse                | 5f695375c60f34c7 | 9712  | 17504           | 17504        |              | 15.83     | 15.83  |        |
 | S99A-QT003  | pfs_example_3      | Example target list 3     | o99103   | Shibasaburo   | Kitasato     |                | openuse                | ba59115da8084653 | 2047  | 395.25          | 395.25       |              | 12.7      | 12.7   |        |
@@ -177,7 +183,7 @@ Suppose you have an Excel file named `pfs_allocation_summary.xlsx` with 2 sheets
 **`Allocation` Sheet**:
 
 | proposal_id | grade | rank | allocated_rot_total | allocated_rot_lr | allocated_rot_mr | allocated_time_total | allocated_time_lr | allocated_time_mr | n_ppc | allocation_rate_lr | allocation_rate_mr | completion_rate_lr | completion_rate_mr |
-|-------------|-------|------|---------------------|------------------|------------------|----------------------|-------------------|-------------------|-------|--------------------|--------------------|--------------------|--------------------|
+| ----------- | ----- | ---- | ------------------- | ---------------- | ---------------- | -------------------- | ----------------- | ----------------- | ----- | ------------------ | ------------------ | ------------------ | ------------------ |
 | S99A-QT001  | A     | 9    | 2.8                 |                  | 2.8              | 284.25               | 0                 | 284.25            | 9     | 0.749011858        |                    | 0.723              |                    |
 | S99A-QT002  | B     | 6.5  | 6.5                 | 6.5              |                  | 8140.5               | 8140.5            | 0                 | 21    | 0.465065128        |                    | 0.279              |                    |
 | S99A-QT003  | B     | 6    | 9.6                 | 9.6              |                  | 350.25               | 350.25            | 0                 | 31    | 0.886148008        |                    | 0.684              |                    |

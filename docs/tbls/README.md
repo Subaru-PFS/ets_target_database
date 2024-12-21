@@ -15,6 +15,7 @@
 | [public.fluxstd](public.fluxstd.md) | 61 |  | BASE TABLE |
 | [public.target](public.target.md) | 61 |  | BASE TABLE |
 | [public.cluster](public.cluster.md) | 10 |  | BASE TABLE |
+| [public.partner](public.partner.md) | 5 |  | BASE TABLE |
 
 ## Stored procedures and functions
 
@@ -307,6 +308,13 @@ erDiagram
   double_precision d_ra
   double_precision d_dec
   integer input_catalog_id FK
+  timestamp_without_time_zone created_at
+  timestamp_without_time_zone updated_at
+}
+"public.partner" {
+  integer partner_id
+  varchar partner_name
+  varchar partner_description
   timestamp_without_time_zone created_at
   timestamp_without_time_zone updated_at
 }

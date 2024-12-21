@@ -24,9 +24,6 @@ Here are the columns in the `proposal_category` table:
 
 ## Available proposal categories
 
-| proposal_category_id | proposal_category_name | proposal_category_description        |
-| -------------------: | ---------------------- | ------------------------------------ |
-|                    1 | openuse                | Subaru openuse proposal              |
-|                    2 | keck                   | Subaru/Keck time exchange proposal   |
-|                    3 | gemini                 | Subaru/Gemini time exchange proposal |
-|                    4 | uh                     | University of Hawaii proposal        |
+| proposal_category_id | proposal_category_name | proposal_category_description |
+| -------------------: | ---------------------- | ----------------------------- |
+|                    1 | openuse                | Subaru openuse proposal       |

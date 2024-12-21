@@ -307,7 +307,8 @@ def draw_diagram(
         outfile = os.path.join(output_dir, f"{sc_outprefix}-{time_string}.pdf")
 
         comm = [
-            f"{os.path.join(config['schemacrawler']['SCHEMACRAWLERDIR'],'_schemacrawler/bin/schemacrawler.sh')}",
+            f"{os.path.join(config['schemacrawler']['SCHEMACRAWLERDIR'],'bin/schemacrawler.sh')}",
+            # f"{os.path.join(config['schemacrawler']['SCHEMACRAWLERDIR'],'_schemacrawler/bin/schemacrawler.sh')}",
             "--command=schema",
             "--server=postgresql",
             f"--host={config['targetdb']['db']['host']}",

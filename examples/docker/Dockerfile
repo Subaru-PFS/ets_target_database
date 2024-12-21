@@ -1,6 +1,7 @@
 # Use the official Docker Hub Postgres 10.6 image
 # FROM postgres:10.6
-FROM postgres:12
+# FROM postgres:12
+FROM postgres:16
 
 # Set environment variables
 ENV POSTGRES_USER ""
@@ -11,8 +12,11 @@ ENV POSTGRES_DB ""
 RUN apt-get update && apt-get install -y \
     git \
     build-essential \
+    liblz4-dev \
+    libreadline-dev \
+    libzstd-dev \
     zlib1g-dev \
-    postgresql-server-dev-12
+    postgresql-server-dev-16
 
 # Clone the q3c extension from GitHub
 RUN git clone https://github.com/segasai/q3c.git

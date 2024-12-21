@@ -7,6 +7,7 @@ from . import (
     Base,
     comment_created_at,
     comment_updated_at,
+    partner,
     proposal_category,
     # proposal_grade,
     utcnow,
@@ -61,29 +62,15 @@ class proposal(Base):
         Integer, ForeignKey("proposal_category.proposal_category_id")
     )
 
-    # is_queue = Column(
-    #     Boolean,
-    #     default=True,
-    #     comment="True when the proposal contains queue-mode allocation",
-    # )
-    # is_classical = Column(
-    #     Boolean,
-    #     default=False,
-    #     comment="True when the proposal contains classical-mode allocation",
-    # )
+    partner_id = Column(
+        Integer,
+        ForeignKey("partner.partner_id"),
+    )
 
     is_too = Column(Boolean, default=False, comment="True when the proposal is ToO")
 
-    created_at = Column(
-        DateTime,
-        comment=comment_created_at,
-        server_default=utcnow(),
-    )
-    updated_at = Column(
-        DateTime,
-        comment=comment_updated_at,
-        onupdate=utcnow(),
-    )
+    created_at = Column(DateTime, comment=comment_created_at, server_default=utcnow())
+    updated_at = Column(DateTime, comment=comment_updated_at, onupdate=utcnow())
 
     proposal_categories = relationship(proposal_category, backref=backref("proposal"))
     # proposal_grades = relationship("proposal_grade", back_populates="proposal")
@@ -101,6 +88,7 @@ class proposal(Base):
         allocated_time_lr,
         allocated_time_mr,
         proposal_category_id,
+        partner_id,
         is_too,
         created_at,
         updated_at,
@@ -116,6 +104,7 @@ class proposal(Base):
         self.allocated_time_lr = allocated_time_lr
         self.allocated_time_mr = allocated_time_mr
         self.proposal_category_id = proposal_category_id
+        self.partner_id = partner_id
         self.is_too = is_too
         self.created_at = created_at
         self.updated_at = updated_at
