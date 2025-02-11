@@ -529,7 +529,7 @@ def add_backref_values(df, db=None, table=None, upload_id=None):
                 logger.error("proposal_category_name is not found in the DataFrame.")
                 raise KeyError("proposal_category_name is not found in the DataFrame.")
 
-        if "partner_id" == df_tmp.columns:
+        if "partner_id" in df_tmp.columns:
             logger.info(
                 "partner_id is found in the DataFrame. Skip back reference detection."
             )
