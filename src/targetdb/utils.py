@@ -529,6 +529,19 @@ def add_backref_values(df, db=None, table=None, upload_id=None):
                 logger.error("proposal_category_name is not found in the DataFrame.")
                 raise KeyError("proposal_category_name is not found in the DataFrame.")
 
+        if "partner_id" == df_tmp.columns:
+            logger.info(
+                "partner_id is found in the DataFrame. Skip back reference detection."
+            )
+        else:
+            if "partner_name" in df_tmp.columns:
+                backref_tables.append("partner")
+                backref_keys.append("partner_name")
+                backref_check_keys.append("partner_id")
+            else:
+                logger.error("partner_name is not found in the DataFrame.")
+                raise KeyError("partner_name is not found in the DataFrame.")
+
     # Join referenced values
     for i in range(len(backref_tables)):
         df_tmp = join_backref_values(

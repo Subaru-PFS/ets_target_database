@@ -7,11 +7,14 @@ The PFS Target Database contains the following tables:
 - [filter_name](filter_name.md)
 - [fluxstd](fluxstd.md)
 - [input_catalog](input_catalog.md)
+- [partner](partner.md)
+- [pfs_arm](pfs_arm.md)
 - [proposal](proposal.md)
 - [proposal_category](proposal_category.md)
 - [sky](sky.md)
 - [target](target.md)
 - [target_type](target_type.md)
+- [user_pointing](user_pointing.md)
 
 ## Schema information by tbls
 
