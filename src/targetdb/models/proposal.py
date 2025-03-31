@@ -1,6 +1,15 @@
 #!/usr/bin/env python3
 
-from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, Integer, String
+from sqlalchemy import (
+    Boolean,
+    Column,
+    DateTime,
+    Float,
+    ForeignKey,
+    Index,
+    Integer,
+    String,
+)
 from sqlalchemy.orm import backref, relationship
 
 from . import (
@@ -20,12 +29,15 @@ class proposal(Base):
     __tablename__ = "proposal"
     # __table_args__ = (UniqueConstraint("proposal_id", "group_id"), {})
 
+    # Create index for grade column
+    __table_args__ = (Index("idx_proposal_grade", "grade"), {})
+
     proposal_id = Column(
         String,
         primary_key=True,
         unique=True,
         autoincrement=False,
-        comment="Unique identifier for proposal (e.g, S21B-OT06?)",
+        comment="Unique identifier for proposal (e.g, S21B-OT06)",
     )
     group_id = Column(
         String,
@@ -33,7 +45,7 @@ class proposal(Base):
         # unique=True,
         nullable=False,
         autoincrement=False,
-        comment="Group ID in STARS (e.g., o21195?)",
+        comment="Group ID in STARS (e.g., o21195)",
     )
     pi_first_name = Column(String, default="", comment="PI's first name")
     pi_last_name = Column(String, nullable=False, comment="PI's last name")
@@ -43,7 +55,7 @@ class proposal(Base):
         String,
         # ForeignKey("proposal_grade.name"),
         nullable=False,
-        comment="TAC grade (A/B/C/F in the case of HSC queue)",
+        comment="TAC grade (A/B/C/F and N/A)",
     )
     allocated_time_total = Column(
         Float, default=0.0, comment="Total fiberhours allocated by TAC (hour)"
