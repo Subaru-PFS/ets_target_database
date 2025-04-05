@@ -1404,6 +1404,57 @@ def insert_targets_from_uploader(
         )
 
 
+def insert_userppc_from_uploader(
+    df_input_catalogs,
+    config,
+    data_dir=Path("."),
+    file_prefix="ppc",
+    commit=False,
+    fetch=False,
+    verbose=False,
+):
+
+    for _, row in df_input_catalogs.iterrows():
+        if not row["is_user_pointing"]:
+            logger.info(f"Skip user pointing for upload_id: {row['upload_id']}")
+            continue
+
+        upload_id = row["upload_id"]
+
+        input_file = list(
+            data_dir.glob(f"????????-??????-{upload_id}/{file_prefix}_{upload_id}.ecsv")
+        )
+
+        if len(input_file) == 0:
+            logger.error(f"Input file for upload_id: {upload_id} is not found.")
+            raise FileNotFoundError(
+                f"Input file for upload_id: {upload_id} is not found."
+            )
+        elif len(input_file) > 1:
+            logger.error(f"Multiple input files are found for upload_id: {upload_id}")
+            raise ValueError(
+                f"Multiple input files are found for upload_id: {upload_id}"
+            )
+
+        logger.info(f"Loading input data from {input_file} into a DataFrame")
+        t_begin = time.time()
+        df = load_input_data(input_file[0])
+        t_end = time.time()
+        logger.info(f"Loaded input data in {t_end - t_begin:.2f} seconds")
+
+        add_database_rows(
+            input_file=input_file[0],
+            table="user_pointing",
+            commit=commit,
+            fetch=fetch,
+            verbose=verbose,
+            config=config,
+            df=df,
+            upload_id=upload_id,
+            insert=True,
+        )
+
+
 def update_input_catalog_active(
     input_catalog_id: int,
     active_flag: bool,

@@ -18,6 +18,7 @@ from ..utils import (
     generate_schema_markdown,
     get_url_object,
     insert_targets_from_uploader,
+    insert_userppc_from_uploader,
     install_q3c_extension,
     load_config,
     load_input_data,
@@ -670,6 +671,74 @@ def insert_targets(
         fetch=fetch,
         verbose=verbose,
     )
+
+
+@app.command(
+    help="Insert user-defined pointings using a list of input catalogs and upload IDs."
+)
+def insert_pointings(
+    input_catalogs: Annotated[
+        Path,
+        typer.Argument(
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            show_default=False,
+            help="Input catalog list to insert (csv).",
+        ),
+    ],
+    config_file: Annotated[
+        str,
+        typer.Option(
+            "-c",
+            "--config",
+            show_default=False,
+            help=config_help_msg,
+        ),
+    ],
+    data_dir: Annotated[
+        Path,
+        typer.Option(
+            exists=True,
+            dir_okay=True,
+            readable=True,
+            help="Path to the data directory.",
+        ),
+    ] = ".",
+    commit: Annotated[
+        bool,
+        typer.Option("--commit", help="Commit changes to the database."),
+    ] = False,
+    fetch: Annotated[
+        bool, typer.Option("--fetch", help="Fetch data from database a the end.")
+    ] = False,
+    verbose: Annotated[
+        bool, typer.Option("-v", "--verbose", help="Verbose output.")
+    ] = False,
+):
+    logger.info(f"Loading config file: {config_file}")
+    config = load_config(config_file)
+
+    logger.info(f"Loading input catalog data from {input_catalogs} into a DataFrame")
+    df_input_catalogs = load_input_data(input_catalogs)
+
+    insert_userppc_from_uploader(
+        df_input_catalogs,
+        config,
+        data_dir=data_dir,
+        commit=commit,
+        fetch=fetch,
+        verbose=verbose,
+    )
+    # insert_targets_from_uploader(
+    #     df_input_catalogs,
+    #     config,
+    #     data_dir=data_dir,
+    #     commit=commit,
+    #     fetch=fetch,
+    #     verbose=verbose,
+    # )
 
 
 @app.command(help="Update active flag in the input_catalog table.")
