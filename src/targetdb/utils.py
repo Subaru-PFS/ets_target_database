@@ -1402,3 +1402,89 @@ def insert_targets_from_uploader(
             upload_id=upload_id,
             insert=True,
         )
+
+
+def update_input_catalog_active(
+    input_catalog_id: int,
+    active_flag: bool,
+    config: dict,
+    commit: bool = False,
+    verbose: bool = False,
+):
+    """
+    Update the active status of an input catalog in the database.
+
+    Parameters
+    ----------
+    input_catalog_id : int
+        The ID of the input catalog to be updated.
+    active_flag : bool
+        The new active status to set for the input catalog.
+    config : dict
+        Configuration dictionary containing database connection details.
+    commit : bool, optional
+        If True, commit the changes to the database. If False, perform a dry run
+        without committing the changes. Default is False.
+    verbose : bool, optional
+        If True, log additional information about the update process. Default is False.
+
+    Notes
+    -----
+    This function connects to the database, updates the active status of the specified
+    input catalog, and optionally commits the changes. If `verbose` is enabled, it logs
+    detailed information about the update process, including the updated table contents
+    after the operation.
+
+    Examples
+    --------
+    >>> config = {
+    ...     "targetdb": {
+    ...         "db": {
+    ...             "host": "localhost",
+    ...             "port": 5432,
+    ...             "user": "user",
+    ...             "password": "password",
+    ...             "database": "targetdb"
+    ...         }
+    ...     }
+    ... }
+    >>> update_input_catalog_active(123, True, config, commit=True, verbose=True)
+    """
+
+    db = TargetDB(**config["targetdb"]["db"])
+    db.connect()
+
+    df = pd.DataFrame(
+        {"input_catalog_id": [input_catalog_id], "active": [active_flag]},
+        # index="input_catalog_id",
+    )
+
+    if verbose:
+        logger.info(
+            f"Updating input_catalog_id {input_catalog_id} to active={active_flag}"
+        )
+        df_res = db.fetch_by_id(
+            "input_catalog",
+            input_catalog_id=input_catalog_id,
+        )
+        logger.info(f"Original input_catalog table: \n{df_res}")
+
+    if commit:
+        logger.info(
+            f"Updating input_catalog_id {input_catalog_id} to active={active_flag}"
+        )
+    else:
+        logger.info(
+            f"Updating input_catalog_id {input_catalog_id} to active={active_flag} (dry run)"
+        )
+
+    db.update("input_catalog", df, dry_run=not commit)
+
+    if verbose:
+        df_res = db.fetch_by_id(
+            "input_catalog",
+            input_catalog_id=input_catalog_id,
+        )
+        logger.info(f"Updated input_catalog table: \n{df_res}")
+
+    db.close()

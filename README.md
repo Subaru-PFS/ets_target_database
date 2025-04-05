@@ -19,22 +19,22 @@ The Q3C extension is required for the database. You can install it by the follow
 ### Python environment
 
 Python and the following packages as well as their dependencies will be used by installing `targetdb`.
-Package versions shown here are those used for the development (as of April 2024).
+Package versions shown here are those used for the development (as of April 2025).
 Newer (and somewhat older) versions should also work.
 
 | Package                                                                | Version |
 |------------------------------------------------------------------------|--------:|
-| [Python](https://www.python.org/)                                      |  3.9.18 |
-| [SQLAlchemy](https://www.sqlalchemy.org/)                              |  2.0.29 |
-| [pandas](https://pandas.pydata.org/)                                   |   2.2.2 |
+| [Python](https://www.python.org/)                                      |  3.11.x |
+| [SQLAlchemy](https://www.sqlalchemy.org/)                              |   2.0.x |
+| [pandas](https://pandas.pydata.org/)                                   |   2.2.3 |
 | [NumPy](https://numpy.org)                                             |  1.26.4 |
-| [Astropy](https://www.astropy.org/)                                    |   6.0.1 |
-| [loguru](https://loguru.readthedocs.io/)                               |   0.7.2 |
+| [Astropy](https://www.astropy.org/)                                    |   7.0.1 |
+| [loguru](https://loguru.readthedocs.io/)                               |   0.7.3 |
 | [SQLAlchemy-Utils](https://sqlalchemy-utils.readthedocs.io/en/latest/) |  0.41.2 |
 | [tabulate](https://pypi.org/project/tabulate/)                         |   0.9.0 |
 | [alembic](https://alembic.sqlalchemy.org/en/latest/)                   |  1.13.1 |
 | [pyarrow](https://arrow.apache.org/docs/python/)                       |  15.0.2 |
-| [Typer](https://typer.tiangolo.com/)                                   |  0.12.3 |
+| [Typer](https://typer.tiangolo.com/)                                   |  0.15.2 |
 | [openpyxl](https://openpyxl.readthedocs.io/en/stable/)                 |   3.1.2 |
 
 If you are using Python 3.10 or earlier, you may need to install [tomli](https://github.com/hukkin/tomli) package.
@@ -47,8 +47,8 @@ For building the documentation, the following packages are required.
 
 | Package                                                         | Version |
 |-----------------------------------------------------------------|--------:|
-| [MkDocs](https://www.mkdocs.org/)                               |   1.5.3 |
-| [mkdocs-material](https://squidfunk.github.io/mkdocs-material/) |  9.5.18 |
+| [MkDocs](https://www.mkdocs.org/)                               |   1.6.1 |
+| [mkdocs-material](https://squidfunk.github.io/mkdocs-material/) |  9.6.11 |
 
 Additionally, the following tools may be useful for testing and development.
 
@@ -134,6 +134,8 @@ pfs-targetdb-cli insert -c dbconf.toml -t proposal examples/data/proposals.csv -
 pfs-targetdb-cli insert -c dbconf.toml -t input_catalog examples/data/input_catalogs.csv --commit
 pfs-targetdb-cli insert -c dbconf.toml -t target_type examples/data/target_types.csv --commit
 pfs-targetdb-cli insert -c dbconf.toml -t filter_name examples/data/filter_names.csv --commit
+pfs-targetdb-cli insert -c dbconf.toml -t partner examples/data/partner.csv --commit
+pfs-targetdb-cli insert -c dbconf.toml -t pfs_arm examples/data/pfs_arm.csv --commit
 ```
 
 ## License
