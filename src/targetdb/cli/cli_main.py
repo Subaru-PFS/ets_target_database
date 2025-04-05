@@ -24,6 +24,7 @@ from ..utils import (
     parse_allocation_file,
     prep_fluxstd_data,
     transfer_data_from_uploader,
+    update_input_catalog_active,
 )
 
 app = typer.Typer(
@@ -362,7 +363,7 @@ def diagram(
 def mdtable(
     output_file: Annotated[
         Optional[str], typer.Option("--output-file", "-o", help="Output file.")
-    ] = None
+    ] = None,
 ):
     generate_schema_markdown(output_file=output_file)
 
@@ -667,6 +668,54 @@ def insert_targets(
         data_dir=data_dir,
         commit=commit,
         fetch=fetch,
+        verbose=verbose,
+    )
+
+
+@app.command(help="Update active flag in the input_catalog table.")
+def update_catalog_active(
+    input_catalog_id: Annotated[
+        int,
+        typer.Argument(
+            show_default=False,
+            help="Input catalog ID to be updated.",
+        ),
+    ],
+    active_flag: Annotated[
+        bool,
+        typer.Argument(
+            show_default=False,
+            help="Active flag to be set.",
+        ),
+    ],
+    config_file: Annotated[
+        str,
+        typer.Option(
+            "-c",
+            "--config",
+            show_default=False,
+            help=config_help_msg,
+        ),
+    ],
+    commit: Annotated[
+        bool,
+        typer.Option(
+            "--commit",
+            help="Commit changes to the database.",
+        ),
+    ] = False,
+    verbose: Annotated[
+        bool, typer.Option("-v", "--verbose", help="Verbose output.")
+    ] = False,
+):
+    logger.info(f"Loading config file: {config_file}")
+    config = load_config(config_file)
+
+    update_input_catalog_active(
+        input_catalog_id=input_catalog_id,
+        active_flag=active_flag,
+        config=config,
+        commit=commit,
         verbose=verbose,
     )
 

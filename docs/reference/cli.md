@@ -61,6 +61,7 @@ $ pfs-targetdb-cli [OPTIONS] COMMAND [ARGS]...
 * `prep-fluxstd`: Prepare flux standard data for the target...
 * `transfer-targets`: Download target lists from the uploader to...
 * `update`: Update rows in a table in the PFS Target...
+* `update-catalog-active`: Update active flag in the input_catalog...
 
 ---
 
@@ -182,7 +183,7 @@ $ pfs-targetdb-cli insert [OPTIONS] INPUT_FILE
 **Options**:
 
 * `-c, --config TEXT`: Database configuration file in the TOML format.  [required]
-* `-t, --table [filter_name|fluxstd|input_catalog|proposal|proposal_category|sky|target|target_type]`: Table name to insert rows.  [required]
+* `-t, --table [filter_name|fluxstd|input_catalog|partner|pfs_arm|proposal|proposal_category|sky|target|target_type|user_pointing]`: Table name to insert rows.  [required]
 * `--commit`: Commit changes to the database.
 * `--fetch`: Fetch data from database a the end.
 * `--from-uploader`: Flag to indicate the data is coming from the PFS Target Uploader. Only required for the `target` table.
@@ -318,7 +319,7 @@ $ pfs-targetdb-cli transfer-targets [OPTIONS] INPUT_FILE
 
 * `-c, --config TEXT`: Database configuration file in the TOML format.  [required]
 * `--local-dir PATH`: Path to the data directory in the local machine  [default: .]
-* `--force`: Force download.
+* `--force / --no-force`: Force download.  [default: no-force]
 * `--help`: Show this message and exit.
 
 ---
@@ -340,7 +341,7 @@ $ pfs-targetdb-cli update [OPTIONS] INPUT_FILE
 **Options**:
 
 * `-c, --config TEXT`: Database configuration file in the TOML format.  [required]
-* `-t, --table [filter_name|fluxstd|input_catalog|proposal|proposal_category|sky|target|target_type]`: Table name to update rows.  [required]
+* `-t, --table [filter_name|fluxstd|input_catalog|partner|pfs_arm|proposal|proposal_category|sky|target|target_type|user_pointing]`: Table name to update rows.  [required]
 * `--commit`: Commit changes to the database.
 * `--fetch`: Fetch data from database a the end.
 * `--from-uploader`: Flag to indicate the data is coming from the PFS Target Uploader. Only required for the `target` table.
@@ -348,3 +349,28 @@ $ pfs-targetdb-cli update [OPTIONS] INPUT_FILE
 * `--proposal_id TEXT`: Proposal ID (e.g., S24B-QT001). Only required for the `target` table
 * `--verbose`: Verbose output.
 * `--help`: Show this message and exit.
+
+---
+
+### `update-catalog-active`
+
+Update active flag in the input_catalog table.
+
+**Usage**:
+
+```console
+$ pfs-targetdb-cli update-catalog-active [OPTIONS] INPUT_CATALOG_ID ACTIVE_FLAG
+```
+
+**Arguments**:
+
+* `INPUT_CATALOG_ID`: Input catalog ID to be updated.  [required]
+* `ACTIVE_FLAG`: Active flag to be set.  [required]
+
+**Options**:
+
+* `-c, --config TEXT`: Database configuration file in the TOML format.  [required]
+* `--commit`: Commit changes to the database.
+* `-v, --verbose`: Verbose output.
+* `--help`: Show this message and exit.
+
