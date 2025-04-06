@@ -75,14 +75,22 @@ jobs:
       - name: Install PostgreSQL development packages
         run: |
           sudo apt-get update
-          sudo apt-get install -y postgresql-server-dev-16 gcc make libreadline-dev libpq-dev flex bison zlib1g-dev
+          # PostgreSQL and development packages
+          sudo apt-get install -y postgresql-server-dev-16 libpq-dev
+          # Build tools
+          sudo apt-get install -y gcc make flex bison zlib1g-dev libreadline-dev
+          # Regular clang (PostgreSQL 16 in Ubuntu may be built with clang)
+          sudo apt-get install -y llvm clang
 
       - name: Build and install q3c
         run: |
           git clone https://github.com/segasai/q3c.git
           cd q3c
-          make
-          sudo make install
+          # Use standard gcc compiler instead of clang for building the extension
+          # PostgreSQL extensions normally use the same compiler that was used for PostgreSQL itself,
+          # but we force gcc here to avoid dependency on specific clang version
+          make USE_PGXS=1 PG_CONFIG=/usr/bin/pg_config NO_LLVM=1
+          sudo make USE_PGXS=1 PG_CONFIG=/usr/bin/pg_config NO_LLVM=1 install
 
       - name: Install q3c extension
         run: |
