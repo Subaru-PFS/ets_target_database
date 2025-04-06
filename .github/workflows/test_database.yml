@@ -74,17 +74,28 @@ jobs:
 
       - name: Setup PostgreSQL with q3c
         run: |
-          # Install all necessary packages for building q3c
+          # Install comprehensive set of dev packages needed for q3c
           sudo apt-get update -y
-          sudo apt-get install -y postgresql-server-dev-16 libreadline-dev zlib1g-dev \
-                                 libzstd-dev liblz4-dev pgxnclient build-essential git
+          sudo apt-get install -y postgresql-server-dev-16 libpq-dev build-essential git \
+                                 libreadline-dev zlib1g-dev libzstd-dev liblz4-dev \
+                                 libssl-dev
 
-          # Use pgxnclient to install q3c - a simpler approach
-          sudo pgxnclient install q3c
+          # Clone q3c from GitHub
+          git clone https://github.com/segasai/q3c.git
+          cd q3c
+          make
+          sudo make install
 
-          # Verify installation
-          ls -la $(pg_config --pkglibdir)/q3c.so
-          ls -la $(pg_config --sharedir)/extension/q3c.control
+        #   # Modify makefile to disable LLVM (which requires specific clang versions)
+        #   sed -i 's/LLVM ?= yes/LLVM = no/g' Makefile
+
+        #   # Build and install with LLVM disabled
+        #   make USE_PGXS=1
+        #   sudo make USE_PGXS=1 install
+
+        #   # Verify installation
+        #   ls -la $(pg_config --pkglibdir)/q3c.so || echo "q3c.so not found!"
+        #   ls -la $(pg_config --sharedir)/extension/q3c.control || echo "q3c.control not found!"
 
       - name: Install q3c extension
         run: |
