@@ -72,25 +72,34 @@ jobs:
         run: |
           pfs-targetdb-cli create-db --config ~/.pfs/test_db_config.toml
 
-      - name: Install PostgreSQL development packages
+      - name: Setup PostgreSQL with q3c
         run: |
-          sudo apt-get update
-          # PostgreSQL and development packages
-          sudo apt-get install -y postgresql-server-dev-16 libpq-dev
-          # Build tools
-          sudo apt-get install -y gcc make flex bison zlib1g-dev libreadline-dev
-          # Regular clang (PostgreSQL 16 in Ubuntu may be built with clang)
-          sudo apt-get install -y llvm clang
+          # Install necessary packages for q3c installation
+          sudo apt-get update -y
+          sudo apt-get install -y postgresql-server-dev-16 libreadline-dev zlib1g-dev
 
-      - name: Build and install q3c
-        run: |
-          git clone https://github.com/segasai/q3c.git
-          cd q3c
-          # Use standard gcc compiler instead of clang for building the extension
-          # PostgreSQL extensions normally use the same compiler that was used for PostgreSQL itself,
-          # but we force gcc here to avoid dependency on specific clang version
-          make USE_PGXS=1 PG_CONFIG=/usr/bin/pg_config NO_LLVM=1
-          sudo make USE_PGXS=1 PG_CONFIG=/usr/bin/pg_config NO_LLVM=1 install
+          # Use a containerized approach to avoid clang-19 dependency
+          docker run --rm -v $(pwd):/workdir -w /workdir postgres:16 bash -c "
+            # Install development tools in container
+            apt-get update -y && \
+            apt-get install -y git make gcc postgresql-server-dev-16 libreadline-dev && \
+            # Download q3c
+            git clone https://github.com/segasai/q3c.git && \
+            cd q3c && \
+            # Disable LLVM to avoid clang dependency
+            sed -i 's/LLVM ?= yes/LLVM ?= no/g' Makefile && \
+            # Build and install q3c
+            make && make install && \
+            # Copy extension files to host
+            mkdir -p /tmp/q3c-install && \
+            cp q3c.so /tmp/q3c-install/ && \
+            cp q3c--*.sql q3c.control /tmp/q3c-install/
+          "
+
+          # Copy extension files from container to PostgreSQL directories
+          sudo cp /tmp/q3c-install/q3c.so $(pg_config --pkglibdir)/
+          sudo mkdir -p $(pg_config --sharedir)/extension
+          sudo cp /tmp/q3c-install/q3c--*.sql /tmp/q3c-install/q3c.control $(pg_config --sharedir)/extension/
 
       - name: Install q3c extension
         run: |
