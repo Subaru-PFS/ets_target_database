@@ -87,18 +87,25 @@ jobs:
           #!/bin/bash
           set -e
 
+          # Define version number - use the same as in the q3c code
+          VERSION="2.0.1"
+          VERSION_DEF='-DQ3C_VERSION=\"'$VERSION'\"'
+
+          # Common compile flags
+          CFLAGS="-fPIC -O3 -I/usr/include/postgresql/16/server -I/usr/include/postgresql/internal $VERSION_DEF"
+
           # Compile the basic objects
-          gcc -fPIC -O3 -I/usr/include/postgresql/16/server -I/usr/include/postgresql/internal -c -o q3c_poly.o q3c_poly.c
-          gcc -fPIC -O3 -I/usr/include/postgresql/16/server -I/usr/include/postgresql/internal -c -o q3cube.o q3cube.c
-          gcc -fPIC -O3 -I/usr/include/postgresql/16/server -I/usr/include/postgresql/internal -c -o prepare.o prepare.c
+          gcc $CFLAGS -c -o q3c_poly.o q3c_poly.c
+          gcc $CFLAGS -c -o q3cube.o q3cube.c
+          gcc $CFLAGS -c -o prepare.o prepare.c
 
           # Compile and run prepare to generate SQL file
           gcc prepare.o q3cube.o q3c_poly.o -lm -o prepare
           ./prepare
 
           # Compile remaining objects and create shared library
-          gcc -fPIC -O3 -I/usr/include/postgresql/16/server -I/usr/include/postgresql/internal -c -o q3c.o q3c.c
-          gcc -fPIC -O3 -I/usr/include/postgresql/16/server -I/usr/include/postgresql/internal -c -o dump.o dump.c
+          gcc $CFLAGS -c -o q3c.o q3c.c
+          gcc $CFLAGS -c -o dump.o dump.c
           gcc -shared -o q3c.so q3c.o q3c_poly.o q3cube.o dump.o -lm
 
           # Verify files were created properly
