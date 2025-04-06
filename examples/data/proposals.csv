@@ -22,11 +22,11 @@ S23B-QT905,,M.,Onodera,,7.5,B,5166.0,0.0,5166.0,1,subaru,False
 S23B-QT906,,Y.,Moritani,,7.0,A,2542.25,2542.25,0.0,1,subaru,False
 S23B-QT907,,J.,Eric,,6.5,C,2594.5,2594.5,0.0,1,subaru,False
 S23B-QT908,,Y.,Takagi,,5.6,C,320.0,320.0,0.0,1,subaru,False
-S24B-QT901,o00001,Sakurako,Okamoto,NaN,9.0,A,284.25,,284.25,1,subaru,False
-S24B-QT902,o00002,Masayuki,Tanaka,NaN,8.5,B,951.0,,951.0,1,subaru,False
-S24B-QT903,o00003,Tae-Soo,Pyo,NaN,8.5,B,3190.75,,3190.75,1,subaru,False
-S24B-QT904,o00004,Akira,Arai,NaN,6.0,B,409.0,,409.0,1,subaru,False
-S24B-QT905,o00005,Yuhei,Takagi,NaN,7.0,B,532.75,,532.75,1,subaru,False
+S24B-QT901,o00001,Sakurako,Okamoto,NaN,9.0,A,284.25,0.0,284.25,1,subaru,False
+S24B-QT902,o00002,Masayuki,Tanaka,NaN,8.5,B,951.0,0.0,951.0,1,subaru,False
+S24B-QT903,o00003,Tae-Soo,Pyo,NaN,8.5,B,3190.75,0.0,3190.75,1,subaru,False
+S24B-QT904,o00004,Akira,Arai,NaN,6.0,B,409.0,0.0,409.0,1,subaru,False
+S24B-QT905,o00005,Yuhei,Takagi,NaN,7.0,B,532.75,0.0,532.75,1,subaru,False
 S24B-QT906,o00006,Miho,Ishigaki,NaN,5.5,C,0.0,0.0,0.0,1,subaru,False
 S24B-QT907,o00007,Naoyuki,Tamura,NaN,6.5,B,8140.5,8140.5,0.0,1,subaru,False
 S24B-QT908,o00008,Kiyoto,Yabe,NaN,8.0,B,707.75,707.75,0.0,1,subaru,False
