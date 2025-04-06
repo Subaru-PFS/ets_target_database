@@ -72,6 +72,18 @@ jobs:
         run: |
           pfs-targetdb-cli create-db --config ~/.pfs/test_db_config.toml
 
+      - name: Install PostgreSQL development packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-server-dev-16 gcc make
+
+      - name: Build and install q3c
+        run: |
+          git clone https://github.com/segasai/q3c.git
+          cd q3c
+          make
+          sudo make install
+
       - name: Install q3c extension
         run: |
           pfs-targetdb-cli install-q3c --config ~/.pfs/test_db_config.toml
