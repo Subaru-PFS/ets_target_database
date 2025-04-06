@@ -91,7 +91,7 @@ jobs:
               libssl-dev \
               && rm -rf /var/lib/apt/lists/*
 
-          # Clone and build q3c
+          # Clone and build q3c with more detailed output
           WORKDIR /build
           RUN git clone https://github.com/segasai/q3c.git \
               && cd q3c \
@@ -99,33 +99,45 @@ jobs:
               && make \
               && make install
 
-          # Create a directory to share the built files
+          # Print locations of installed files for debugging
+          RUN echo "Checking installed q3c files:" \
+              && ls -la \$(pg_config --pkglibdir)/q3c.so \
+              && ls -la \$(pg_config --sharedir)/extension/q3c*
+
+          # Create output directory and copy files with explicit paths
           RUN mkdir -p /output \
               && cp \$(pg_config --pkglibdir)/q3c.so /output/ \
-              && cp \$(pg_config --sharedir)/extension/q3c* /output/
+              && cp \$(pg_config --sharedir)/extension/q3c* /output/ \
+              && ls -la /output/
           EOF
 
           # Build the container
           docker build -t q3c-builder -f Dockerfile.q3c .
 
-          # Create a temporary directory for the output files
+          # Extract built files from the container using a different approach
           mkdir -p /tmp/q3c-output
 
-          # Extract built files from the container
-          docker run --rm -v /tmp/q3c-output:/mnt q3c-builder cp -r /output/* /mnt/
+          # Create a container, copy files and then remove it
+          docker create --name q3c-temp q3c-builder
+          docker cp q3c-temp:/output/. /tmp/q3c-output/
+          docker rm q3c-temp
+
+          # Check extracted files
+          echo "Files extracted from container:"
+          ls -la /tmp/q3c-output/
 
           # Install the files to the host system
           sudo mkdir -p $(pg_config --pkglibdir)
           sudo mkdir -p $(pg_config --sharedir)/extension
-          sudo cp /tmp/q3c-output/q3c.so $(pg_config --pkglibdir)/
-          sudo cp /tmp/q3c-output/q3c* $(pg_config --sharedir)/extension/
+          sudo find /tmp/q3c-output -name "q3c.so" -exec cp {} $(pg_config --pkglibdir)/ \;
+          sudo find /tmp/q3c-output -name "q3c*" -not -name "*.so" -exec cp {} $(pg_config --sharedir)/extension/ \;
 
           # List the installed files to verify
           echo "Installed files in PostgreSQL lib directory:"
-          ls -la $(pg_config --pkglibdir)/q3c.so
+          ls -la $(pg_config --pkglibdir)/q3c.so || echo "q3c.so not found!"
 
           echo "Installed files in PostgreSQL extension directory:"
-          ls -la $(pg_config --sharedir)/extension/q3c*
+          ls -la $(pg_config --sharedir)/extension/q3c* || echo "q3c extension files not found!"
 
       - name: Install q3c extension
         run: |
