@@ -3,9 +3,9 @@ S21B-EN01,o21001,Hirofumi,Okita,None,9.0,a,240000.0,0.0,0.0,1,subaru,False
 S21B-EN16,o21016,Shintaro,Koshida,None,9.0,a,240000.0,0.0,0.0,1,subaru,False
 S21B-EN99,o21999,Masato,Onodera,None,1.0,a,1.0,0.0,0.0,1,subaru,False
 S21B-QN078,o21628,Takashi,Moriya,None,9.5,a,120000.0,0.0,0.0,1,subaru,False
-S21B-TE037-KQ,o21150,George,Becker,None,9.5,a,60000.0,0.0,0.0,2,subaru,False
-S21B-TE114-GQ,o21154,David,Sand,None,9.5,a,12000.0,0.0,0.0,3,subaru,False
-S21B-UH006-A1Q,o21165,Lukas,Zalesky,M.,9.5,a,4800.0,0.0,0.0,4,subaru,False
+S21B-TE037-KQ,o21150,George,Becker,None,9.5,a,60000.0,0.0,0.0,1,subaru,False
+S21B-TE114-GQ,o21154,David,Sand,None,9.5,a,12000.0,0.0,0.0,1,subaru,False
+S21B-UH006-A1Q,o21165,Lukas,Zalesky,M.,9.5,a,4800.0,0.0,0.0,1,subaru,False
 S22A-EN16,o22016,Shintaro,Koshida,None,9.0,a,240000.0,0.0,0.0,1,subaru,False
 S22B-EN16,o22016,Shintaro,Koshida,None,9.0,a,240000.0,0.0,0.0,1,subaru,False
 S22B-EN16-CO,o22016,Kiyoto,Yabe,None,9.0,a,240000.0,0.0,0.0,1,subaru,False
