@@ -133,7 +133,7 @@ jobs:
 
       - name: Insert fluxstd data
         run: |
-          pfs-targetdb-cli insert -c ~/pfs/test_db_config.toml \
+          pfs-targetdb-cli insert -c ~/.pfs/test_db_config.toml \
             -t fluxstd \
             examples/data/fluxstd/Fstar_v3.3/feather/ra354.8_354.9_dec-40.0_90.0.feather \
             --commit
