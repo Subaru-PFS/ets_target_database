@@ -75,7 +75,7 @@ jobs:
       - name: Install PostgreSQL development packages
         run: |
           sudo apt-get update
-          sudo apt-get install -y postgresql-server-dev-16 gcc make
+          sudo apt-get install -y postgresql-server-dev-16 gcc make libreadline-dev libpq-dev flex bison zlib1g-dev
 
       - name: Build and install q3c
         run: |
