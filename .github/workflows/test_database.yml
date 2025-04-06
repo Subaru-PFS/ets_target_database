@@ -105,39 +105,49 @@ jobs:
               && ls -la \$(pg_config --sharedir)/extension/q3c*
 
           # Create output directory and copy files with explicit paths
-          RUN mkdir -p /output \
-              && cp \$(pg_config --pkglibdir)/q3c.so /output/ \
-              && cp \$(pg_config --sharedir)/extension/q3c* /output/ \
-              && ls -la /output/
+          RUN mkdir -p /output/lib \
+              && mkdir -p /output/extension \
+              && cp \$(pg_config --pkglibdir)/q3c.so /output/lib/ \
+              && cp \$(pg_config --sharedir)/extension/q3c* /output/extension/ \
+              && ls -la /output/lib/ /output/extension/
           EOF
 
           # Build the container
           docker build -t q3c-builder -f Dockerfile.q3c .
 
-          # Extract built files from the container using a different approach
-          mkdir -p /tmp/q3c-output
+          # Extract built files from the container
+          mkdir -p /tmp/q3c-output/lib
+          mkdir -p /tmp/q3c-output/extension
 
           # Create a container, copy files and then remove it
           docker create --name q3c-temp q3c-builder
-          docker cp q3c-temp:/output/. /tmp/q3c-output/
+          docker cp q3c-temp:/output/lib /tmp/q3c-output/
+          docker cp q3c-temp:/output/extension /tmp/q3c-output/
           docker rm q3c-temp
 
           # Check extracted files
           echo "Files extracted from container:"
-          ls -la /tmp/q3c-output/
+          ls -la /tmp/q3c-output/lib/ /tmp/q3c-output/extension/
 
-          # Install the files to the host system
-          sudo mkdir -p $(pg_config --pkglibdir)
-          sudo mkdir -p $(pg_config --sharedir)/extension
-          sudo find /tmp/q3c-output -name "q3c.so" -exec cp {} $(pg_config --pkglibdir)/ \;
-          sudo find /tmp/q3c-output -name "q3c*" -not -name "*.so" -exec cp {} $(pg_config --sharedir)/extension/ \;
+          # Find the correct PostgreSQL directories in the service container
+          echo "Determining correct PostgreSQL directories for installation"
+          # Query the PostgreSQL service container to get the right paths
+          POSTGRES_CONTAINER_ID=$(docker ps -q --filter "ancestor=postgres:16")
+          POSTGRES_PKGLIBDIR=$(docker exec $POSTGRES_CONTAINER_ID pg_config --pkglibdir)
+          POSTGRES_SHAREDIR=$(docker exec $POSTGRES_CONTAINER_ID pg_config --sharedir)
 
-          # List the installed files to verify
-          echo "Installed files in PostgreSQL lib directory:"
-          ls -la $(pg_config --pkglibdir)/q3c.so || echo "q3c.so not found!"
+          echo "PostgreSQL library directory in service container: $POSTGRES_PKGLIBDIR"
+          echo "PostgreSQL share directory in service container: $POSTGRES_SHAREDIR"
 
-          echo "Installed files in PostgreSQL extension directory:"
-          ls -la $(pg_config --sharedir)/extension/q3c* || echo "q3c extension files not found!"
+          # Install the files directly into the PostgreSQL service container
+          echo "Installing q3c extension files into PostgreSQL service container"
+          docker cp /tmp/q3c-output/lib/q3c.so $POSTGRES_CONTAINER_ID:$POSTGRES_PKGLIBDIR/
+          docker cp /tmp/q3c-output/extension/ $POSTGRES_CONTAINER_ID:$POSTGRES_SHAREDIR/
+
+          # Verify files were installed correctly in the container
+          echo "Verifying installation in PostgreSQL service container"
+          docker exec $POSTGRES_CONTAINER_ID ls -la $POSTGRES_PKGLIBDIR/q3c.so
+          docker exec $POSTGRES_CONTAINER_ID ls -la $POSTGRES_SHAREDIR/extension/q3c*
 
       - name: Install q3c extension
         run: |
