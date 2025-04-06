@@ -134,30 +134,44 @@ jobs:
           echo "Determining correct PostgreSQL directories for installation"
           # Query the PostgreSQL service container to get the right paths
           POSTGRES_CONTAINER_ID=$(docker ps -q --filter "ancestor=postgres:16")
-          POSTGRES_PKGLIBDIR=$(docker exec $POSTGRES_CONTAINER_ID pg_config --pkglibdir)
-          POSTGRES_SHAREDIR=$(docker exec $POSTGRES_CONTAINER_ID pg_config --sharedir)
 
-          echo "PostgreSQL library directory in service container: $POSTGRES_PKGLIBDIR"
-          echo "PostgreSQL share directory in service container: $POSTGRES_SHAREDIR"
+          if [ -z "$POSTGRES_CONTAINER_ID" ]; then
+            echo "ERROR: Could not find PostgreSQL container!"
+            docker ps
+            exit 1
+          fi
 
-          # Make sure extension directory exists in the container
-          docker exec $POSTGRES_CONTAINER_ID mkdir -p $POSTGRES_SHAREDIR/extension
+          echo "PostgreSQL container ID: $POSTGRES_CONTAINER_ID"
 
-          # Install the files directly into the PostgreSQL service container - one by one
-          echo "Installing q3c.so into PostgreSQL service container"
-          docker cp /tmp/q3c-output/lib/q3c.so $POSTGRES_CONTAINER_ID:$POSTGRES_PKGLIBDIR/
+          # Debug PostgreSQL file structure
+          echo "Debugging PostgreSQL directory structure in container"
+          docker exec $POSTGRES_CONTAINER_ID find /usr/share/postgresql -type d | sort
+          docker exec $POSTGRES_CONTAINER_ID find /usr/lib/postgresql -type d | sort
 
-          echo "Installing extension files into PostgreSQL service container"
-          for file in /tmp/q3c-output/extension/q3c*; do
+          # Create a temporary directory in the container
+          docker exec $POSTGRES_CONTAINER_ID mkdir -p /tmp/q3c-ext
+
+          # Copy files to temp directory in container first
+          docker cp /tmp/q3c-output/lib/q3c.so $POSTGRES_CONTAINER_ID:/tmp/q3c-ext/
+          for file in /tmp/q3c-output/extension/*; do
             filename=$(basename "$file")
-            echo "Copying $filename..."
-            docker cp "$file" "$POSTGRES_CONTAINER_ID:$POSTGRES_SHAREDIR/extension/$filename"
+            docker cp "$file" "$POSTGRES_CONTAINER_ID:/tmp/q3c-ext/$filename"
           done
 
-          # Verify files were installed correctly in the container
+          # Verify files in temp directory
+          echo "Verifying files in container's temp directory:"
+          docker exec $POSTGRES_CONTAINER_ID ls -la /tmp/q3c-ext/
+
+          # Now copy to correct PostgreSQL locations inside the container
+          echo "Installing extension files in container"
+          docker exec $POSTGRES_CONTAINER_ID bash -c "mkdir -p /usr/share/postgresql/16/extension"
+          docker exec $POSTGRES_CONTAINER_ID bash -c "cp /tmp/q3c-ext/q3c.so /usr/lib/postgresql/16/lib/"
+          docker exec $POSTGRES_CONTAINER_ID bash -c "cp /tmp/q3c-ext/q3c*.sql /tmp/q3c-ext/q3c.control /usr/share/postgresql/16/extension/"
+
+          # Verify installation
           echo "Verifying installation in PostgreSQL service container"
-          docker exec $POSTGRES_CONTAINER_ID ls -la $POSTGRES_PKGLIBDIR/q3c.so
-          docker exec $POSTGRES_CONTAINER_ID ls -la $POSTGRES_SHAREDIR/extension/q3c*
+          docker exec $POSTGRES_CONTAINER_ID ls -la /usr/lib/postgresql/16/lib/q3c.so
+          docker exec $POSTGRES_CONTAINER_ID ls -la /usr/share/postgresql/16/extension/q3c*
 
       - name: Install q3c extension
         run: |
