@@ -145,7 +145,7 @@ jobs:
 
       - name: Transfer target lists
         run: |
-          pfs-targetdb-cli transfer-targets -c~/.pfs/test_db_config.toml examples/data/targets/example_input_catalogs.csv \
+          pfs-targetdb-cli transfer-targets -c ~/.pfs/test_db_config.toml examples/data/targets/example_input_catalogs.csv \
             --local-dir examples/data/targets --force
 
       - name: Insert targets
