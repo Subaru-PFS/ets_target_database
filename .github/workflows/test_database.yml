@@ -158,6 +158,14 @@ jobs:
           pfs-targetdb-cli insert-pointings -c ~/.pfs/test_db_config.toml examples/data/targets/example_input_catalogs.csv \
             --data-dir examples/data/targets/ --commit
 
+      - name: Change input catalog active status
+        run: |
+          pfs-targetdb-cli update-catalog-active 1004 true -c ~/.pfs/test_db_config.toml --verbose --commit
+
+          - name: Generate ER diagram
+          run: |
+            pfs-targetdb-cli diagram -c ~/.pfs/test_db_config.toml --generator tbls --output-dir ./diagram-test
+
       #   - name: Run tests
       #     run: |
       #       pytest -xvs tests/ --cov=src/targetdb/ --cov-report=xml
@@ -168,10 +176,6 @@ jobs:
       #       token: ${{ secrets.CODECOV_TOKEN }}
       #       file: ./coverage.xml
       #       fail_ci_if_error: false
-
-      - name: Generate ER diagram
-        run: |
-          pfs-targetdb-cli diagram -c ~/.pfs/test_db_config.toml --generator tbls --output-dir ./diagram-test
 
     #   - name: Test migrations
     #     run: |
