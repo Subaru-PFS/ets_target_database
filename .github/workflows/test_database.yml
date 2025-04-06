@@ -162,9 +162,9 @@ jobs:
         run: |
           pfs-targetdb-cli update-catalog-active 1004 true -c ~/.pfs/test_db_config.toml --verbose --commit
 
-          - name: Generate ER diagram
-          run: |
-            pfs-targetdb-cli diagram -c ~/.pfs/test_db_config.toml --generator tbls --output-dir ./diagram-test
+      - name: Generate ER diagram
+        run: |
+          pfs-targetdb-cli diagram -c ~/.pfs/test_db_config.toml --generator tbls --output-dir ./diagram-test
 
       #   - name: Run tests
       #     run: |
