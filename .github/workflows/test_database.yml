@@ -121,13 +121,14 @@ jobs:
 
           # Create a container, copy files and then remove it
           docker create --name q3c-temp q3c-builder
-          docker cp q3c-temp:/output/lib /tmp/q3c-output/
-          docker cp q3c-temp:/output/extension /tmp/q3c-output/
+          docker cp q3c-temp:/output/lib/. /tmp/q3c-output/lib/
+          docker cp q3c-temp:/output/extension/. /tmp/q3c-output/extension/
           docker rm q3c-temp
 
           # Check extracted files
           echo "Files extracted from container:"
-          ls -la /tmp/q3c-output/lib/ /tmp/q3c-output/extension/
+          ls -la /tmp/q3c-output/extension/
+          ls -la /tmp/q3c-output/lib/
 
           # Find the correct PostgreSQL directories in the service container
           echo "Determining correct PostgreSQL directories for installation"
@@ -139,10 +140,19 @@ jobs:
           echo "PostgreSQL library directory in service container: $POSTGRES_PKGLIBDIR"
           echo "PostgreSQL share directory in service container: $POSTGRES_SHAREDIR"
 
-          # Install the files directly into the PostgreSQL service container
-          echo "Installing q3c extension files into PostgreSQL service container"
+          # Make sure extension directory exists in the container
+          docker exec $POSTGRES_CONTAINER_ID mkdir -p $POSTGRES_SHAREDIR/extension
+
+          # Install the files directly into the PostgreSQL service container - one by one
+          echo "Installing q3c.so into PostgreSQL service container"
           docker cp /tmp/q3c-output/lib/q3c.so $POSTGRES_CONTAINER_ID:$POSTGRES_PKGLIBDIR/
-          docker cp /tmp/q3c-output/extension/ $POSTGRES_CONTAINER_ID:$POSTGRES_SHAREDIR/
+
+          echo "Installing extension files into PostgreSQL service container"
+          for file in /tmp/q3c-output/extension/q3c*; do
+            filename=$(basename "$file")
+            echo "Copying $filename..."
+            docker cp "$file" "$POSTGRES_CONTAINER_ID:$POSTGRES_SHAREDIR/extension/$filename"
+          done
 
           # Verify files were installed correctly in the container
           echo "Verifying installation in PostgreSQL service container"
