@@ -82,7 +82,8 @@ jobs:
           docker run --rm -v $(pwd):/workdir -w /workdir postgres:16 bash -c "
             # Install development tools in container
             apt-get update -y && \
-            apt-get install -y git make gcc postgresql-server-dev-16 libreadline-dev && \
+            apt-get install -y git make gcc postgresql-server-dev-16 libreadline-dev \
+                              zlib1g-dev libzstd-dev liblz4-dev && \
             # Download q3c
             git clone https://github.com/segasai/q3c.git && \
             cd q3c && \
