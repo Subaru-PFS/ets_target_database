@@ -48,45 +48,21 @@ $ pfs-targetdb-cli [OPTIONS] COMMAND [ARGS]...
 
 **Commands**:
 
-* `checkdups`: Check for duplicates in data files in a...
 * `create-db`: Create a database on a PostgreSQL server.
-* `create-schema`: Create tables of the PFS tartedb in a...
-* `diagram`: Generate an ER diagram of a database.
 * `drop-db`: Drop a database on a PostgreSQL server.
-* `insert`: Insert rows into a table in the PFS Target...
-* `insert-targets`: Insert targets using a list of input...
 * `install-q3c`: Insert the Q3C extension.
-* `mdtable`: Generate a Markdown output of the schema...
-* `parse-alloc`: Parse an Excel file containing time...
+* `create-schema`: Create tables of the PFS tartedb in a...
+* `checkdups`: Check for duplicates in data files in a...
 * `prep-fluxstd`: Prepare flux standard data for the target...
-* `transfer-targets`: Download target lists from the uploader to...
+* `diagram`: Generate an ER diagram of a database.
+* `mdtable`: Generate a Markdown output of the schema...
+* `insert`: Insert rows into a table in the PFS Target...
 * `update`: Update rows in a table in the PFS Target...
+* `parse-alloc`: Parse an Excel file containing time...
+* `transfer-targets`: Download target lists from the uploader to...
+* `insert-targets`: Insert targets using a list of input...
+* `insert-pointings`: Insert user-defined pointings using a list...
 * `update-catalog-active`: Update active flag in the input_catalog...
-
----
-
-### `checkdups`
-
-Check for duplicates in data files in a directory.
-
-**Usage**:
-
-```console
-$ pfs-targetdb-cli checkdups [OPTIONS] DIRECTORY
-```
-
-**Arguments**:
-
-* `DIRECTORY`: Directory path containing input files.  [required]
-
-**Options**:
-
-* `-o, --outdir TEXT`: Directory path to save output files.  [default: .]
-* `--skip-save-merged`: Do not save the merged DataFrame.
-* `--additional-columns TEXT`: Additional columns to output for the merged file.  (e.g., 'psf_mag_g' 'psf_mag_r'). The following columns are saved by default: "obj_id", "ra", "dec", "input_catalog_id", "version", "input_file", "is_fstar_gaia", "prob_f_star".
-* `--check-columns TEXT`: Columns used to check for duplicates.  [default: obj_id, input_catalog_id, version]
-* `--format [feather|parquet]`: File format of the merged data file.  [default: parquet]
-* `--help`: Show this message and exit.
 
 ---
 
@@ -98,6 +74,40 @@ Create a database on a PostgreSQL server.
 
 ```console
 $ pfs-targetdb-cli create-db [OPTIONS]
+```
+
+**Options**:
+
+* `-c, --config TEXT`: Database configuration file in the TOML format.  [required]
+* `--help`: Show this message and exit.
+
+---
+
+### `drop-db`
+
+Drop a database on a PostgreSQL server.
+
+**Usage**:
+
+```console
+$ pfs-targetdb-cli drop-db [OPTIONS]
+```
+
+**Options**:
+
+* `-c, --config TEXT`: Database configuration file in the TOML format.  [required]
+* `--help`: Show this message and exit.
+
+---
+
+### `install-q3c`
+
+Insert the Q3C extension.
+
+**Usage**:
+
+```console
+$ pfs-targetdb-cli install-q3c [OPTIONS]
 ```
 
 **Options**:
@@ -121,6 +131,57 @@ $ pfs-targetdb-cli create-schema [OPTIONS]
 
 * `-c, --config TEXT`: Database configuration file in the TOML format.  [required]
 * `--drop-all`: Flag to drop all tables before creating schema.
+* `--help`: Show this message and exit.
+
+---
+
+### `checkdups`
+
+Check for duplicates in data files in a directory.
+
+**Usage**:
+
+```console
+$ pfs-targetdb-cli checkdups [OPTIONS] DIRECTORY
+```
+
+**Arguments**:
+
+* `DIRECTORY`: Directory path containing input files.  [required]
+
+**Options**:
+
+* `-o, --outdir TEXT`: Directory path to save output files.  [default: .]
+* `--skip-save-merged`: Do not save the merged DataFrame.
+* `--additional-columns TEXT`: Additional columns to output for the merged file.  (e.g., &#x27;psf_mag_g&#x27; &#x27;psf_mag_r&#x27;). The following columns are saved by default: &quot;obj_id&quot;, &quot;ra&quot;, &quot;dec&quot;, &quot;input_catalog_id&quot;, &quot;version&quot;, &quot;input_file&quot;, &quot;is_fstar_gaia&quot;, &quot;prob_f_star&quot;.
+* `--check-columns TEXT`: Columns used to check for duplicates.  [default: obj_id, input_catalog_id, version]
+* `--format [feather|parquet]`: File format of the merged data file.  [default: parquet]
+* `--help`: Show this message and exit.
+
+---
+
+### `prep-fluxstd`
+
+Prepare flux standard data for the target database by supplementing additional required fields.
+
+**Usage**:
+
+```console
+$ pfs-targetdb-cli prep-fluxstd [OPTIONS] INPUT_DIR OUTPUT_DIR
+```
+
+**Arguments**:
+
+* `INPUT_DIR`: Directory path containing input files. Files must be in one of the following formats: parquet, feather, or csv. The input files must be generated in a certain format to be compatible for targetdb.  [required]
+* `OUTPUT_DIR`: Directory path to save the output files.  [required]
+
+**Options**:
+
+* `--version TEXT`: Version **string** for the F-star candidate catalog (e.g., &#x27;3.3&#x27;).  [required]
+* `--input_catalog_id INTEGER`: Input catalog ID for the flux standard star catalog.
+* `--input_catalog_name TEXT`: Input catalog name for the flux standard star catalog.
+* `--rename-cols TEXT`: Dictionary to rename columns (e.g., &#x27;{&quot;fstar_gaia&quot;: &quot;is_fstar_gaia&quot;}&#x27;).
+* `--format [feather|parquet]`: File format of the output data file.  [default: parquet]
 * `--help`: Show this message and exit.
 
 ---
@@ -149,19 +210,19 @@ $ pfs-targetdb-cli diagram [OPTIONS]
 
 ---
 
-### `drop-db`
+### `mdtable`
 
-Drop a database on a PostgreSQL server.
+Generate a Markdown output of the schema of the PFS Target Database.
 
 **Usage**:
 
 ```console
-$ pfs-targetdb-cli drop-db [OPTIONS]
+$ pfs-targetdb-cli mdtable [OPTIONS]
 ```
 
 **Options**:
 
-* `-c, --config TEXT`: Database configuration file in the TOML format.  [required]
+* `-o, --output-file TEXT`: Output file.
 * `--help`: Show this message and exit.
 
 ---
@@ -194,136 +255,6 @@ $ pfs-targetdb-cli insert [OPTIONS] INPUT_FILE
 
 ---
 
-### `insert-targets`
-
-Insert targets using a list of input catalogs and upload IDs.
-
-**Usage**:
-
-```console
-$ pfs-targetdb-cli insert-targets [OPTIONS] INPUT_CATALOGS
-```
-
-**Arguments**:
-
-* `INPUT_CATALOGS`: Input catalog list to insert (csv).  [required]
-
-**Options**:
-
-* `-c, --config TEXT`: Database configuration file in the TOML format.  [required]
-* `--data-dir PATH`: Path to the data directory.  [default: .]
-* `--commit`: Commit changes to the database.
-* `--fetch`: Fetch data from database a the end.
-* `-v, --verbose`: Verbose output.
-* `--help`: Show this message and exit.
-
----
-
-### `install-q3c`
-
-Insert the Q3C extension.
-
-**Usage**:
-
-```console
-$ pfs-targetdb-cli install-q3c [OPTIONS]
-```
-
-**Options**:
-
-* `-c, --config TEXT`: Database configuration file in the TOML format.  [required]
-* `--help`: Show this message and exit.
-
----
-
-### `mdtable`
-
-Generate a Markdown output of the schema of the PFS Target Database.
-
-**Usage**:
-
-```console
-$ pfs-targetdb-cli mdtable [OPTIONS]
-```
-
-**Options**:
-
-* `-o, --output-file TEXT`: Output file.
-* `--help`: Show this message and exit.
-
----
-
-### `parse-alloc`
-
-Parse an Excel file containing time allocation information.
-
-**Usage**:
-
-```console
-$ pfs-targetdb-cli parse-alloc [OPTIONS] INPUT_FILE
-```
-
-**Arguments**:
-
-* `INPUT_FILE`: Path to the Excel file containing time allocation information (e.g., "allocations.xlsx").  [required]
-
-**Options**:
-
-* `--output-dir PATH`: Directory path to save output files.  [default: .]
-* `--outfile-prefix TEXT`: Prefix to the output files.
-* `--help`: Show this message and exit.
-
----
-
-### `prep-fluxstd`
-
-Prepare flux standard data for the target database by supplementing additional required fields.
-
-**Usage**:
-
-```console
-$ pfs-targetdb-cli prep-fluxstd [OPTIONS] INPUT_DIR OUTPUT_DIR
-```
-
-**Arguments**:
-
-* `INPUT_DIR`: Directory path containing input files. Files must be in one of the following formats: parquet, feather, or csv. The input files must be generated in a certain format to be compatible for targetdb.  [required]
-* `OUTPUT_DIR`: Directory path to save the output files.  [required]
-
-**Options**:
-
-* `--version TEXT`: Version **string** for the F-star candidate catalog (e.g., '3.3').  [required]
-* `--input_catalog_id INTEGER`: Input catalog ID for the flux standard star catalog.
-* `--input_catalog_name TEXT`: Input catalog name for the flux standard star catalog.
-* `--rename-cols TEXT`: Dictionary to rename columns (e.g., '{"fstar_gaia": "is_fstar_gaia"}').
-* `--format [feather|parquet]`: File format of the output data file.  [default: parquet]
-* `--help`: Show this message and exit.
-
----
-
-### `transfer-targets`
-
-Download target lists from the uploader to the local machine.
-
-**Usage**:
-
-```console
-$ pfs-targetdb-cli transfer-targets [OPTIONS] INPUT_FILE
-```
-
-**Arguments**:
-
-* `INPUT_FILE`: Input catalog list file (csv).  [required]
-
-**Options**:
-
-* `-c, --config TEXT`: Database configuration file in the TOML format.  [required]
-* `--local-dir PATH`: Path to the data directory in the local machine  [default: .]
-* `--force / --no-force`: Force download.  [default: no-force]
-* `--help`: Show this message and exit.
-
----
-
 ### `update`
 
 Update rows in a table in the PFS Target Database.
@@ -352,6 +283,101 @@ $ pfs-targetdb-cli update [OPTIONS] INPUT_FILE
 
 ---
 
+### `parse-alloc`
+
+Parse an Excel file containing time allocation information.
+
+**Usage**:
+
+```console
+$ pfs-targetdb-cli parse-alloc [OPTIONS] INPUT_FILE
+```
+
+**Arguments**:
+
+* `INPUT_FILE`: Path to the Excel file containing time allocation information (e.g., &quot;allocations.xlsx&quot;).  [required]
+
+**Options**:
+
+* `--output-dir PATH`: Directory path to save output files.  [default: .]
+* `--outfile-prefix TEXT`: Prefix to the output files.
+* `--help`: Show this message and exit.
+
+---
+
+### `transfer-targets`
+
+Download target lists from the uploader to the local machine.
+
+**Usage**:
+
+```console
+$ pfs-targetdb-cli transfer-targets [OPTIONS] INPUT_FILE
+```
+
+**Arguments**:
+
+* `INPUT_FILE`: Input catalog list file (csv).  [required]
+
+**Options**:
+
+* `-c, --config TEXT`: Database configuration file in the TOML format.  [required]
+* `--local-dir PATH`: Path to the data directory in the local machine  [default: .]
+* `--force / --no-force`: Force download.  [default: no-force]
+* `--help`: Show this message and exit.
+
+---
+
+### `insert-targets`
+
+Insert targets using a list of input catalogs and upload IDs.
+
+**Usage**:
+
+```console
+$ pfs-targetdb-cli insert-targets [OPTIONS] INPUT_CATALOGS
+```
+
+**Arguments**:
+
+* `INPUT_CATALOGS`: Input catalog list to insert (csv).  [required]
+
+**Options**:
+
+* `-c, --config TEXT`: Database configuration file in the TOML format.  [required]
+* `--data-dir PATH`: Path to the data directory.  [default: .]
+* `--commit`: Commit changes to the database.
+* `--fetch`: Fetch data from database a the end.
+* `-v, --verbose`: Verbose output.
+* `--help`: Show this message and exit.
+
+---
+
+### `insert-pointings`
+
+Insert user-defined pointings using a list of input catalogs and upload IDs.
+
+**Usage**:
+
+```console
+$ pfs-targetdb-cli insert-pointings [OPTIONS] INPUT_CATALOGS
+```
+
+**Arguments**:
+
+* `INPUT_CATALOGS`: Input catalog list to insert (csv).  [required]
+
+**Options**:
+
+* `-c, --config TEXT`: Database configuration file in the TOML format.  [required]
+* `--data-dir PATH`: Path to the data directory.  [default: .]
+* `--commit`: Commit changes to the database.
+* `--fetch`: Fetch data from database a the end.
+* `-v, --verbose`: Verbose output.
+* `--help`: Show this message and exit.
+
+---
+
 ### `update-catalog-active`
 
 Update active flag in the input_catalog table.
@@ -373,4 +399,3 @@ $ pfs-targetdb-cli update-catalog-active [OPTIONS] INPUT_CATALOG_ID ACTIVE_FLAG
 * `--commit`: Commit changes to the database.
 * `-v, --verbose`: Verbose output.
 * `--help`: Show this message and exit.
-
