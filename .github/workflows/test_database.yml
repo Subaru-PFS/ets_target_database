@@ -121,7 +121,7 @@ jobs:
 
       - name: Insert input catalog for fluxstd
         run: |
-          pfs-targetdb-cli insert -c ~/.pfs/test_db_config.toml -t input_catalog examples/data/input_catalogs_fluxstd.csv --commit
+          pfs-targetdb-cli insert -c ~/.pfs/test_db_config.toml -t input_catalog examples/data/input_catalog_fluxstd.csv --commit
 
       - name: Prepare fluxstd file"
         run: |
