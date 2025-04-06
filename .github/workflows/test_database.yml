@@ -74,104 +74,32 @@ jobs:
 
       - name: Setup PostgreSQL with q3c
         run: |
-          # Create a Docker container based on the same PostgreSQL image
-          # This ensures identical environment to our services container
-          cat > Dockerfile.q3c << EOF
-          FROM postgres:16
-
-          # Install build dependencies
-          RUN apt-get update && apt-get install -y \
-              build-essential \
-              git \
-              postgresql-server-dev-16 \
-              libreadline-dev \
-              zlib1g-dev \
-              libzstd-dev \
-              liblz4-dev \
-              libssl-dev \
-              && rm -rf /var/lib/apt/lists/*
-
-          # Clone and build q3c with more detailed output
-          WORKDIR /build
-          RUN git clone https://github.com/segasai/q3c.git \
-              && cd q3c \
-              && sed -i 's/LLVM ?= yes/LLVM = no/g' Makefile \
-              && make \
-              && make install
-
-          # Print locations of installed files for debugging
-          RUN echo "Checking installed q3c files:" \
-              && ls -la \$(pg_config --pkglibdir)/q3c.so \
-              && ls -la \$(pg_config --sharedir)/extension/q3c*
-
-          # Create output directory and copy files with explicit paths
-          RUN mkdir -p /output/lib \
-              && mkdir -p /output/extension \
-              && cp \$(pg_config --pkglibdir)/q3c.so /output/lib/ \
-              && cp \$(pg_config --sharedir)/extension/q3c* /output/extension/ \
-              && ls -la /output/lib/ /output/extension/
-          EOF
-
-          # Build the container
-          docker build -t q3c-builder -f Dockerfile.q3c .
-
-          # Extract built files from the container
-          mkdir -p /tmp/q3c-output/lib
-          mkdir -p /tmp/q3c-output/extension
-
-          # Create a container, copy files and then remove it
-          docker create --name q3c-temp q3c-builder
-          docker cp q3c-temp:/output/lib/. /tmp/q3c-output/lib/
-          docker cp q3c-temp:/output/extension/. /tmp/q3c-output/extension/
-          docker rm q3c-temp
-
-          # Check extracted files
-          echo "Files extracted from container:"
-          ls -la /tmp/q3c-output/extension/
-          ls -la /tmp/q3c-output/lib/
-
-          # Find the correct PostgreSQL directories in the service container
-          echo "Determining correct PostgreSQL directories for installation"
-          # Query the PostgreSQL service container to get the right paths
+          # Identify the PostgreSQL container
           POSTGRES_CONTAINER_ID=$(docker ps -q --filter "ancestor=postgres:16")
-
-          if [ -z "$POSTGRES_CONTAINER_ID" ]; then
-            echo "ERROR: Could not find PostgreSQL container!"
-            docker ps
-            exit 1
-          fi
-
           echo "PostgreSQL container ID: $POSTGRES_CONTAINER_ID"
 
-          # Debug PostgreSQL file structure
-          echo "Debugging PostgreSQL directory structure in container"
-          docker exec $POSTGRES_CONTAINER_ID find /usr/share/postgresql -type d | sort
-          docker exec $POSTGRES_CONTAINER_ID find /usr/lib/postgresql -type d | sort
+          # Install necessary packages inside the PostgreSQL container
+          docker exec $POSTGRES_CONTAINER_ID apt-get update
+          docker exec $POSTGRES_CONTAINER_ID apt-get install -y \
+            postgresql-server-dev-16 \
+            build-essential \
+            git \
+            libreadline-dev \
+            zlib1g-dev \
+            libzstd-dev \
+            liblz4-dev \
+            libssl-dev
 
-          # Create a temporary directory in the container
-          docker exec $POSTGRES_CONTAINER_ID mkdir -p /tmp/q3c-ext
+          # Clone q3c repository inside the container
+          docker exec $POSTGRES_CONTAINER_ID bash -c "mkdir -p /build && cd /build && git clone https://github.com/segasai/q3c.git"
 
-          # Copy files to temp directory in container first
-          docker cp /tmp/q3c-output/lib/q3c.so $POSTGRES_CONTAINER_ID:/tmp/q3c-ext/
-          for file in /tmp/q3c-output/extension/*; do
-            filename=$(basename "$file")
-            docker cp "$file" "$POSTGRES_CONTAINER_ID:/tmp/q3c-ext/$filename"
-          done
-
-          # Verify files in temp directory
-          echo "Verifying files in container's temp directory:"
-          docker exec $POSTGRES_CONTAINER_ID ls -la /tmp/q3c-ext/
-
-          # Now copy to correct PostgreSQL locations inside the container
-          echo "Installing extension files in container"
-          docker exec $POSTGRES_CONTAINER_ID bash -c "mkdir -p /usr/share/postgresql/16/extension"
-          docker exec $POSTGRES_CONTAINER_ID bash -c "cp /tmp/q3c-ext/q3c.so /usr/lib/postgresql/16/lib/"
-          docker exec $POSTGRES_CONTAINER_ID bash -c "cp /tmp/q3c-ext/q3c*.sql /tmp/q3c-ext/q3c.control /usr/share/postgresql/16/extension/"
+          # Build and install q3c inside the container
+          docker exec $POSTGRES_CONTAINER_ID bash -c "cd /build/q3c && sed -i 's/LLVM ?= yes/LLVM = no/g' Makefile && make && make install"
 
           # Verify installation
-          echo "Verifying installation in PostgreSQL service container"
-          docker exec $POSTGRES_CONTAINER_ID ls -la /usr/lib/postgresql/16/lib/q3c.so
-          docker exec $POSTGRES_CONTAINER_ID ls -la /usr/share/postgresql/16/extension/q3c*
+          echo "Verifying q3c installation in PostgreSQL container:"
+          docker exec $POSTGRES_CONTAINER_ID bash -c "ls -la \$(pg_config --pkglibdir)/q3c.so"
+          docker exec $POSTGRES_CONTAINER_ID bash -c "ls -la \$(pg_config --sharedir)/extension/q3c*"
 
       - name: Install q3c extension
         run: |
