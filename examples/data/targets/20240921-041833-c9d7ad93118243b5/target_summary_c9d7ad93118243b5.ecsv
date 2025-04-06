@@ -1,0 +1,32 @@
+# %ECSV 1.0
+# ---
+# datatype:
+# - {name: Priority, datatype: string, subtype: json}
+# - {name: N (L), datatype: int64}
+# - {name: Texp (L), datatype: float64}
+# - {name: N (M), datatype: int64}
+# - {name: Texp (M), datatype: float64}
+# delimiter: ','
+# meta: !!omap
+# - {original_filename: example_perseus_cluster_r60arcmin.csv}
+# - {original_filename_ppc: null}
+# - {ppp_status: true}
+# - {single_exptime: 900}
+# - {observation_type: queue}
+# - {ppc_status: auto}
+# - {upload_id: c9d7ad93118243b5}
+# - {upload_at: !!timestamp '2024-09-21 04:18:33.446888+00:00'}
+# schema: astropy-2.0
+Priority,N (L),Texp (L),N (M),Texp (M)
+0,16,4.0,15,3.75
+1,11,2.75,9,2.25
+2,32,8.0,45,11.25
+3,46,11.5,58,14.5
+4,10,2.5,5,1.25
+5,71,17.75,76,19.0
+6,13,3.25,10,2.5
+7,7,1.75,16,4.0
+8,3,0.75,9,2.25
+9,36,9.0,51,12.75
+"""Other""",0,0.0,0,0.0
+"""Total""",245,61.25,294,73.5

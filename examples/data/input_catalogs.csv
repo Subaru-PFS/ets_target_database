@@ -9,7 +9,7 @@ input_catalog_id,input_catalog_name,input_catalog_description,upload_id
 7,scssp_pdr2_wide,HSC-SSP Public Data Release 2 (Wide),
 8,hscssp_pdr2_dud,HSC-SSP Public Dta Release 2 (Deep+UltraDeep),
 9,hscssp_pdr3_wide,HSC-SSP Public Data Release 3 (Wide),
-0,hscssp_pdr3_dud,HSC-SSP Public Data Release 3 (Deep+UltraDeep),
+10,hscssp_pdr3_dud,HSC-SSP Public Data Release 3 (Deep+UltraDeep),
 11,hscssp_pdr4_wide,HS-SSP Public Data Release 4 (Wide),
 12,hscssp_pdr4_dud,HSC-SSP Public Data Release 4 (Dee+UltraDeep),
 1001,sky_hscssp_s21a_wide,Sky positions from S21A HSC-SSP (Wide),

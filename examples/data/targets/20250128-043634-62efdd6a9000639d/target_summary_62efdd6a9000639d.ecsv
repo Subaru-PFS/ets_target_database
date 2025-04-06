@@ -1,0 +1,32 @@
+# %ECSV 1.0
+# ---
+# datatype:
+# - {name: Priority, datatype: string, subtype: json}
+# - {name: N (L), datatype: int64}
+# - {name: Texp (L), datatype: float64}
+# - {name: N (M), datatype: int64}
+# - {name: Texp (M), datatype: float64}
+# delimiter: ','
+# meta: !!omap
+# - {original_filename: random_example_n00000500_L_tractpatch.csv}
+# - {original_filename_ppc: null}
+# - {ppp_status: true}
+# - {single_exptime: 900}
+# - {observation_type: queue}
+# - {ppc_status: auto}
+# - {upload_id: 62efdd6a9000639d}
+# - {upload_at: !!timestamp '2025-01-28 04:36:34.778784+00:00'}
+# schema: astropy-2.0
+Priority,N (L),Texp (L),N (M),Texp (M)
+0,0,0.0,0,0.0
+1,6,1.5,0,0.0
+2,0,0.0,0,0.0
+3,0,0.0,0,0.0
+4,0,0.0,0,0.0
+5,0,0.0,0,0.0
+6,0,0.0,0,0.0
+7,0,0.0,0,0.0
+8,0,0.0,0,0.0
+9,0,0.0,0,0.0
+"""Other""",0,0.0,0,0.0
+"""Total""",6,1.5,0,0.0

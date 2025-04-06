@@ -1,0 +1,26 @@
+# %ECSV 1.0
+# ---
+# datatype:
+# - {name: ppc_code, datatype: string}
+# - {name: ppc_ra, datatype: float64}
+# - {name: ppc_dec, datatype: float64}
+# - {name: ppc_pa, datatype: float64}
+# - {name: ppc_resolution, datatype: string}
+# - {name: ppc_priority, datatype: float64}
+# - {name: Fiber usage fraction (%), datatype: float64}
+# - {name: allocated_targets, datatype: string, subtype: json}
+# delimiter: ','
+# meta: !!omap
+# - {original_filename: random_example_n00000500_L_tractpatch.csv}
+# - {original_filename_ppc: null}
+# - {ppp_status: true}
+# - {single_exptime: 900}
+# - {observation_type: queue}
+# - {ppc_status: auto}
+# - {upload_id: 62efdd6a9000639d}
+# - {upload_at: !!timestamp '2025-01-28 04:36:34.778784+00:00'}
+# schema: astropy-2.0
+ppc_code,ppc_ra,ppc_dec,ppc_pa,ppc_resolution,ppc_priority,Fiber usage fraction (%),allocated_targets
+Point_low_1,149.57046408793786,2.269512607776,0.0,L,330.89645916816187,0.12531328320802004,"[""ob_00000002"",""ob_00000000"",""ob_00000003""]"
+Point_low_2,150.2851980713226,2.455792473811557,0.0,L,497.2534969023496,0.0835421888053467,"[""ob_00000005"",""ob_00000004""]"
+Point_low_3,150.56462635981282,1.0452978233464145,0.0,L,1000.0,0.04177109440267335,"[""ob_00000001""]"

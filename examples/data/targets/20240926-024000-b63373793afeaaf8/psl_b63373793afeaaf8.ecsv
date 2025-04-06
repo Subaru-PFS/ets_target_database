@@ -1,0 +1,25 @@
+# %ECSV 1.0
+# ---
+# datatype:
+# - {name: resolution, datatype: string, subtype: json}
+# - {name: N_ppc, datatype: string, subtype: json}
+# - {name: Texp (h), datatype: float64}
+# - {name: Texp (fiberhour), datatype: float64}
+# - {name: Request time (h), datatype: float64}
+# - {name: Used fiber fraction (%), datatype: float64}
+# - {name: Fraction of PPC < 30% (%), datatype: float64}
+# - {name: P_all, datatype: float64}
+# - {name: P_0, datatype: float64}
+# delimiter: ','
+# meta: !!omap
+# - {original_filename: cosmos_001000.csv}
+# - {original_filename_ppc: null}
+# - {ppp_status: false}
+# - {single_exptime: 900}
+# - {observation_type: queue}
+# - {ppc_status: skip}
+# - {upload_id: b63373793afeaaf8}
+# - {upload_at: !!timestamp '2024-09-26 02:40:00.371006+00:00'}
+# schema: astropy-2.0
+resolution,N_ppc,Texp (h),Texp (fiberhour),Request time (h),Used fiber fraction (%),Fraction of PPC < 30% (%),P_all,P_0
+null,null,nan,nan,nan,nan,nan,nan,nan

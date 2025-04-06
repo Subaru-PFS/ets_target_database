@@ -1,0 +1,183 @@
+name: Test Database
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_targetdb
+        ports:
+          - 5432:5432
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up tbls
+        uses: k1low/setup-tbls@v1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/pyproject.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+          pip install pytest pytest-cov alembic
+
+      - name: Create test config
+        run: |
+          mkdir -p ~/.pfs
+          cat > ~/.pfs/test_db_config.toml << EOF
+          [targetdb.db]
+          dialect = "postgresql"
+          user = "postgres"
+          password = "postgres"
+          host = "localhost"
+          port = 5432
+          dbname = "test_targetdb"
+
+          [uploader]
+          host = "localhost"
+          data_dir = "examples/data/uploader"
+          EOF
+
+      - name: Create database
+        run: |
+          pfs-targetdb-cli create-db --config ~/.pfs/test_db_config.toml
+
+      - name: Setup PostgreSQL with q3c
+        run: |
+          # Identify the PostgreSQL container
+          POSTGRES_CONTAINER_ID=$(docker ps -q --filter "ancestor=postgres:16")
+          echo "PostgreSQL container ID: $POSTGRES_CONTAINER_ID"
+
+          # Install necessary packages inside the PostgreSQL container
+          docker exec $POSTGRES_CONTAINER_ID apt-get update
+          docker exec $POSTGRES_CONTAINER_ID apt-get install -y \
+            postgresql-server-dev-16 \
+            build-essential \
+            git \
+            libreadline-dev \
+            zlib1g-dev \
+            libzstd-dev \
+            liblz4-dev \
+            libssl-dev
+
+          # Clone q3c repository inside the container
+          docker exec $POSTGRES_CONTAINER_ID bash -c "mkdir -p /build && cd /build && git clone https://github.com/segasai/q3c.git"
+
+          # Build and install q3c inside the container
+          docker exec $POSTGRES_CONTAINER_ID bash -c "cd /build/q3c && sed -i 's/LLVM ?= yes/LLVM = no/g' Makefile && make && make install"
+
+          # Verify installation
+          echo "Verifying q3c installation in PostgreSQL container:"
+          docker exec $POSTGRES_CONTAINER_ID bash -c "ls -la \$(pg_config --pkglibdir)/q3c.so"
+          docker exec $POSTGRES_CONTAINER_ID bash -c "ls -la \$(pg_config --sharedir)/extension/q3c*"
+
+      - name: Install q3c extension
+        run: |
+          pfs-targetdb-cli install-q3c --config ~/.pfs/test_db_config.toml
+
+      - name: Create schema
+        run: |
+          pfs-targetdb-cli create-schema --config ~/.pfs/test_db_config.toml
+
+      - name: Insert example data
+        run: |
+          pfs-targetdb-cli insert -c ~/.pfs/test_db_config.toml -t target_type examples/data/target_types.csv --commit
+          pfs-targetdb-cli insert -c ~/.pfs/test_db_config.toml -t filter_name examples/data/filter_names.csv --commit
+          pfs-targetdb-cli insert -c ~/.pfs/test_db_config.toml -t partner examples/data/partner.csv --commit
+          pfs-targetdb-cli insert -c ~/.pfs/test_db_config.toml -t pfs_arm examples/data/pfs_arm.csv --commit
+          pfs-targetdb-cli insert -c ~/.pfs/test_db_config.toml -t proposal_category examples/data/proposal_category.csv --commit
+          pfs-targetdb-cli insert -c ~/.pfs/test_db_config.toml -t proposal examples/data/proposals.csv --commit
+          pfs-targetdb-cli insert -c ~/.pfs/test_db_config.toml -t input_catalog examples/data/input_catalogs.csv --commit
+
+      - name: Insert input catalog for fluxstd
+        run: |
+          pfs-targetdb-cli insert -c ~/.pfs/test_db_config.toml -t input_catalog examples/data/input_catalog_fluxstd.csv --commit
+
+      - name: Prepare fluxstd file"
+        run: |
+          pfs-targetdb-cli prep-fluxstd examples/data/fluxstd/Fstar_v3.3/feather-original examples/data/fluxstd/Fstar_v3.3/feather \
+            --version "3.3" \
+            --input_catalog_id 3006 \
+            --rename-cols '{"fstar_gaia": "is_fstar_gaia"}' \
+            --format feather
+
+      - name: Insert fluxstd data
+        run: |
+          pfs-targetdb-cli insert -c ~/.pfs/test_db_config.toml \
+            -t fluxstd \
+            examples/data/fluxstd/Fstar_v3.3/feather/ra354.8_354.9_dec-40.0_90.0.feather \
+            --commit
+
+      - name: Insert proposals and input catalogs for science target
+        run: |
+          pfs-targetdb-cli insert -c ~/.pfs/test_db_config.toml examples/data/targets/example_proposals.csv -t proposal --commit
+          pfs-targetdb-cli insert -c ~/.pfs/test_db_config.toml examples/data/targets/example_input_catalogs.csv -t input_catalog --commit --fetch
+
+      - name: Transfer target lists
+        run: |
+          pfs-targetdb-cli transfer-targets -c ~/.pfs/test_db_config.toml examples/data/targets/example_input_catalogs.csv \
+            --local-dir examples/data/targets --force
+
+      - name: Insert targets
+        run: |
+          pfs-targetdb-cli insert-targets -c ~/.pfs/test_db_config.toml examples/data/targets/example_input_catalogs.csv \
+            --data-dir examples/data/targets/ --commit
+
+      - name: Insert custom pointings
+        run: |
+          pfs-targetdb-cli insert-pointings -c ~/.pfs/test_db_config.toml examples/data/targets/example_input_catalogs.csv \
+            --data-dir examples/data/targets/ --commit
+
+      - name: Change input catalog active status
+        run: |
+          pfs-targetdb-cli update-catalog-active 1004 true -c ~/.pfs/test_db_config.toml --verbose --commit
+
+      - name: Generate ER diagram
+        run: |
+          pfs-targetdb-cli diagram -c ~/.pfs/test_db_config.toml --generator tbls --output-dir ./diagram-test
+
+      #   - name: Run tests
+      #     run: |
+      #       pytest -xvs tests/ --cov=src/targetdb/ --cov-report=xml
+
+      #   - name: Upload coverage to Codecov
+      #     uses: codecov/codecov-action@v4
+      #     with:
+      #       token: ${{ secrets.CODECOV_TOKEN }}
+      #       file: ./coverage.xml
+      #       fail_ci_if_error: false
+
+    #   - name: Test migrations
+    #     run: |
+    #       alembic -c alembic/local_test/alembic/alembic.ini upgrade head
+    #       alembic -c alembic/local_test/alembic/alembic.ini downgrade base

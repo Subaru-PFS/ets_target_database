@@ -1,0 +1,4 @@
+proposal_id,group_id,pi_first_name,pi_last_name,pi_middle_name,rank,grade,allocated_time_total,allocated_time_lr,allocated_time_mr,proposal_category_name,partner_name,is_too
+S99A-QT001,o99101,Eiichi,Shibusawa,,9.0,A,10000.0,7500.0,2500.0,openuse,subaru,False
+S99A-QT002,o99102,Umeko,Tsuda,,6.5,B,5000.0,1000.0,4000.0,openuse,keck,False
+S99A-QT003,o99103,Shibasaburo,Kitasato,,6.0,B,1000.0,1000.0,0.0,openuse,uh,False

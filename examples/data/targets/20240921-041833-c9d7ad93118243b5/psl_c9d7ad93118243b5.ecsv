@@ -1,0 +1,36 @@
+# %ECSV 1.0
+# ---
+# datatype:
+# - {name: resolution, datatype: string}
+# - {name: N_ppc, datatype: float64}
+# - {name: Texp (h), datatype: float64}
+# - {name: Texp (fiberhour), datatype: float64}
+# - {name: Request time (h), datatype: float64}
+# - {name: Used fiber fraction (%), datatype: float64}
+# - {name: Fraction of PPC < 30% (%), datatype: float64}
+# - {name: P_all, datatype: float64}
+# - {name: P_0, datatype: float64}
+# - {name: P_1, datatype: float64}
+# - {name: P_2, datatype: float64}
+# - {name: P_3, datatype: float64}
+# - {name: P_4, datatype: float64}
+# - {name: P_5, datatype: float64}
+# - {name: P_6, datatype: float64}
+# - {name: P_7, datatype: float64}
+# - {name: P_8, datatype: float64}
+# - {name: P_9, datatype: float64}
+# delimiter: ','
+# meta: !!omap
+# - {original_filename: example_perseus_cluster_r60arcmin.csv}
+# - {original_filename_ppc: null}
+# - {ppp_status: true}
+# - {single_exptime: 900}
+# - {observation_type: queue}
+# - {ppc_status: auto}
+# - {upload_id: c9d7ad93118243b5}
+# - {upload_at: !!timestamp '2024-09-21 04:18:33.446888+00:00'}
+# schema: astropy-2.0
+resolution,N_ppc,Texp (h),Texp (fiberhour),Request time (h),Used fiber fraction (%),Fraction of PPC < 30% (%),P_all,P_0,P_1,P_2,P_3,P_4,P_5,P_6,P_7,P_8,P_9
+low,13.0,3.25,61.25,4.924242424242425,0.7872244714349979,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0
+medium,14.0,3.5,73.5,5.303030303030304,0.8771929824561402,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0
+Total,27.0,6.75,134.75,10.227272727272728,1.664417453891138,,,,,,,,,,,,

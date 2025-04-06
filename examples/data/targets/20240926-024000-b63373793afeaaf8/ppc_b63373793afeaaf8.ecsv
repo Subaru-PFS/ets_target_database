@@ -1,0 +1,23 @@
+# %ECSV 1.0
+# ---
+# datatype:
+# - {name: ppc_code, datatype: string, subtype: json}
+# - {name: ppc_ra, datatype: float64}
+# - {name: ppc_dec, datatype: float64}
+# - {name: ppc_pa, datatype: float64}
+# - {name: ppc_priority, datatype: int64}
+# - {name: Fiber usage fraction (%), datatype: float64}
+# - {name: ppc_resolution, datatype: string, subtype: json}
+# delimiter: ','
+# meta: !!omap
+# - {original_filename: cosmos_001000.csv}
+# - {original_filename_ppc: null}
+# - {ppp_status: false}
+# - {single_exptime: 900}
+# - {observation_type: queue}
+# - {ppc_status: skip}
+# - {upload_id: b63373793afeaaf8}
+# - {upload_at: !!timestamp '2024-09-26 02:40:00.371006+00:00'}
+# schema: astropy-2.0
+ppc_code,ppc_ra,ppc_dec,ppc_pa,ppc_priority,Fiber usage fraction (%),ppc_resolution
+null,nan,nan,nan,-1,nan,null
