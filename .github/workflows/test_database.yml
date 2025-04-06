@@ -83,15 +83,15 @@ jobs:
           # Clone q3c from GitHub
           git clone https://github.com/segasai/q3c.git
           cd q3c
-          make
-          sudo make install
+          #   make
+          #   sudo make install
 
-        #   # Modify makefile to disable LLVM (which requires specific clang versions)
-        #   sed -i 's/LLVM ?= yes/LLVM = no/g' Makefile
+          # Modify makefile to disable LLVM (which requires specific clang versions)
+          sed -i 's/LLVM ?= yes/LLVM = no/g' Makefile
 
-        #   # Build and install with LLVM disabled
-        #   make USE_PGXS=1
-        #   sudo make USE_PGXS=1 install
+          # Build and install with LLVM disabled
+          make USE_PGXS=1
+          sudo make USE_PGXS=1 install
 
         #   # Verify installation
         #   ls -la $(pg_config --pkglibdir)/q3c.so || echo "q3c.so not found!"
