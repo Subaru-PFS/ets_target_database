@@ -76,31 +76,45 @@ jobs:
         run: |
           # Install necessary packages for q3c installation
           sudo apt-get update -y
-          sudo apt-get install -y postgresql-server-dev-16 libreadline-dev zlib1g-dev
+          sudo apt-get install -y postgresql-server-dev-16 libreadline-dev zlib1g-dev libzstd-dev liblz4-dev
 
-          # Use a containerized approach to avoid clang-19 dependency
-          docker run --rm -v $(pwd):/workdir -w /workdir postgres:16 bash -c "
-            # Install development tools in container
-            apt-get update -y && \
-            apt-get install -y git make gcc postgresql-server-dev-16 libreadline-dev \
-                              zlib1g-dev libzstd-dev liblz4-dev && \
-            # Download q3c
-            git clone https://github.com/segasai/q3c.git && \
-            cd q3c && \
-            # Disable LLVM to avoid clang dependency
-            sed -i 's/LLVM ?= yes/LLVM ?= no/g' Makefile && \
-            # Build and install q3c
-            make && make install && \
-            # Copy extension files to host
-            mkdir -p /tmp/q3c-install && \
-            cp q3c.so /tmp/q3c-install/ && \
-            cp q3c--*.sql q3c.control /tmp/q3c-install/
-          "
+          # Download q3c locally
+          git clone https://github.com/segasai/q3c.git
+          cd q3c
 
-          # Copy extension files from container to PostgreSQL directories
-          sudo cp /tmp/q3c-install/q3c.so $(pg_config --pkglibdir)/
+          # Create a manual build script to avoid LLVM dependency
+          cat > build_q3c.sh << 'EOF'
+          #!/bin/bash
+          set -e
+
+          # Compile the basic objects
+          gcc -fPIC -O3 -I/usr/include/postgresql/16/server -I/usr/include/postgresql/internal -c -o q3c_poly.o q3c_poly.c
+          gcc -fPIC -O3 -I/usr/include/postgresql/16/server -I/usr/include/postgresql/internal -c -o q3cube.o q3cube.c
+          gcc -fPIC -O3 -I/usr/include/postgresql/16/server -I/usr/include/postgresql/internal -c -o prepare.o prepare.c
+
+          # Compile and run prepare to generate SQL file
+          gcc prepare.o q3cube.o q3c_poly.o -lm -o prepare
+          ./prepare
+
+          # Compile remaining objects and create shared library
+          gcc -fPIC -O3 -I/usr/include/postgresql/16/server -I/usr/include/postgresql/internal -c -o q3c.o q3c.c
+          gcc -fPIC -O3 -I/usr/include/postgresql/16/server -I/usr/include/postgresql/internal -c -o dump.o dump.c
+          gcc -shared -o q3c.so q3c.o q3c_poly.o q3cube.o dump.o -lm
+
+          # Verify files were created properly
+          ls -la q3c.so q3c--*.sql q3c.control
+          EOF
+
+          chmod +x build_q3c.sh
+
+          # Execute the build script
+          ./build_q3c.sh
+
+          # Install the extension files
+          sudo mkdir -p $(pg_config --pkglibdir)
           sudo mkdir -p $(pg_config --sharedir)/extension
-          sudo cp /tmp/q3c-install/q3c--*.sql /tmp/q3c-install/q3c.control $(pg_config --sharedir)/extension/
+          sudo cp q3c.so $(pg_config --pkglibdir)/
+          sudo cp q3c--*.sql q3c.control $(pg_config --sharedir)/extension/
 
       - name: Install q3c extension
         run: |
