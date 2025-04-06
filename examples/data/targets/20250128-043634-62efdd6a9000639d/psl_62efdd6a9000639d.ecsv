@@ -1,0 +1,26 @@
+# %ECSV 1.0
+# ---
+# datatype:
+# - {name: resolution, datatype: string}
+# - {name: N_ppc, datatype: float64}
+# - {name: Texp (h), datatype: float64}
+# - {name: Texp (fiberhour), datatype: float64}
+# - {name: Request time (h), datatype: float64}
+# - {name: Used fiber fraction (%), datatype: float64}
+# - {name: Fraction of PPC < 30% (%), datatype: float64}
+# - {name: P_all, datatype: float64}
+# - {name: P_1, datatype: float64}
+# delimiter: ','
+# meta: !!omap
+# - {original_filename: random_example_n00000500_L_tractpatch.csv}
+# - {original_filename_ppc: null}
+# - {ppp_status: true}
+# - {single_exptime: 900}
+# - {observation_type: queue}
+# - {ppc_status: auto}
+# - {upload_id: 62efdd6a9000639d}
+# - {upload_at: !!timestamp '2025-01-28 04:36:34.778784+00:00'}
+# schema: astropy-2.0
+resolution,N_ppc,Texp (h),Texp (fiberhour),Request time (h),Used fiber fraction (%),Fraction of PPC < 30% (%),P_all,P_1
+low,3.0,0.75,1.5,1.1363636363636365,0.0835421888053467,100.0,100.0,100.0
+Total,3.0,0.75,1.5,1.1363636363636365,0.0835421888053467,,,

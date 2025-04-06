@@ -1,0 +1,32 @@
+# %ECSV 1.0
+# ---
+# datatype:
+# - {name: Priority, datatype: string, subtype: json}
+# - {name: N (L), datatype: int64}
+# - {name: Texp (L), datatype: float64}
+# - {name: N (M), datatype: int64}
+# - {name: Texp (M), datatype: float64}
+# delimiter: ','
+# meta: !!omap
+# - {original_filename: cosmos_001000.csv}
+# - {original_filename_ppc: null}
+# - {ppp_status: false}
+# - {single_exptime: 900}
+# - {observation_type: queue}
+# - {ppc_status: skip}
+# - {upload_id: b63373793afeaaf8}
+# - {upload_at: !!timestamp '2024-09-26 02:40:00.371006+00:00'}
+# schema: astropy-2.0
+Priority,N (L),Texp (L),N (M),Texp (M)
+0,87,43.50710668009611,2,1.0139501541884155
+1,102,51.173314024802345,0,0.0
+2,103,52.45171710461888,1,0.4118823216855088
+3,95,44.921023145596344,1,0.5663691194227803
+4,115,56.64191585733056,2,0.8231384355756991
+5,102,49.820840030451045,2,0.9162978619967375
+6,91,45.78037553822587,2,1.0286353526107583
+7,97,48.01397491902539,0,0.0
+8,93,44.98823806031827,0,0.0
+9,105,51.043401153642854,0,0.0
+"""Other""",0,-6.467517879274156e-14,0,0.0
+"""Total""",990,488.3419065141077,10,4.760273245479899

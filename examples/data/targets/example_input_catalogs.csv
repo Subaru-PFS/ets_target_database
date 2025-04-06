@@ -1,0 +1,4 @@
+input_catalog_name,input_catalog_description,upload_id,proposal_id,is_classical,is_user_pointing
+pfs_example_1,Example target list 1,c9d7ad93118243b5,S99A-QT001,False,False
+pfs_example_2,Example target list 2,b63373793afeaaf8,S99A-QT002,True,False
+pfs_example_3,Example target list 3,62efdd6a9000639d,S99A-QT003,True,True

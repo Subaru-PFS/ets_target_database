@@ -1,0 +1,8 @@
+input_catalog_id,input_catalog_name,input_catalog_description,upload_id
+3000,"Fstar_v1.0","F-type star candidates version 1.0 for flux calibration",
+3001,"Fstar_v2.0","F-type star candidates version 2.0 for flux calibration",
+3002,"Fstar_v2.1","F-type star candidates version 2.1 for flux calibration",
+3003,"Fstar_v3.0","F-type star candidates version 3.0 for flux calibration",
+3004,"Fstar_v3.1","F-type star candidates version 3.1 for flux calibration",
+3005,"Fstar_v3.2","F-type star candidates version 3.2 for flux calibration",
+3006,"Fstar_v3.3","F-type star candidates version 3.3 for flux calibration",
