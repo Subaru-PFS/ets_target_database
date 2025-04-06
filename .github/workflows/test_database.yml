@@ -155,7 +155,7 @@ jobs:
 
       - name: Insert custom pointings
         run: |
-          pfs-targetdb-cli insert-pointings -c ~/.pfs/test_db_config.toml examples/data/targets/example_pointings.csv \
+          pfs-targetdb-cli insert-pointings -c ~/.pfs/test_db_config.toml examples/data/targets/example_input_catalogs.csv \
             --data-dir examples/data/targets/ --commit
 
       #   - name: Run tests
