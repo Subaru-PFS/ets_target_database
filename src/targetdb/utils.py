@@ -1413,6 +1413,32 @@ def insert_userppc_from_uploader(
     fetch=False,
     verbose=False,
 ):
+    """
+    Insert user pointing data from the uploader into the database.
+
+    Parameters
+    ----------
+    df_input_catalogs : pandas.DataFrame
+        DataFrame containing the input catalogs.
+    config : dict
+        Configuration dictionary containing database connection details.
+    data_dir : Path, optional
+        Directory where the input files are located. Defaults to Path(".").
+    file_prefix : str, optional
+        Prefix for the input files. Defaults to "ppc".
+    commit : bool, optional
+        If True, commit the changes to the database. Defaults to False.
+    fetch : bool, optional
+        If True, fetch the results after inserting. Defaults to False.
+    verbose : bool, optional
+        If True, log additional information. Defaults to False.
+
+    Notes
+    -----
+    This function iterates over the input catalogs, checks if is_user_pointing is True,
+    and then loads the corresponding input file. It then adds back reference values,
+    renames columns, and prepares the DataFrame for insertion into the database.
+    """
 
     for _, row in df_input_catalogs.iterrows():
         if not row["is_user_pointing"]:
