@@ -21,14 +21,16 @@
 
 | Name | Type | Definition |
 | ---- | ---- | ---------- |
+| cluster_cluster_id_target_id_key | UNIQUE | UNIQUE (cluster_id, target_id) |
+| cluster_pkey | PRIMARY KEY | PRIMARY KEY (cluster_id, target_id) |
 | cluster_input_catalog_id_fkey | FOREIGN KEY | FOREIGN KEY (input_catalog_id) REFERENCES input_catalog(input_catalog_id) |
 | cluster_target_id_fkey | FOREIGN KEY | FOREIGN KEY (target_id) REFERENCES target(target_id) |
-| cluster_pkey | PRIMARY KEY | PRIMARY KEY (cluster_id, target_id) |
 
 ## Indexes
 
 | Name | Definition |
 | ---- | ---------- |
+| cluster_cluster_id_target_id_key | CREATE UNIQUE INDEX cluster_cluster_id_target_id_key ON public.cluster USING btree (cluster_id, target_id) |
 | cluster_pkey | CREATE UNIQUE INDEX cluster_pkey ON public.cluster USING btree (cluster_id, target_id) |
 
 ## Relations
@@ -54,7 +56,6 @@ erDiagram
 "public.target" {
   bigint target_id
   varchar proposal_id FK
-  varchar ob_code
   bigint obj_id
   double_precision ra
   double_precision dec
@@ -78,52 +79,65 @@ erDiagram
   double_precision psf_mag_z
   double_precision psf_mag_y
   double_precision psf_mag_j
-  double_precision psf_mag_error_g
-  double_precision psf_mag_error_r
-  double_precision psf_mag_error_i
-  double_precision psf_mag_error_z
-  double_precision psf_mag_error_y
-  double_precision psf_mag_error_j
   double_precision psf_flux_g
   double_precision psf_flux_r
   double_precision psf_flux_i
   double_precision psf_flux_z
   double_precision psf_flux_y
   double_precision psf_flux_j
-  double_precision psf_flux_error_g
-  double_precision psf_flux_error_r
-  double_precision psf_flux_error_i
-  double_precision psf_flux_error_z
-  double_precision psf_flux_error_y
-  double_precision psf_flux_error_j
+  double_precision priority
+  double_precision effective_exptime
+  boolean is_medium_resolution
+  double_precision qa_relative_throughput
+  double_precision qa_relative_noise
+  double_precision qa_reference_lambda
+  boolean is_cluster
+  timestamp_without_time_zone created_at
+  timestamp_without_time_zone updated_at
   varchar filter_g FK
   varchar filter_r FK
   varchar filter_i FK
   varchar filter_z FK
   varchar filter_y FK
   varchar filter_j FK
-  double_precision priority
-  double_precision effective_exptime
+  double_precision psf_mag_error_g
+  double_precision psf_mag_error_r
+  double_precision psf_mag_error_i
+  double_precision psf_mag_error_z
+  double_precision psf_mag_error_y
+  double_precision psf_mag_error_j
+  double_precision psf_flux_error_g
+  double_precision psf_flux_error_r
+  double_precision psf_flux_error_i
+  double_precision psf_flux_error_z
+  double_precision psf_flux_error_y
+  double_precision psf_flux_error_j
+  varchar ob_code
   double_precision single_exptime
-  boolean is_medium_resolution
-  double_precision qa_relative_throughput
-  double_precision qa_relative_noise
-  double_precision qa_reference_lambda
   varchar qa_reference_arm FK
-  boolean is_cluster
-  timestamp_without_time_zone created_at
-  timestamp_without_time_zone updated_at
+  double_precision total_flux_g
+  double_precision total_flux_r
+  double_precision total_flux_i
+  double_precision total_flux_z
+  double_precision total_flux_y
+  double_precision total_flux_j
+  double_precision total_flux_error_g
+  double_precision total_flux_error_r
+  double_precision total_flux_error_i
+  double_precision total_flux_error_z
+  double_precision total_flux_error_y
+  double_precision total_flux_error_j
 }
 "public.input_catalog" {
-  integer input_catalog_id
   varchar input_catalog_name
   varchar input_catalog_description
+  timestamp_without_time_zone created_at
+  timestamp_without_time_zone updated_at
   varchar_16_ upload_id
+  integer input_catalog_id
   boolean active
   boolean is_classical
   boolean is_user_pointing
-  timestamp_without_time_zone created_at
-  timestamp_without_time_zone updated_at
 }
 ```
 

@@ -50,15 +50,15 @@ erDiagram
   timestamp_without_time_zone updated_at
 }
 "public.input_catalog" {
-  integer input_catalog_id
   varchar input_catalog_name
   varchar input_catalog_description
+  timestamp_without_time_zone created_at
+  timestamp_without_time_zone updated_at
   varchar_16_ upload_id
+  integer input_catalog_id
   boolean active
   boolean is_classical
   boolean is_user_pointing
-  timestamp_without_time_zone created_at
-  timestamp_without_time_zone updated_at
 }
 ```
 

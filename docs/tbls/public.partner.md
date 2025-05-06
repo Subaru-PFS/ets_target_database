@@ -6,7 +6,7 @@
 
 | Name | Type | Default | Nullable | Children | Parents | Comment |
 | ---- | ---- | ------- | -------- | -------- | ------- | ------- |
-| partner_id | integer |  | false |  |  | Unique identifier of the partner |
+| partner_id | integer |  | false | [public.proposal](public.proposal.md) |  | Unique identifier of the partner |
 | partner_name | varchar |  | false |  |  | Name of the partner (e.g., subaru, gemini, keck, and uh) |
 | partner_description | varchar |  | true |  |  | Description of the partner |
 | created_at | timestamp without time zone | timezone('utc'::text, CURRENT_TIMESTAMP) | true |  |  | The date and time in UTC when the record was created |
@@ -18,6 +18,7 @@
 | ---- | ---- | ---------- |
 | partner_pkey | PRIMARY KEY | PRIMARY KEY (partner_id) |
 | partner_partner_name_key | UNIQUE | UNIQUE (partner_name) |
+| partner_partner_id_key | UNIQUE | UNIQUE (partner_id) |
 
 ## Indexes
 
@@ -25,12 +26,14 @@
 | ---- | ---------- |
 | partner_pkey | CREATE UNIQUE INDEX partner_pkey ON public.partner USING btree (partner_id) |
 | partner_partner_name_key | CREATE UNIQUE INDEX partner_partner_name_key ON public.partner USING btree (partner_name) |
+| partner_partner_id_key | CREATE UNIQUE INDEX partner_partner_id_key ON public.partner USING btree (partner_id) |
 
 ## Relations
 
 ```mermaid
 erDiagram
 
+"public.proposal" }o--o| "public.partner" : "FOREIGN KEY (partner_id) REFERENCES partner(partner_id)"
 
 "public.partner" {
   integer partner_id
@@ -38,6 +41,23 @@ erDiagram
   varchar partner_description
   timestamp_without_time_zone created_at
   timestamp_without_time_zone updated_at
+}
+"public.proposal" {
+  varchar proposal_id
+  varchar group_id
+  varchar pi_first_name
+  varchar pi_last_name
+  varchar pi_middle_name
+  double_precision rank
+  varchar grade
+  double_precision allocated_time_total
+  integer proposal_category_id FK
+  timestamp_without_time_zone created_at
+  timestamp_without_time_zone updated_at
+  double_precision allocated_time_lr
+  double_precision allocated_time_mr
+  boolean is_too
+  integer partner_id FK
 }
 ```
 

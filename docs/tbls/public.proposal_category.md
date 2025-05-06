@@ -17,6 +17,7 @@
 | Name | Type | Definition |
 | ---- | ---- | ---------- |
 | proposal_category_pkey | PRIMARY KEY | PRIMARY KEY (proposal_category_id) |
+| proposal_category_proposal_category_id_key | UNIQUE | UNIQUE (proposal_category_id) |
 | proposal_category_proposal_category_name_key | UNIQUE | UNIQUE (proposal_category_name) |
 
 ## Indexes
@@ -24,6 +25,7 @@
 | Name | Definition |
 | ---- | ---------- |
 | proposal_category_pkey | CREATE UNIQUE INDEX proposal_category_pkey ON public.proposal_category USING btree (proposal_category_id) |
+| proposal_category_proposal_category_id_key | CREATE UNIQUE INDEX proposal_category_proposal_category_id_key ON public.proposal_category USING btree (proposal_category_id) |
 | proposal_category_proposal_category_name_key | CREATE UNIQUE INDEX proposal_category_proposal_category_name_key ON public.proposal_category USING btree (proposal_category_name) |
 
 ## Relations
@@ -49,12 +51,13 @@ erDiagram
   double_precision rank
   varchar grade
   double_precision allocated_time_total
-  double_precision allocated_time_lr
-  double_precision allocated_time_mr
   integer proposal_category_id FK
-  boolean is_too
   timestamp_without_time_zone created_at
   timestamp_without_time_zone updated_at
+  double_precision allocated_time_lr
+  double_precision allocated_time_mr
+  boolean is_too
+  integer partner_id FK
 }
 ```
 
