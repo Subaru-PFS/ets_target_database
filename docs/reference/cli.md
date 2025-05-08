@@ -44,25 +44,25 @@ $ pfs-targetdb-cli [OPTIONS] COMMAND [ARGS]...
 
 **Options**:
 
-* `--help`: Show this message and exit.
+- `--help`: Show this message and exit.
 
 **Commands**:
 
-* `create-db`: Create a database on a PostgreSQL server.
-* `drop-db`: Drop a database on a PostgreSQL server.
-* `install-q3c`: Insert the Q3C extension.
-* `create-schema`: Create tables of the PFS tartedb in a...
-* `checkdups`: Check for duplicates in data files in a...
-* `prep-fluxstd`: Prepare flux standard data for the target...
-* `diagram`: Generate an ER diagram of a database.
-* `mdtable`: Generate a Markdown output of the schema...
-* `insert`: Insert rows into a table in the PFS Target...
-* `update`: Update rows in a table in the PFS Target...
-* `parse-alloc`: Parse an Excel file containing time...
-* `transfer-targets`: Download target lists from the uploader to...
-* `insert-targets`: Insert targets using a list of input...
-* `insert-pointings`: Insert user-defined pointings using a list...
-* `update-catalog-active`: Update active flag in the input_catalog...
+- `create-db`: Create a database on a PostgreSQL server.
+- `drop-db`: Drop a database on a PostgreSQL server.
+- `install-q3c`: Insert the Q3C extension.
+- `create-schema`: Create tables of the PFS tartedb in a...
+- `checkdups`: Check for duplicates in data files in a...
+- `prep-fluxstd`: Prepare flux standard data for the target...
+- `diagram`: Generate an ER diagram of a database.
+- `mdtable`: Generate a Markdown output of the schema...
+- `insert`: Insert rows into a table in the PFS Target...
+- `update`: Update rows in a table in the PFS Target...
+- `parse-alloc`: Parse an Excel file containing time...
+- `transfer-targets`: Download target lists from the uploader to...
+- `insert-targets`: Insert targets using a list of input...
+- `insert-pointings`: Insert user-defined pointings using a list...
+- `update-catalog-active`: Update active flag in the input_catalog...
 
 ---
 
@@ -78,8 +78,8 @@ $ pfs-targetdb-cli create-db [OPTIONS]
 
 **Options**:
 
-* `-c, --config TEXT`: Database configuration file in the TOML format.  [required]
-* `--help`: Show this message and exit.
+- `-c, --config TEXT`: Database configuration file in the TOML format. [required]
+- `--help`: Show this message and exit.
 
 ---
 
@@ -95,8 +95,8 @@ $ pfs-targetdb-cli drop-db [OPTIONS]
 
 **Options**:
 
-* `-c, --config TEXT`: Database configuration file in the TOML format.  [required]
-* `--help`: Show this message and exit.
+- `-c, --config TEXT`: Database configuration file in the TOML format. [required]
+- `--help`: Show this message and exit.
 
 ---
 
@@ -112,8 +112,8 @@ $ pfs-targetdb-cli install-q3c [OPTIONS]
 
 **Options**:
 
-* `-c, --config TEXT`: Database configuration file in the TOML format.  [required]
-* `--help`: Show this message and exit.
+- `-c, --config TEXT`: Database configuration file in the TOML format. [required]
+- `--help`: Show this message and exit.
 
 ---
 
@@ -129,9 +129,9 @@ $ pfs-targetdb-cli create-schema [OPTIONS]
 
 **Options**:
 
-* `-c, --config TEXT`: Database configuration file in the TOML format.  [required]
-* `--drop-all`: Flag to drop all tables before creating schema.
-* `--help`: Show this message and exit.
+- `-c, --config TEXT`: Database configuration file in the TOML format. [required]
+- `--drop-all`: Flag to drop all tables before creating schema.
+- `--help`: Show this message and exit.
 
 ---
 
@@ -147,16 +147,16 @@ $ pfs-targetdb-cli checkdups [OPTIONS] DIRECTORY
 
 **Arguments**:
 
-* `DIRECTORY`: Directory path containing input files.  [required]
+- `DIRECTORY`: Directory path containing input files. [required]
 
 **Options**:
 
-* `-o, --outdir TEXT`: Directory path to save output files.  [default: .]
-* `--skip-save-merged`: Do not save the merged DataFrame.
-* `--additional-columns TEXT`: Additional columns to output for the merged file.  (e.g., &#x27;psf_mag_g&#x27; &#x27;psf_mag_r&#x27;). The following columns are saved by default: &quot;obj_id&quot;, &quot;ra&quot;, &quot;dec&quot;, &quot;input_catalog_id&quot;, &quot;version&quot;, &quot;input_file&quot;, &quot;is_fstar_gaia&quot;, &quot;prob_f_star&quot;.
-* `--check-columns TEXT`: Columns used to check for duplicates.  [default: obj_id, input_catalog_id, version]
-* `--format [feather|parquet]`: File format of the merged data file.  [default: parquet]
-* `--help`: Show this message and exit.
+- `-o, --outdir TEXT`: Directory path to save output files. [default: .]
+- `--skip-save-merged`: Do not save the merged DataFrame.
+- `--additional-columns TEXT`: Additional columns to output for the merged file. (e.g., &#x27;psf_mag_g&#x27; &#x27;psf_mag_r&#x27;). The following columns are saved by default: &quot;obj_id&quot;, &quot;ra&quot;, &quot;dec&quot;, &quot;input_catalog_id&quot;, &quot;version&quot;, &quot;input_file&quot;, &quot;is_fstar_gaia&quot;, &quot;prob_f_star&quot;.
+- `--check-columns TEXT`: Columns used to check for duplicates. [default: obj_id, input_catalog_id, version]
+- `--format [feather|parquet]`: File format of the merged data file. [default: parquet]
+- `--help`: Show this message and exit.
 
 ---
 
@@ -172,17 +172,17 @@ $ pfs-targetdb-cli prep-fluxstd [OPTIONS] INPUT_DIR OUTPUT_DIR
 
 **Arguments**:
 
-* `INPUT_DIR`: Directory path containing input files. Files must be in one of the following formats: parquet, feather, or csv. The input files must be generated in a certain format to be compatible for targetdb.  [required]
-* `OUTPUT_DIR`: Directory path to save the output files.  [required]
+- `INPUT_DIR`: Directory path containing input files. Files must be in one of the following formats: parquet, feather, or csv. The input files must be generated in a certain format to be compatible for targetdb. [required]
+- `OUTPUT_DIR`: Directory path to save the output files. [required]
 
 **Options**:
 
-* `--version TEXT`: Version **string** for the F-star candidate catalog (e.g., &#x27;3.3&#x27;).  [required]
-* `--input_catalog_id INTEGER`: Input catalog ID for the flux standard star catalog.
-* `--input_catalog_name TEXT`: Input catalog name for the flux standard star catalog.
-* `--rename-cols TEXT`: Dictionary to rename columns (e.g., &#x27;{&quot;fstar_gaia&quot;: &quot;is_fstar_gaia&quot;}&#x27;).
-* `--format [feather|parquet]`: File format of the output data file.  [default: parquet]
-* `--help`: Show this message and exit.
+- `--version TEXT`: Version **string** for the F-star candidate catalog (e.g., &#x27;3.3&#x27;). [required]
+- `--input_catalog_id INTEGER`: Input catalog ID for the flux standard star catalog.
+- `--input_catalog_name TEXT`: Input catalog name for the flux standard star catalog.
+- `--rename-cols TEXT`: Dictionary to rename columns (e.g., &#x27;{&quot;fstar_gaia&quot;: &quot;is_fstar_gaia&quot;}&#x27;).
+- `--format [feather|parquet]`: File format of the output data file. [default: parquet]
+- `--help`: Show this message and exit.
 
 ---
 
@@ -198,15 +198,15 @@ $ pfs-targetdb-cli diagram [OPTIONS]
 
 **Options**:
 
-* `-c, --config TEXT`: Database configuration file in the TOML format.  [required]
-* `--generator [schemacrawler|tbls]`: Program to generate ER diagram.  [default: schemacrawler]
-* `--output-dir TEXT`: Directory path to save output files.  [default: diagram]
-* `--title TEXT`: Title of the ER diagram.  [default: PFS Target Database]
-* `--sc-info-level TEXT`: SchemaCrawler info level.  [default: maximum]
-* `--sc-level-level TEXT`: SchemaCrawler log level.  [default: SEVERE]
-* `--sc-outprefix TEXT`: Output file prefix.  [default: erdiagram_targetdb]
-* `--tbls-format TEXT`: tbls format for ER diagrams.  [default: mermaid]
-* `--help`: Show this message and exit.
+- `-c, --config TEXT`: Database configuration file in the TOML format. [required]
+- `--generator [schemacrawler|tbls]`: Program to generate ER diagram. [default: schemacrawler]
+- `--output-dir TEXT`: Directory path to save output files. [default: diagram]
+- `--title TEXT`: Title of the ER diagram. [default: PFS Target Database]
+- `--sc-info-level TEXT`: SchemaCrawler info level. [default: maximum]
+- `--sc-level-level TEXT`: SchemaCrawler log level. [default: SEVERE]
+- `--sc-outprefix TEXT`: Output file prefix. [default: erdiagram_targetdb]
+- `--tbls-format TEXT`: tbls format for ER diagrams. [default: mermaid]
+- `--help`: Show this message and exit.
 
 ---
 
@@ -222,8 +222,8 @@ $ pfs-targetdb-cli mdtable [OPTIONS]
 
 **Options**:
 
-* `-o, --output-file TEXT`: Output file.
-* `--help`: Show this message and exit.
+- `-o, --output-file TEXT`: Output file.
+- `--help`: Show this message and exit.
 
 ---
 
@@ -239,19 +239,20 @@ $ pfs-targetdb-cli insert [OPTIONS] INPUT_FILE
 
 **Arguments**:
 
-* `INPUT_FILE`: Input file to be inserted to targetdb (CSV, ECSV, Feather, or Parquet format).  [required]
+- `INPUT_FILE`: Input file to be inserted to targetdb (CSV, ECSV, Feather, or Parquet format). [required]
 
 **Options**:
 
-* `-c, --config TEXT`: Database configuration file in the TOML format.  [required]
-* `-t, --table [filter_name|fluxstd|input_catalog|partner|pfs_arm|proposal|proposal_category|sky|target|target_type|user_pointing]`: Table name to insert rows.  [required]
-* `--commit`: Commit changes to the database.
-* `--fetch`: Fetch data from database a the end.
-* `--from-uploader`: Flag to indicate the data is coming from the PFS Target Uploader. Only required for the `target` table.
-* `--upload_id TEXT`: Upload ID issued by the PFS Target Uploader. Only required for the `target` table.
-* `--proposal_id TEXT`: Proposal ID (e.g., S24B-QT001). Only required for the `target` table.
-* `-v, --verbose`: Verbose output.
-* `--help`: Show this message and exit.
+- `-c, --config TEXT`: Database configuration file in the TOML format. [required]
+- `-t, --table [filter_name|fluxstd|input_catalog|partner|pfs_arm|proposal|proposal_category|sky|target|target_type|user_pointing]`: Table name to insert rows. [required]
+- `--commit`: Commit changes to the database.
+- `--fetch`: Fetch data from database a the end.
+- `--from-uploader`: Flag to indicate the data is coming from the PFS Target Uploader. Only required for the `target` table.
+- `--flux-type [total|psf]`: Flux type for the flux standard star catalog. [default: total]
+- `--upload_id TEXT`: Upload ID issued by the PFS Target Uploader. Only required for the `target` table.
+- `--proposal_id TEXT`: Proposal ID (e.g., S24B-QT001). Only required for the `target` table.
+- `-v, --verbose`: Verbose output.
+- `--help`: Show this message and exit.
 
 ---
 
@@ -267,19 +268,19 @@ $ pfs-targetdb-cli update [OPTIONS] INPUT_FILE
 
 **Arguments**:
 
-* `INPUT_FILE`: Input file containing data to update records in the PFS Target Database (CSV, ECSV, or Feather formats).  [required]
+- `INPUT_FILE`: Input file containing data to update records in the PFS Target Database (CSV, ECSV, or Feather formats). [required]
 
 **Options**:
 
-* `-c, --config TEXT`: Database configuration file in the TOML format.  [required]
-* `-t, --table [filter_name|fluxstd|input_catalog|partner|pfs_arm|proposal|proposal_category|sky|target|target_type|user_pointing]`: Table name to update rows.  [required]
-* `--commit`: Commit changes to the database.
-* `--fetch`: Fetch data from database a the end.
-* `--from-uploader`: Flag to indicate the data is coming from the PFS Target Uploader. Only required for the `target` table.
-* `--upload_id TEXT`: Upload ID issued by the PFS Target Uploader. Only required for the `target` table
-* `--proposal_id TEXT`: Proposal ID (e.g., S24B-QT001). Only required for the `target` table
-* `--verbose`: Verbose output.
-* `--help`: Show this message and exit.
+- `-c, --config TEXT`: Database configuration file in the TOML format. [required]
+- `-t, --table [filter_name|fluxstd|input_catalog|partner|pfs_arm|proposal|proposal_category|sky|target|target_type|user_pointing]`: Table name to update rows. [required]
+- `--commit`: Commit changes to the database.
+- `--fetch`: Fetch data from database a the end.
+- `--from-uploader`: Flag to indicate the data is coming from the PFS Target Uploader. Only required for the `target` table.
+- `--upload_id TEXT`: Upload ID issued by the PFS Target Uploader. Only required for the `target` table
+- `--proposal_id TEXT`: Proposal ID (e.g., S24B-QT001). Only required for the `target` table
+- `--verbose`: Verbose output.
+- `--help`: Show this message and exit.
 
 ---
 
@@ -295,13 +296,13 @@ $ pfs-targetdb-cli parse-alloc [OPTIONS] INPUT_FILE
 
 **Arguments**:
 
-* `INPUT_FILE`: Path to the Excel file containing time allocation information (e.g., &quot;allocations.xlsx&quot;).  [required]
+- `INPUT_FILE`: Path to the Excel file containing time allocation information (e.g., &quot;allocations.xlsx&quot;). [required]
 
 **Options**:
 
-* `--output-dir PATH`: Directory path to save output files.  [default: .]
-* `--outfile-prefix TEXT`: Prefix to the output files.
-* `--help`: Show this message and exit.
+- `--output-dir PATH`: Directory path to save output files. [default: .]
+- `--outfile-prefix TEXT`: Prefix to the output files.
+- `--help`: Show this message and exit.
 
 ---
 
@@ -317,14 +318,14 @@ $ pfs-targetdb-cli transfer-targets [OPTIONS] INPUT_FILE
 
 **Arguments**:
 
-* `INPUT_FILE`: Input catalog list file (csv).  [required]
+- `INPUT_FILE`: Input catalog list file (csv). [required]
 
 **Options**:
 
-* `-c, --config TEXT`: Database configuration file in the TOML format.  [required]
-* `--local-dir PATH`: Path to the data directory in the local machine  [default: .]
-* `--force / --no-force`: Force download.  [default: no-force]
-* `--help`: Show this message and exit.
+- `-c, --config TEXT`: Database configuration file in the TOML format. [required]
+- `--local-dir PATH`: Path to the data directory in the local machine [default: .]
+- `--force / --no-force`: Force download. [default: no-force]
+- `--help`: Show this message and exit.
 
 ---
 
@@ -340,16 +341,17 @@ $ pfs-targetdb-cli insert-targets [OPTIONS] INPUT_CATALOGS
 
 **Arguments**:
 
-* `INPUT_CATALOGS`: Input catalog list to insert (csv).  [required]
+- `INPUT_CATALOGS`: Input catalog list to insert (csv). [required]
 
 **Options**:
 
-* `-c, --config TEXT`: Database configuration file in the TOML format.  [required]
-* `--data-dir PATH`: Path to the data directory.  [default: .]
-* `--commit`: Commit changes to the database.
-* `--fetch`: Fetch data from database a the end.
-* `-v, --verbose`: Verbose output.
-* `--help`: Show this message and exit.
+- `-c, --config TEXT`: Database configuration file in the TOML format. [required]
+- `--data-dir PATH`: Path to the data directory. [default: .]
+- `--flux-type [total|psf]`: Flux type for the flux standard star catalog. [default: total]
+- `--commit`: Commit changes to the database.
+- `--fetch`: Fetch data from database a the end.
+- `-v, --verbose`: Verbose output.
+- `--help`: Show this message and exit.
 
 ---
 
@@ -365,16 +367,16 @@ $ pfs-targetdb-cli insert-pointings [OPTIONS] INPUT_CATALOGS
 
 **Arguments**:
 
-* `INPUT_CATALOGS`: Input catalog list to insert (csv).  [required]
+- `INPUT_CATALOGS`: Input catalog list to insert (csv). [required]
 
 **Options**:
 
-* `-c, --config TEXT`: Database configuration file in the TOML format.  [required]
-* `--data-dir PATH`: Path to the data directory.  [default: .]
-* `--commit`: Commit changes to the database.
-* `--fetch`: Fetch data from database a the end.
-* `-v, --verbose`: Verbose output.
-* `--help`: Show this message and exit.
+- `-c, --config TEXT`: Database configuration file in the TOML format. [required]
+- `--data-dir PATH`: Path to the data directory. [default: .]
+- `--commit`: Commit changes to the database.
+- `--fetch`: Fetch data from database a the end.
+- `-v, --verbose`: Verbose output.
+- `--help`: Show this message and exit.
 
 ---
 
@@ -390,12 +392,12 @@ $ pfs-targetdb-cli update-catalog-active [OPTIONS] INPUT_CATALOG_ID ACTIVE_FLAG
 
 **Arguments**:
 
-* `INPUT_CATALOG_ID`: Input catalog ID to be updated.  [required]
-* `ACTIVE_FLAG`: Active flag to be set.  [required]
+- `INPUT_CATALOG_ID`: Input catalog ID to be updated. [required]
+- `ACTIVE_FLAG`: Active flag to be set. [required]
 
 **Options**:
 
-* `-c, --config TEXT`: Database configuration file in the TOML format.  [required]
-* `--commit`: Commit changes to the database.
-* `-v, --verbose`: Verbose output.
-* `--help`: Show this message and exit.
+- `-c, --config TEXT`: Database configuration file in the TOML format. [required]
+- `--commit`: Commit changes to the database.
+- `-v, --verbose`: Verbose output.
+- `--help`: Show this message and exit.

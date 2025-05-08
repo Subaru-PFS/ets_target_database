@@ -575,6 +575,7 @@ def make_target_df_from_uploader(
     table="target",
     proposal_id=None,
     upload_id=None,
+    flux_type="total",
     target_type_name="SCIENCE",
     insert=False,
     update=False,
@@ -594,6 +595,8 @@ def make_target_df_from_uploader(
         The proposal id to be used. Defaults to None.
     upload_id : str, optional
         The upload id to be used. Defaults to None.
+    flux_type : str, optional
+        The kind of flux to use and must be "total" or "psf". Defaults to "total".
     target_type_name : str, optional
         The type of the target. Defaults to "SCIENCE".
     insert : bool, optional
@@ -637,6 +640,10 @@ def make_target_df_from_uploader(
     if "reference_arm" in df.columns:
         df.rename(columns={"reference_arm": "qa_reference_arm"}, inplace=True)
 
+    if flux_type not in ["total", "psf"]:
+        logger.error(f"flux_type must be 'total' or 'psf'. {flux_type=}")
+        raise ValueError(f"flux_type must be 'total' or 'psf'. {flux_type=}")
+
     # fill missing values with None or NaN for filters and fluxes
     for band in ["g", "r", "i", "z", "y", "j"]:
         if f"filter_{band}" in df.columns:
@@ -647,10 +654,13 @@ def make_target_df_from_uploader(
             except AttributeError:
                 pass
         if f"flux_{band}" in df.columns:
-            df.rename(columns={f"flux_{band}": f"psf_flux_{band}"}, inplace=True)
+            df.rename(
+                columns={f"flux_{band}": f"{flux_type}_flux_{band}"}, inplace=True
+            )
         if f"flux_error_{band}" in df.columns:
             df.rename(
-                columns={f"flux_error_{band}": f"psf_flux_error_{band}"}, inplace=True
+                columns={f"flux_error_{band}": f"{flux_type}_flux_error_{band}"},
+                inplace=True,
             )
 
     df["target_type_name"] = target_type_name
@@ -755,6 +765,7 @@ def add_database_rows(
     config=None,
     df=None,
     from_uploader=False,
+    flux_type="total",
     proposal_id=None,
     upload_id=None,
     insert=False,
@@ -783,6 +794,8 @@ def add_database_rows(
         The DataFrame to add rows from. Defaults to None.
     from_uploader : bool, optional
         If True, the DataFrame is from an uploader. Defaults to False.
+    flux_type : str, optional
+        The kind of flux to use and must be "total" or "psf". Defaults to "total".
     proposal_id : int, optional
         The proposal id to be used. Defaults to None.
     upload_id : int, optional
@@ -812,6 +825,10 @@ def add_database_rows(
         logger.warning("Neither insert nor update is selected. Exiting...")
         return
 
+    if flux_type not in ["total", "psf"]:
+        logger.error(f"flux_type must be 'total' or 'psf'. {flux_type=}")
+        raise ValueError(f"flux_type must be 'total' or 'psf'. {flux_type=}")
+
     logger.info("Connecting to targetDB")
     db = TargetDB(**config["targetdb"]["db"])
     db.connect()
@@ -827,6 +844,7 @@ def add_database_rows(
                 table=table,
                 proposal_id=proposal_id,
                 upload_id=upload_id,
+                flux_type=flux_type,
                 insert=insert,
                 update=update,
             )
@@ -1353,11 +1371,16 @@ def insert_targets_from_uploader(
     df_input_catalogs,
     config,
     data_dir=Path("."),
+    flux_type="total",
     file_prefix="target",
     commit=False,
     fetch=False,
     verbose=False,
 ):
+
+    if flux_type not in ["total", "psf"]:
+        logger.error(f"flux_type must be 'total' or 'psf'. {flux_type=}")
+        raise ValueError(f"flux_type must be 'total' or 'psf'. {flux_type=}")
 
     for _, row in df_input_catalogs.iterrows():
         proposal_id = row["proposal_id"]
@@ -1398,6 +1421,7 @@ def insert_targets_from_uploader(
             config=config,
             df=df,
             from_uploader=True,
+            flux_type=flux_type,
             proposal_id=proposal_id,
             upload_id=upload_id,
             insert=True,

@@ -59,6 +59,11 @@ class TargetdbTable(str, Enum):
     user_pointing = "user_pointing"
 
 
+class FluxType(str, Enum):
+    total = "total"
+    psf = "psf"
+
+
 config_help_msg = "Database configuration file in the TOML format."
 
 
@@ -407,6 +412,12 @@ def insert(
             help="Flag to indicate the data is coming from the PFS Target Uploader. Only required for the `target` table.",
         ),
     ] = False,
+    flux_type: Annotated[
+        FluxType,
+        typer.Option(
+            "--flux-type", help="Flux type for the flux standard star catalog."
+        ),
+    ] = "total",
     upload_id: Annotated[
         str,
         typer.Option(
@@ -445,6 +456,7 @@ def insert(
         config=config,
         df=df,
         from_uploader=from_uploader,
+        flux_type=flux_type,
         proposal_id=proposal_id,
         upload_id=upload_id,
         insert=True,
@@ -646,6 +658,12 @@ def insert_targets(
             help="Path to the data directory.",
         ),
     ] = ".",
+    flux_type: Annotated[
+        FluxType,
+        typer.Option(
+            "--flux-type", help="Flux type for the flux standard star catalog."
+        ),
+    ] = "total",
     commit: Annotated[
         bool,
         typer.Option("--commit", help="Commit changes to the database."),
@@ -667,6 +685,7 @@ def insert_targets(
         df_input_catalogs,
         config,
         data_dir=data_dir,
+        flux_type=flux_type,
         commit=commit,
         fetch=fetch,
         verbose=verbose,

@@ -148,6 +148,20 @@ class target(Base):
     psf_flux_error_y = Column(Float, comment="Error in y-band PSF flux (nJy)")
     psf_flux_error_j = Column(Float, comment="Error in J band PSF flux (nJy)")
 
+    total_flux_g = Column(Float, comment="g-band total flux (nJy)")
+    total_flux_r = Column(Float, comment="r-band total flux (nJy)")
+    total_flux_i = Column(Float, comment="i-band total flux (nJy)")
+    total_flux_z = Column(Float, comment="z-band total flux (nJy)")
+    total_flux_y = Column(Float, comment="y-band total flux (nJy)")
+    total_flux_j = Column(Float, comment="J band total flux (nJy)")
+
+    total_flux_error_g = Column(Float, comment="Error in g-band total flux (nJy)")
+    total_flux_error_r = Column(Float, comment="Error in r-band total flux (nJy)")
+    total_flux_error_i = Column(Float, comment="Error in i-band total flux (nJy)")
+    total_flux_error_z = Column(Float, comment="Error in z-band total flux (nJy)")
+    total_flux_error_y = Column(Float, comment="Error in y-band total flux (nJy)")
+    total_flux_error_j = Column(Float, comment="Error in J band total flux (nJy)")
+
     filter_g = Column(
         String,
         ForeignKey("filter_name.filter_name"),
@@ -309,6 +323,20 @@ class target(Base):
         psf_flux_error_y,
         psf_flux_error_j,
         #
+        total_flux_g,
+        total_flux_r,
+        total_flux_i,
+        total_flux_z,
+        total_flux_y,
+        total_flux_j,
+        #
+        total_flux_error_g,
+        total_flux_error_r,
+        total_flux_error_i,
+        total_flux_error_z,
+        total_flux_error_y,
+        total_flux_error_j,
+        #
         filter_g,
         filter_r,
         filter_i,
@@ -377,6 +405,20 @@ class target(Base):
         self.psf_flux_error_z = psf_flux_error_z
         self.psf_flux_error_y = psf_flux_error_y
         self.psf_flux_error_j = psf_flux_error_j
+        #
+        self.total_flux_g = total_flux_g
+        self.total_flux_r = total_flux_r
+        self.total_flux_i = total_flux_i
+        self.total_flux_z = total_flux_z
+        self.total_flux_y = total_flux_y
+        self.total_flux_j = total_flux_j
+        #
+        self.total_flux_error_g = total_flux_error_g
+        self.total_flux_error_r = total_flux_error_r
+        self.total_flux_error_i = total_flux_error_i
+        self.total_flux_error_z = total_flux_error_z
+        self.total_flux_error_y = total_flux_error_y
+        self.total_flux_error_j = total_flux_error_j
         #
         self.filter_g = filter_g
         self.filter_r = filter_r

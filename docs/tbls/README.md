@@ -4,17 +4,18 @@
 
 | Name | Columns | Comment | Type |
 | ---- | ------- | ------- | ---- |
+| [public.alembic_version](public.alembic_version.md) | 1 |  | BASE TABLE |
+| [public.cluster](public.cluster.md) | 10 |  | BASE TABLE |
 | [public.filter_name](public.filter_name.md) | 4 |  | BASE TABLE |
-| [public.pfs_arm](public.pfs_arm.md) | 4 |  | BASE TABLE |
-| [public.proposal_category](public.proposal_category.md) | 5 |  | BASE TABLE |
+| [public.fluxstd](public.fluxstd.md) | 61 |  | BASE TABLE |
 | [public.input_catalog](public.input_catalog.md) | 9 |  | BASE TABLE |
+| [public.pfs_arm](public.pfs_arm.md) | 4 |  | BASE TABLE |
+| [public.proposal](public.proposal.md) | 15 |  | BASE TABLE |
+| [public.proposal_category](public.proposal_category.md) | 5 |  | BASE TABLE |
+| [public.sky](public.sky.md) | 14 |  | BASE TABLE |
+| [public.target](public.target.md) | 73 |  | BASE TABLE |
 | [public.target_type](public.target_type.md) | 5 |  | BASE TABLE |
 | [public.user_pointing](public.user_pointing.md) | 10 |  | BASE TABLE |
-| [public.proposal](public.proposal.md) | 14 |  | BASE TABLE |
-| [public.sky](public.sky.md) | 14 |  | BASE TABLE |
-| [public.fluxstd](public.fluxstd.md) | 61 |  | BASE TABLE |
-| [public.target](public.target.md) | 61 |  | BASE TABLE |
-| [public.cluster](public.cluster.md) | 10 |  | BASE TABLE |
 | [public.partner](public.partner.md) | 5 |  | BASE TABLE |
 
 ## Stored procedures and functions
@@ -55,6 +56,12 @@
 | public.q3c_poly_query | bool | real, real, double precision[] | FUNCTION |
 | public.q3c_poly_query | bool | double precision, double precision, polygon | FUNCTION |
 | public.q3c_poly_query | bool | real, real, polygon | FUNCTION |
+| public.bt_index_check | void | index regclass | FUNCTION |
+| public.bt_index_parent_check | void | index regclass | FUNCTION |
+| public.bt_index_check | void | index regclass, heapallindexed boolean | FUNCTION |
+| public.bt_index_parent_check | void | index regclass, heapallindexed boolean | FUNCTION |
+| public.bt_index_parent_check | void | index regclass, heapallindexed boolean, rootdescend boolean | FUNCTION |
+| public.verify_heapam | record | relation regclass, on_error_stop boolean DEFAULT false, check_toast boolean DEFAULT false, skip text DEFAULT 'none'::text, startblock bigint DEFAULT NULL::bigint, endblock bigint DEFAULT NULL::bigint, OUT blkno bigint, OUT offnum integer, OUT attnum integer, OUT msg text | FUNCTION |
 
 ## Enums
 
@@ -67,10 +74,8 @@
 ```mermaid
 erDiagram
 
-"public.user_pointing" }o--|| "public.input_catalog" : "FOREIGN KEY (input_catalog_id) REFERENCES input_catalog(input_catalog_id)"
-"public.proposal" }o--o| "public.proposal_category" : "FOREIGN KEY (proposal_category_id) REFERENCES proposal_category(proposal_category_id)"
-"public.sky" }o--|| "public.input_catalog" : "FOREIGN KEY (input_catalog_id) REFERENCES input_catalog(input_catalog_id)"
-"public.sky" }o--o| "public.target_type" : "FOREIGN KEY (target_type_id) REFERENCES target_type(target_type_id)"
+"public.cluster" }o--o| "public.input_catalog" : "FOREIGN KEY (input_catalog_id) REFERENCES input_catalog(input_catalog_id)"
+"public.cluster" }o--|| "public.target" : "FOREIGN KEY (target_id) REFERENCES target(target_id)"
 "public.fluxstd" }o--o| "public.filter_name" : "FOREIGN KEY (filter_g) REFERENCES filter_name(filter_name)"
 "public.fluxstd" }o--o| "public.filter_name" : "FOREIGN KEY (filter_i) REFERENCES filter_name(filter_name)"
 "public.fluxstd" }o--o| "public.filter_name" : "FOREIGN KEY (filter_j) REFERENCES filter_name(filter_name)"
@@ -79,97 +84,40 @@ erDiagram
 "public.fluxstd" }o--o| "public.filter_name" : "FOREIGN KEY (filter_z) REFERENCES filter_name(filter_name)"
 "public.fluxstd" }o--|| "public.input_catalog" : "FOREIGN KEY (input_catalog_id) REFERENCES input_catalog(input_catalog_id)"
 "public.fluxstd" }o--o| "public.target_type" : "FOREIGN KEY (target_type_id) REFERENCES target_type(target_type_id)"
+"public.proposal" }o--o| "public.proposal_category" : "FOREIGN KEY (proposal_category_id) REFERENCES proposal_category(proposal_category_id)"
+"public.proposal" }o--o| "public.partner" : "FOREIGN KEY (partner_id) REFERENCES partner(partner_id)"
+"public.sky" }o--|| "public.input_catalog" : "FOREIGN KEY (input_catalog_id) REFERENCES input_catalog(input_catalog_id)"
+"public.sky" }o--o| "public.target_type" : "FOREIGN KEY (target_type_id) REFERENCES target_type(target_type_id)"
 "public.target" }o--o| "public.filter_name" : "FOREIGN KEY (filter_g) REFERENCES filter_name(filter_name)"
 "public.target" }o--o| "public.filter_name" : "FOREIGN KEY (filter_i) REFERENCES filter_name(filter_name)"
 "public.target" }o--o| "public.filter_name" : "FOREIGN KEY (filter_j) REFERENCES filter_name(filter_name)"
 "public.target" }o--o| "public.filter_name" : "FOREIGN KEY (filter_r) REFERENCES filter_name(filter_name)"
 "public.target" }o--o| "public.filter_name" : "FOREIGN KEY (filter_y) REFERENCES filter_name(filter_name)"
 "public.target" }o--o| "public.filter_name" : "FOREIGN KEY (filter_z) REFERENCES filter_name(filter_name)"
-"public.target" }o--o| "public.pfs_arm" : "FOREIGN KEY (qa_reference_arm) REFERENCES pfs_arm(name)"
 "public.target" }o--|| "public.input_catalog" : "FOREIGN KEY (input_catalog_id) REFERENCES input_catalog(input_catalog_id)"
-"public.target" }o--o| "public.target_type" : "FOREIGN KEY (target_type_id) REFERENCES target_type(target_type_id)"
+"public.target" }o--o| "public.pfs_arm" : "FOREIGN KEY (qa_reference_arm) REFERENCES pfs_arm(name)"
 "public.target" }o--o| "public.proposal" : "FOREIGN KEY (proposal_id) REFERENCES proposal(proposal_id)"
-"public.cluster" }o--o| "public.input_catalog" : "FOREIGN KEY (input_catalog_id) REFERENCES input_catalog(input_catalog_id)"
-"public.cluster" }o--|| "public.target" : "FOREIGN KEY (target_id) REFERENCES target(target_id)"
+"public.target" }o--o| "public.target_type" : "FOREIGN KEY (target_type_id) REFERENCES target_type(target_type_id)"
+"public.user_pointing" }o--|| "public.input_catalog" : "FOREIGN KEY (input_catalog_id) REFERENCES input_catalog(input_catalog_id)"
 
+"public.alembic_version" {
+  varchar_32_ version_num
+}
+"public.cluster" {
+  bigint cluster_id
+  bigint target_id FK
+  integer n_targets
+  double_precision ra_cluster
+  double_precision dec_cluster
+  double_precision d_ra
+  double_precision d_dec
+  integer input_catalog_id FK
+  timestamp_without_time_zone created_at
+  timestamp_without_time_zone updated_at
+}
 "public.filter_name" {
   varchar filter_name
   varchar filter_name_description
-  timestamp_without_time_zone created_at
-  timestamp_without_time_zone updated_at
-}
-"public.pfs_arm" {
-  varchar name
-  varchar description
-  timestamp_without_time_zone created_at
-  timestamp_without_time_zone updated_at
-}
-"public.proposal_category" {
-  integer proposal_category_id
-  varchar proposal_category_name
-  varchar proposal_category_description
-  timestamp_without_time_zone created_at
-  timestamp_without_time_zone updated_at
-}
-"public.input_catalog" {
-  integer input_catalog_id
-  varchar input_catalog_name
-  varchar input_catalog_description
-  varchar_16_ upload_id
-  boolean active
-  boolean is_classical
-  boolean is_user_pointing
-  timestamp_without_time_zone created_at
-  timestamp_without_time_zone updated_at
-}
-"public.target_type" {
-  integer target_type_id
-  varchar target_type_name
-  varchar target_type_description
-  timestamp_without_time_zone created_at
-  timestamp_without_time_zone updated_at
-}
-"public.user_pointing" {
-  bigint user_pointing_id
-  varchar ppc_code
-  double_precision ppc_ra
-  double_precision ppc_dec
-  double_precision ppc_pa
-  resolutionmode ppc_resolution
-  double_precision ppc_priority
-  integer input_catalog_id FK
-  timestamp_without_time_zone created_at
-  timestamp_without_time_zone updated_at
-}
-"public.proposal" {
-  varchar proposal_id
-  varchar group_id
-  varchar pi_first_name
-  varchar pi_last_name
-  varchar pi_middle_name
-  double_precision rank
-  varchar grade
-  double_precision allocated_time_total
-  double_precision allocated_time_lr
-  double_precision allocated_time_mr
-  integer proposal_category_id FK
-  boolean is_too
-  timestamp_without_time_zone created_at
-  timestamp_without_time_zone updated_at
-}
-"public.sky" {
-  bigint sky_id
-  bigint obj_id
-  varchar obj_id_orig
-  double_precision ra
-  double_precision dec
-  varchar epoch
-  integer tract
-  integer patch
-  integer target_type_id FK
-  integer input_catalog_id FK
-  double_precision mag_thresh
-  varchar version
   timestamp_without_time_zone created_at
   timestamp_without_time_zone updated_at
 }
@@ -195,33 +143,36 @@ erDiagram
   double_precision psf_mag_z
   double_precision psf_mag_y
   double_precision psf_mag_j
-  double_precision psf_mag_error_g
-  double_precision psf_mag_error_r
-  double_precision psf_mag_error_i
-  double_precision psf_mag_error_z
-  double_precision psf_mag_error_y
-  double_precision psf_mag_error_j
   double_precision psf_flux_g
   double_precision psf_flux_r
   double_precision psf_flux_i
   double_precision psf_flux_z
   double_precision psf_flux_y
   double_precision psf_flux_j
-  double_precision psf_flux_error_g
-  double_precision psf_flux_error_r
-  double_precision psf_flux_error_i
-  double_precision psf_flux_error_z
-  double_precision psf_flux_error_y
-  double_precision psf_flux_error_j
+  double_precision prob_f_star
+  boolean flags_dist
+  boolean flags_ebv
+  varchar version
+  timestamp_without_time_zone created_at
+  timestamp_without_time_zone updated_at
   varchar filter_g FK
   varchar filter_r FK
   varchar filter_i FK
   varchar filter_z FK
   varchar filter_y FK
   varchar filter_j FK
-  double_precision prob_f_star
-  boolean flags_dist
-  boolean flags_ebv
+  double_precision psf_mag_error_g
+  double_precision psf_mag_error_r
+  double_precision psf_mag_error_i
+  double_precision psf_mag_error_z
+  double_precision psf_mag_error_y
+  double_precision psf_mag_error_j
+  double_precision psf_flux_error_g
+  double_precision psf_flux_error_r
+  double_precision psf_flux_error_i
+  double_precision psf_flux_error_z
+  double_precision psf_flux_error_y
+  double_precision psf_flux_error_j
   double_precision teff_brutus
   double_precision teff_brutus_low
   double_precision teff_brutus_high
@@ -232,6 +183,60 @@ erDiagram
   double_precision teff_gspphot_lower
   double_precision teff_gspphot_upper
   boolean is_fstar_gaia
+}
+"public.input_catalog" {
+  varchar input_catalog_name
+  varchar input_catalog_description
+  timestamp_without_time_zone created_at
+  timestamp_without_time_zone updated_at
+  varchar_16_ upload_id
+  integer input_catalog_id
+  boolean active
+  boolean is_classical
+  boolean is_user_pointing
+}
+"public.pfs_arm" {
+  varchar name
+  varchar description
+  timestamp_without_time_zone created_at
+  timestamp_without_time_zone updated_at
+}
+"public.proposal" {
+  varchar proposal_id
+  varchar group_id
+  varchar pi_first_name
+  varchar pi_last_name
+  varchar pi_middle_name
+  double_precision rank
+  varchar grade
+  double_precision allocated_time_total
+  integer proposal_category_id FK
+  timestamp_without_time_zone created_at
+  timestamp_without_time_zone updated_at
+  double_precision allocated_time_lr
+  double_precision allocated_time_mr
+  boolean is_too
+  integer partner_id FK
+}
+"public.proposal_category" {
+  integer proposal_category_id
+  varchar proposal_category_name
+  varchar proposal_category_description
+  timestamp_without_time_zone created_at
+  timestamp_without_time_zone updated_at
+}
+"public.sky" {
+  bigint sky_id
+  bigint obj_id
+  varchar obj_id_orig
+  double_precision ra
+  double_precision dec
+  varchar epoch
+  integer tract
+  integer patch
+  integer target_type_id FK
+  integer input_catalog_id FK
+  double_precision mag_thresh
   varchar version
   timestamp_without_time_zone created_at
   timestamp_without_time_zone updated_at
@@ -239,7 +244,6 @@ erDiagram
 "public.target" {
   bigint target_id
   varchar proposal_id FK
-  varchar ob_code
   bigint obj_id
   double_precision ra
   double_precision dec
@@ -263,50 +267,70 @@ erDiagram
   double_precision psf_mag_z
   double_precision psf_mag_y
   double_precision psf_mag_j
-  double_precision psf_mag_error_g
-  double_precision psf_mag_error_r
-  double_precision psf_mag_error_i
-  double_precision psf_mag_error_z
-  double_precision psf_mag_error_y
-  double_precision psf_mag_error_j
   double_precision psf_flux_g
   double_precision psf_flux_r
   double_precision psf_flux_i
   double_precision psf_flux_z
   double_precision psf_flux_y
   double_precision psf_flux_j
-  double_precision psf_flux_error_g
-  double_precision psf_flux_error_r
-  double_precision psf_flux_error_i
-  double_precision psf_flux_error_z
-  double_precision psf_flux_error_y
-  double_precision psf_flux_error_j
+  double_precision priority
+  double_precision effective_exptime
+  boolean is_medium_resolution
+  double_precision qa_relative_throughput
+  double_precision qa_relative_noise
+  double_precision qa_reference_lambda
+  boolean is_cluster
+  timestamp_without_time_zone created_at
+  timestamp_without_time_zone updated_at
   varchar filter_g FK
   varchar filter_r FK
   varchar filter_i FK
   varchar filter_z FK
   varchar filter_y FK
   varchar filter_j FK
-  double_precision priority
-  double_precision effective_exptime
+  double_precision psf_mag_error_g
+  double_precision psf_mag_error_r
+  double_precision psf_mag_error_i
+  double_precision psf_mag_error_z
+  double_precision psf_mag_error_y
+  double_precision psf_mag_error_j
+  double_precision psf_flux_error_g
+  double_precision psf_flux_error_r
+  double_precision psf_flux_error_i
+  double_precision psf_flux_error_z
+  double_precision psf_flux_error_y
+  double_precision psf_flux_error_j
+  varchar ob_code
   double_precision single_exptime
-  boolean is_medium_resolution
-  double_precision qa_relative_throughput
-  double_precision qa_relative_noise
-  double_precision qa_reference_lambda
   varchar qa_reference_arm FK
-  boolean is_cluster
+  double_precision total_flux_g
+  double_precision total_flux_r
+  double_precision total_flux_i
+  double_precision total_flux_z
+  double_precision total_flux_y
+  double_precision total_flux_j
+  double_precision total_flux_error_g
+  double_precision total_flux_error_r
+  double_precision total_flux_error_i
+  double_precision total_flux_error_z
+  double_precision total_flux_error_y
+  double_precision total_flux_error_j
+}
+"public.target_type" {
+  integer target_type_id
+  varchar target_type_name
+  varchar target_type_description
   timestamp_without_time_zone created_at
   timestamp_without_time_zone updated_at
 }
-"public.cluster" {
-  bigint cluster_id
-  bigint target_id FK
-  integer n_targets
-  double_precision ra_cluster
-  double_precision dec_cluster
-  double_precision d_ra
-  double_precision d_dec
+"public.user_pointing" {
+  bigint user_pointing_id
+  varchar ppc_code
+  double_precision ppc_ra
+  double_precision ppc_dec
+  double_precision ppc_pa
+  resolutionmode ppc_resolution
+  double_precision ppc_priority
   integer input_catalog_id FK
   timestamp_without_time_zone created_at
   timestamp_without_time_zone updated_at

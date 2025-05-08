@@ -15,12 +15,14 @@
 
 | Name | Type | Definition |
 | ---- | ---- | ---------- |
+| filter_name_filter_name_key | UNIQUE | UNIQUE (filter_name) |
 | filter_name_pkey | PRIMARY KEY | PRIMARY KEY (filter_name) |
 
 ## Indexes
 
 | Name | Definition |
 | ---- | ---------- |
+| filter_name_filter_name_key | CREATE UNIQUE INDEX filter_name_filter_name_key ON public.filter_name USING btree (filter_name) |
 | filter_name_pkey | CREATE UNIQUE INDEX filter_name_pkey ON public.filter_name USING btree (filter_name) |
 
 ## Relations
@@ -69,33 +71,36 @@ erDiagram
   double_precision psf_mag_z
   double_precision psf_mag_y
   double_precision psf_mag_j
-  double_precision psf_mag_error_g
-  double_precision psf_mag_error_r
-  double_precision psf_mag_error_i
-  double_precision psf_mag_error_z
-  double_precision psf_mag_error_y
-  double_precision psf_mag_error_j
   double_precision psf_flux_g
   double_precision psf_flux_r
   double_precision psf_flux_i
   double_precision psf_flux_z
   double_precision psf_flux_y
   double_precision psf_flux_j
-  double_precision psf_flux_error_g
-  double_precision psf_flux_error_r
-  double_precision psf_flux_error_i
-  double_precision psf_flux_error_z
-  double_precision psf_flux_error_y
-  double_precision psf_flux_error_j
+  double_precision prob_f_star
+  boolean flags_dist
+  boolean flags_ebv
+  varchar version
+  timestamp_without_time_zone created_at
+  timestamp_without_time_zone updated_at
   varchar filter_g FK
   varchar filter_r FK
   varchar filter_i FK
   varchar filter_z FK
   varchar filter_y FK
   varchar filter_j FK
-  double_precision prob_f_star
-  boolean flags_dist
-  boolean flags_ebv
+  double_precision psf_mag_error_g
+  double_precision psf_mag_error_r
+  double_precision psf_mag_error_i
+  double_precision psf_mag_error_z
+  double_precision psf_mag_error_y
+  double_precision psf_mag_error_j
+  double_precision psf_flux_error_g
+  double_precision psf_flux_error_r
+  double_precision psf_flux_error_i
+  double_precision psf_flux_error_z
+  double_precision psf_flux_error_y
+  double_precision psf_flux_error_j
   double_precision teff_brutus
   double_precision teff_brutus_low
   double_precision teff_brutus_high
@@ -106,14 +111,10 @@ erDiagram
   double_precision teff_gspphot_lower
   double_precision teff_gspphot_upper
   boolean is_fstar_gaia
-  varchar version
-  timestamp_without_time_zone created_at
-  timestamp_without_time_zone updated_at
 }
 "public.target" {
   bigint target_id
   varchar proposal_id FK
-  varchar ob_code
   bigint obj_id
   double_precision ra
   double_precision dec
@@ -137,41 +138,54 @@ erDiagram
   double_precision psf_mag_z
   double_precision psf_mag_y
   double_precision psf_mag_j
-  double_precision psf_mag_error_g
-  double_precision psf_mag_error_r
-  double_precision psf_mag_error_i
-  double_precision psf_mag_error_z
-  double_precision psf_mag_error_y
-  double_precision psf_mag_error_j
   double_precision psf_flux_g
   double_precision psf_flux_r
   double_precision psf_flux_i
   double_precision psf_flux_z
   double_precision psf_flux_y
   double_precision psf_flux_j
-  double_precision psf_flux_error_g
-  double_precision psf_flux_error_r
-  double_precision psf_flux_error_i
-  double_precision psf_flux_error_z
-  double_precision psf_flux_error_y
-  double_precision psf_flux_error_j
+  double_precision priority
+  double_precision effective_exptime
+  boolean is_medium_resolution
+  double_precision qa_relative_throughput
+  double_precision qa_relative_noise
+  double_precision qa_reference_lambda
+  boolean is_cluster
+  timestamp_without_time_zone created_at
+  timestamp_without_time_zone updated_at
   varchar filter_g FK
   varchar filter_r FK
   varchar filter_i FK
   varchar filter_z FK
   varchar filter_y FK
   varchar filter_j FK
-  double_precision priority
-  double_precision effective_exptime
+  double_precision psf_mag_error_g
+  double_precision psf_mag_error_r
+  double_precision psf_mag_error_i
+  double_precision psf_mag_error_z
+  double_precision psf_mag_error_y
+  double_precision psf_mag_error_j
+  double_precision psf_flux_error_g
+  double_precision psf_flux_error_r
+  double_precision psf_flux_error_i
+  double_precision psf_flux_error_z
+  double_precision psf_flux_error_y
+  double_precision psf_flux_error_j
+  varchar ob_code
   double_precision single_exptime
-  boolean is_medium_resolution
-  double_precision qa_relative_throughput
-  double_precision qa_relative_noise
-  double_precision qa_reference_lambda
   varchar qa_reference_arm FK
-  boolean is_cluster
-  timestamp_without_time_zone created_at
-  timestamp_without_time_zone updated_at
+  double_precision total_flux_g
+  double_precision total_flux_r
+  double_precision total_flux_i
+  double_precision total_flux_z
+  double_precision total_flux_y
+  double_precision total_flux_j
+  double_precision total_flux_error_g
+  double_precision total_flux_error_r
+  double_precision total_flux_error_i
+  double_precision total_flux_error_z
+  double_precision total_flux_error_y
+  double_precision total_flux_error_j
 }
 ```
 

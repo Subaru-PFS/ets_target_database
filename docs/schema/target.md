@@ -54,6 +54,18 @@ Here are the columns in the `target` table:
 | psf_flux_error_z       | float     | Error in PSF flux in _z_-band                                                                    | nJy    | (\*)         |         |
 | psf_flux_error_y       | float     | Error in PSF flux in _y_-band                                                                    | nJy    | (\*)         |         |
 | psf_flux_error_j       | float     | Error in PSF flux in _j_-band                                                                    | nJy    | (\*)         |         |
+| total_flux_g           | float     | Total flux in _g_-band                                                                           | nJy    | (\*)         |         |
+| total_flux_r           | float     | Total flux in _r_-band                                                                           | nJy    | (\*)         |         |
+| total_flux_i           | float     | Total flux in _i_-band                                                                           | nJy    | (\*)         |         |
+| total_flux_z           | float     | Total flux in _z_-band                                                                           | nJy    | (\*)         |         |
+| total_flux_y           | float     | Total flux in _y_-band                                                                           | nJy    | (\*)         |         |
+| total_flux_j           | float     | Total flux in _j_-band                                                                           | nJy    | (\*)         |         |
+| total_flux_error_g     | float     | Error in total flux in _g_-band                                                                  | nJy    | (\*)         |         |
+| total_flux_error_r     | float     | Error in total flux in _r_-band                                                                  | nJy    | (\*)         |         |
+| total_flux_error_i     | float     | Error in total flux in _i_-band                                                                  | nJy    | (\*)         |         |
+| total_flux_error_z     | float     | Error in total flux in _z_-band                                                                  | nJy    | (\*)         |         |
+| total_flux_error_y     | float     | Error in total flux in _y_-band                                                                  | nJy    | (\*)         |         |
+| total_flux_error_j     | float     | Error in total flux in _j_-band                                                                  | nJy    | (\*)         |         |
 | filter_g               | str       | Photometric band used to measure the PSF flux in _g_-band                                        |        | (\*)         |         |
 | filter_r               | str       | Photometric band used to measure the PSF flux in _r_-band                                        |        | (\*)         |         |
 | filter_i               | str       | Photometric band used to measure the PSF flux in _i_-band                                        |        | (\*)         |         |
