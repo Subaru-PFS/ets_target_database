@@ -225,7 +225,7 @@ def checkdups(
     check_duplicates(
         indir=directory,
         outdir=output_dir,
-        file_format=file_format,
+        file_format=file_format.value,
         skip_save_merged=skip_save_merged,
         additional_columns=additional_columns,
         check_columns=check_columns,
@@ -306,7 +306,7 @@ def prep_fluxstd(
         input_catalog_id,
         input_catalog_name,
         rename_cols=rename_cols,
-        file_format=file_format,
+        file_format=file_format.value,
     )
 
 
@@ -353,7 +353,7 @@ def diagram(
 
     draw_diagram(
         config,
-        generator=generator,
+        generator=generator.value,
         output_dir=output_dir,
         title=title,
         sc_info_level=sc_info_level,
@@ -417,7 +417,7 @@ def insert(
         typer.Option(
             "--flux-type", help="Flux type for the flux standard star catalog."
         ),
-    ] = "total",
+    ] = FluxType.total,
     upload_id: Annotated[
         str,
         typer.Option(
@@ -449,14 +449,14 @@ def insert(
 
     add_database_rows(
         input_file=input_file,
-        table=table,
+        table=table.value,
         commit=commit,
         fetch=fetch,
         verbose=verbose,
         config=config,
         df=df,
         from_uploader=from_uploader,
-        flux_type=flux_type,
+        flux_type=flux_type.value,
         proposal_id=proposal_id,
         upload_id=upload_id,
         insert=True,
@@ -663,7 +663,7 @@ def insert_targets(
         typer.Option(
             "--flux-type", help="Flux type for the flux standard star catalog."
         ),
-    ] = "total",
+    ] = FluxType.total,
     commit: Annotated[
         bool,
         typer.Option("--commit", help="Commit changes to the database."),
@@ -685,7 +685,7 @@ def insert_targets(
         df_input_catalogs,
         config,
         data_dir=data_dir,
-        flux_type=flux_type,
+        flux_type=flux_type.value,
         commit=commit,
         fetch=fetch,
         verbose=verbose,

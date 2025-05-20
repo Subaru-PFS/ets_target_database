@@ -654,10 +654,12 @@ def make_target_df_from_uploader(
             except AttributeError:
                 pass
         if f"flux_{band}" in df.columns:
+            logger.info(f"flux_{band} is renamed to {flux_type}_flux_{band}")
             df.rename(
                 columns={f"flux_{band}": f"{flux_type}_flux_{band}"}, inplace=True
             )
         if f"flux_error_{band}" in df.columns:
+            logger.info("flux_error_{band} is renamed to {flux_type}_flux_error_{band}")
             df.rename(
                 columns={f"flux_error_{band}": f"{flux_type}_flux_error_{band}"},
                 inplace=True,
@@ -874,6 +876,10 @@ def add_database_rows(
         else:
             dry_run = True
             logger.info("No changes will be committed to targetDB (i.e., dry run)")
+
+        # logger.info(f"{df['total_flux_r'][:100]}")
+        # db.close()
+        # exit()
 
         if insert:
             db.insert(table, df, dry_run=dry_run)
