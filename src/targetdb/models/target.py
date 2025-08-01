@@ -47,6 +47,7 @@ class target(Base):
             name="target_propid_obcode_key",
         ),
         Index("target_q3c_ang2ipix_idx", sqlalchemy.text("q3c_ang2ipix(ra, dec)")),
+        Index("target_input_catalog_id_idx", "input_catalog_id"),
         {},
     )
 
@@ -283,6 +284,11 @@ class target(Base):
         ra,
         dec,
         epoch,
+        #
+        parallax,
+        pmra,
+        pmdec,
+        #
         tract,
         patch,
         target_type_id,
@@ -366,6 +372,11 @@ class target(Base):
         self.ra = ra
         self.dec = dec
         self.epoch = epoch
+        #
+        self.parallax = parallax
+        self.pmra = pmra
+        self.pmdec = pmdec
+        #
         self.tract = tract
         self.patch = patch
         self.target_type_id = target_type_id
