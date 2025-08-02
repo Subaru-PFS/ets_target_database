@@ -48,6 +48,9 @@ class target(Base):
         ),
         Index("target_q3c_ang2ipix_idx", sqlalchemy.text("q3c_ang2ipix(ra, dec)")),
         Index("target_input_catalog_id_idx", "input_catalog_id"),
+        Index("target_obj_id_input_catalog_id_idx", "obj_id", "input_catalog_id"),
+        Index("target_proposal_id_idx", "proposal_id"),
+        Index("target_proposal_id_obj_id_idx", "proposal_id", "obj_id"),
         {},
     )
 
