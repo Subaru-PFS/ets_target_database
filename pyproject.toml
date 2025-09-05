@@ -9,7 +9,7 @@ dependencies = [
     "alembic",
     "astropy",
     "loguru",
-    "numpy<2.0",
+    "numpy>=2.0",
     "openpyxl",
     "pandas",
     "psycopg2-binary",
@@ -22,7 +22,7 @@ dependencies = [
     'tomli >= 1.1.0 ; python_version < "3.11"',
     "typer",
 ]
-requires-python = ">=3.11, <3.12"
+requires-python = ">=3.11, <3.13"
 readme = "README.md"
 license = { text = "MIT" }
 classifiers = [
@@ -31,6 +31,7 @@ classifiers = [
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Topic :: Database",
     "Topic :: Scientific/Engineering :: Astronomy",
 ]
@@ -59,7 +60,7 @@ include-package-data = true
 version = { attr = "targetdb.__version__" }
 
 [tool.ruff]
-target-version = "py39"
+target-version = "py312"
 line-length = 88
 # line-length = 128
 
