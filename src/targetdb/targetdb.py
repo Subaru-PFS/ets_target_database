@@ -215,8 +215,11 @@ class TargetDB(object):
         """
         model = getattr(models, tablename)
         try:
-            # Use session.connection() instead of session.bind for SQLAlchemy 2.x compatibility
-            df = pd.read_sql(self.session.query(model).statement, self.session.connection())
+            # Use session.execute() to avoid immutabledict issues with pd.read_sql()
+            result = self.session.execute(self.session.query(model).statement)
+            columns = result.keys()
+            data = result.fetchall()
+            df = pd.DataFrame(data, columns=columns)
         except:
             self.session.rollback()
             raise
@@ -243,8 +246,11 @@ class TargetDB(object):
         for k, v in kwargs.items():
             query = query.filter(getattr(model, k) == v)
         try:
-            # Use session.connection() instead of session.bind for SQLAlchemy 2.x compatibility
-            df = pd.read_sql(query.statement, self.session.connection())
+            # Use session.execute() to avoid immutabledict issues with pd.read_sql()
+            result = self.session.execute(query.statement)
+            columns = result.keys()
+            data = result.fetchall()
+            df = pd.DataFrame(data, columns=columns)
         except:
             self.session.rollback()
             raise
@@ -266,8 +272,11 @@ class TargetDB(object):
         ----
         """
         try:
-            # Use session.connection() instead of session.bind for SQLAlchemy 2.x compatibility
-            df = pd.read_sql(query, self.session.connection())
+            # Use session.execute() with text() to avoid immutabledict issues with pd.read_sql()
+            result = self.session.execute(text(query))
+            columns = result.keys()
+            data = result.fetchall()
+            df = pd.DataFrame(data, columns=columns)
         except:
             self.session.rollback()
             raise
