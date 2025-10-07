@@ -215,7 +215,8 @@ class TargetDB(object):
         """
         model = getattr(models, tablename)
         try:
-            df = pd.read_sql(self.session.query(model).statement, self.session.bind)
+            # Use session.connection() instead of session.bind for SQLAlchemy 2.x compatibility
+            df = pd.read_sql(self.session.query(model).statement, self.session.connection())
         except:
             self.session.rollback()
             raise
@@ -242,7 +243,8 @@ class TargetDB(object):
         for k, v in kwargs.items():
             query = query.filter(getattr(model, k) == v)
         try:
-            df = pd.read_sql(query.statement, self.session.bind)
+            # Use session.connection() instead of session.bind for SQLAlchemy 2.x compatibility
+            df = pd.read_sql(query.statement, self.session.connection())
         except:
             self.session.rollback()
             raise
@@ -264,7 +266,8 @@ class TargetDB(object):
         ----
         """
         try:
-            df = pd.read_sql(query, self.session.bind)
+            # Use session.connection() instead of session.bind for SQLAlchemy 2.x compatibility
+            df = pd.read_sql(query, self.session.connection())
         except:
             self.session.rollback()
             raise
