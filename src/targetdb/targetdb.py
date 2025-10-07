@@ -3,7 +3,7 @@
 import io
 
 import pandas as pd
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, select
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import text
 
@@ -215,8 +215,15 @@ class TargetDB(object):
         """
         model = getattr(models, tablename)
         try:
-            # Use session.connection() instead of session.bind for SQLAlchemy 2.x compatibility
-            df = pd.read_sql(self.session.query(model).statement, self.session.connection())
+            # Use session.execute() with select() to avoid immutabledict issues with pd.read_sql()
+            stmt = select(model)
+            result = self.session.execute(stmt)
+            # Get column names from the model's mapper
+            columns = [c.key for c in model.__mapper__.columns]
+            data = result.fetchall()
+            # Extract values from Row objects (each row is a tuple with one element - the model instance)
+            rows = [[getattr(row[0], col) for col in columns] for row in data]
+            df = pd.DataFrame(rows, columns=columns)
         except:
             self.session.rollback()
             raise
@@ -239,12 +246,18 @@ class TargetDB(object):
         ----
         """
         model = getattr(models, tablename)
-        query = self.session.query(model)
-        for k, v in kwargs.items():
-            query = query.filter(getattr(model, k) == v)
         try:
-            # Use session.connection() instead of session.bind for SQLAlchemy 2.x compatibility
-            df = pd.read_sql(query.statement, self.session.connection())
+            # Use session.execute() with select() to avoid immutabledict issues with pd.read_sql()
+            stmt = select(model)
+            for k, v in kwargs.items():
+                stmt = stmt.filter(getattr(model, k) == v)
+            result = self.session.execute(stmt)
+            # Get column names from the model's mapper
+            columns = [c.key for c in model.__mapper__.columns]
+            data = result.fetchall()
+            # Extract values from Row objects (each row is a tuple with one element - the model instance)
+            rows = [[getattr(row[0], col) for col in columns] for row in data]
+            df = pd.DataFrame(rows, columns=columns)
         except:
             self.session.rollback()
             raise
@@ -266,8 +279,11 @@ class TargetDB(object):
         ----
         """
         try:
-            # Use session.connection() instead of session.bind for SQLAlchemy 2.x compatibility
-            df = pd.read_sql(query, self.session.connection())
+            # Use session.execute() with text() to avoid immutabledict issues with pd.read_sql()
+            result = self.session.execute(text(query))
+            columns = result.keys()
+            data = result.fetchall()
+            df = pd.DataFrame(data, columns=columns)
         except:
             self.session.rollback()
             raise
