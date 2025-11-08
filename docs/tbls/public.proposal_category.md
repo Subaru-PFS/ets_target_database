@@ -17,7 +17,6 @@
 | Name | Type | Definition |
 | ---- | ---- | ---------- |
 | proposal_category_pkey | PRIMARY KEY | PRIMARY KEY (proposal_category_id) |
-| proposal_category_proposal_category_id_key | UNIQUE | UNIQUE (proposal_category_id) |
 | proposal_category_proposal_category_name_key | UNIQUE | UNIQUE (proposal_category_name) |
 
 ## Indexes
@@ -25,7 +24,6 @@
 | Name | Definition |
 | ---- | ---------- |
 | proposal_category_pkey | CREATE UNIQUE INDEX proposal_category_pkey ON public.proposal_category USING btree (proposal_category_id) |
-| proposal_category_proposal_category_id_key | CREATE UNIQUE INDEX proposal_category_proposal_category_id_key ON public.proposal_category USING btree (proposal_category_id) |
 | proposal_category_proposal_category_name_key | CREATE UNIQUE INDEX proposal_category_proposal_category_name_key ON public.proposal_category USING btree (proposal_category_name) |
 
 ## Relations

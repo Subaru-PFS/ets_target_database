@@ -17,7 +17,6 @@ class partner(Base):
     partner_id = Column(
         Integer,
         primary_key=True,
-        unique=True,
         autoincrement=False,
         comment="Unique identifier of the partner",
     )

@@ -35,7 +35,6 @@ class proposal(Base):
     proposal_id = Column(
         String,
         primary_key=True,
-        unique=True,
         autoincrement=False,
         comment="Unique identifier for proposal (e.g, S21B-OT06)",
     )

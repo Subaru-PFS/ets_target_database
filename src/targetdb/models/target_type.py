@@ -29,7 +29,6 @@ class target_type(Base):
     target_type_id = Column(
         Integer,
         primary_key=True,
-        unique=True,
         autoincrement=False,
         comment="Unique identifier for target types",
     )

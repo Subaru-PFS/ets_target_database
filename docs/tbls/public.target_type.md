@@ -17,14 +17,12 @@
 | Name | Type | Definition |
 | ---- | ---- | ---------- |
 | target_type_pkey | PRIMARY KEY | PRIMARY KEY (target_type_id) |
-| target_type_target_type_id_key | UNIQUE | UNIQUE (target_type_id) |
 
 ## Indexes
 
 | Name | Definition |
 | ---- | ---------- |
 | target_type_pkey | CREATE UNIQUE INDEX target_type_pkey ON public.target_type USING btree (target_type_id) |
-| target_type_target_type_id_key | CREATE UNIQUE INDEX target_type_target_type_id_key ON public.target_type USING btree (target_type_id) |
 
 ## Relations
 
@@ -57,7 +55,7 @@ erDiagram
   integer tract
   integer patch
   integer target_type_id FK
-  integer input_catalog_id FK
+  integer input_catalog_id
   double_precision psf_mag_g
   double_precision psf_mag_r
   double_precision psf_mag_i
@@ -76,12 +74,12 @@ erDiagram
   varchar version
   timestamp_without_time_zone created_at
   timestamp_without_time_zone updated_at
-  varchar filter_g FK
-  varchar filter_r FK
-  varchar filter_i FK
-  varchar filter_z FK
-  varchar filter_y FK
-  varchar filter_j FK
+  varchar filter_g
+  varchar filter_r
+  varchar filter_i
+  varchar filter_z
+  varchar filter_y
+  varchar filter_j
   double_precision psf_mag_error_g
   double_precision psf_mag_error_r
   double_precision psf_mag_error_i
@@ -115,7 +113,7 @@ erDiagram
   integer tract
   integer patch
   integer target_type_id FK
-  integer input_catalog_id FK
+  integer input_catalog_id
   double_precision mag_thresh
   varchar version
   timestamp_without_time_zone created_at
@@ -134,7 +132,7 @@ erDiagram
   integer tract
   integer patch
   integer target_type_id FK
-  integer input_catalog_id FK
+  integer input_catalog_id
   double_precision fiber_mag_g
   double_precision fiber_mag_r
   double_precision fiber_mag_i
@@ -162,12 +160,12 @@ erDiagram
   boolean is_cluster
   timestamp_without_time_zone created_at
   timestamp_without_time_zone updated_at
-  varchar filter_g FK
-  varchar filter_r FK
-  varchar filter_i FK
-  varchar filter_z FK
-  varchar filter_y FK
-  varchar filter_j FK
+  varchar filter_g
+  varchar filter_r
+  varchar filter_i
+  varchar filter_z
+  varchar filter_y
+  varchar filter_j
   double_precision psf_mag_error_g
   double_precision psf_mag_error_r
   double_precision psf_mag_error_i

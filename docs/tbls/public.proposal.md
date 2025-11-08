@@ -28,7 +28,6 @@
 | ---- | ---- | ---------- |
 | proposal_proposal_category_id_fkey | FOREIGN KEY | FOREIGN KEY (proposal_category_id) REFERENCES proposal_category(proposal_category_id) |
 | proposal_pkey | PRIMARY KEY | PRIMARY KEY (proposal_id) |
-| proposal_proposal_id_key | UNIQUE | UNIQUE (proposal_id) |
 | proposal_partner_id_fkey | FOREIGN KEY | FOREIGN KEY (partner_id) REFERENCES partner(partner_id) |
 
 ## Indexes
@@ -36,7 +35,6 @@
 | Name | Definition |
 | ---- | ---------- |
 | proposal_pkey | CREATE UNIQUE INDEX proposal_pkey ON public.proposal USING btree (proposal_id) |
-| proposal_proposal_id_key | CREATE UNIQUE INDEX proposal_proposal_id_key ON public.proposal USING btree (proposal_id) |
 | idx_proposal_grade | CREATE INDEX idx_proposal_grade ON public.proposal USING btree (grade) |
 
 ## Relations
@@ -78,7 +76,7 @@ erDiagram
   integer tract
   integer patch
   integer target_type_id FK
-  integer input_catalog_id FK
+  integer input_catalog_id
   double_precision fiber_mag_g
   double_precision fiber_mag_r
   double_precision fiber_mag_i
@@ -106,12 +104,12 @@ erDiagram
   boolean is_cluster
   timestamp_without_time_zone created_at
   timestamp_without_time_zone updated_at
-  varchar filter_g FK
-  varchar filter_r FK
-  varchar filter_i FK
-  varchar filter_z FK
-  varchar filter_y FK
-  varchar filter_j FK
+  varchar filter_g
+  varchar filter_r
+  varchar filter_i
+  varchar filter_z
+  varchar filter_y
+  varchar filter_j
   double_precision psf_mag_error_g
   double_precision psf_mag_error_r
   double_precision psf_mag_error_i

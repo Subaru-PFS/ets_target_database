@@ -18,7 +18,6 @@
 | ---- | ---- | ---------- |
 | partner_pkey | PRIMARY KEY | PRIMARY KEY (partner_id) |
 | partner_partner_name_key | UNIQUE | UNIQUE (partner_name) |
-| partner_partner_id_key | UNIQUE | UNIQUE (partner_id) |
 
 ## Indexes
 
@@ -26,7 +25,6 @@
 | ---- | ---------- |
 | partner_pkey | CREATE UNIQUE INDEX partner_pkey ON public.partner USING btree (partner_id) |
 | partner_partner_name_key | CREATE UNIQUE INDEX partner_partner_name_key ON public.partner USING btree (partner_name) |
-| partner_partner_id_key | CREATE UNIQUE INDEX partner_partner_id_key ON public.partner USING btree (partner_id) |
 
 ## Relations
 
