@@ -24,7 +24,6 @@ class input_catalog(Base):
             cycle=False,
         ),
         primary_key=True,
-        unique=True,
         comment="Unique identifier for input catalogs",
     )
     input_catalog_name = Column(

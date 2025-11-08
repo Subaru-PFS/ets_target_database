@@ -15,7 +15,6 @@ class pfs_arm(Base):
     name = Column(
         String,
         primary_key=True,
-        unique=True,
         comment="Arm name (e.g., 'b', 'r', 'n', and 'm')",
     )
     description = Column(

@@ -16,7 +16,6 @@ class proposal_category(Base):
     proposal_category_id = Column(
         Integer,
         primary_key=True,
-        unique=True,
         autoincrement=False,
         comment="Unique identifier of proposal category",
     )

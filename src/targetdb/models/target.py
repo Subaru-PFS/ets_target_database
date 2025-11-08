@@ -57,7 +57,6 @@ class target(Base):
     target_id = Column(
         BigInteger,
         primary_key=True,
-        unique=True,
         autoincrement=True,
         comment="Unique identifier for each target",
     )

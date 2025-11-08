@@ -17,7 +17,6 @@ class unique_object(Base):
     unique_object_id = Column(
         BigInteger,
         primary_key=True,
-        unique=True,
         autoincrement=True,
         comment="Unique unique_object identifier",
     )

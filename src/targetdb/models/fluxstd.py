@@ -13,7 +13,6 @@ from sqlalchemy import (
     String,
     UniqueConstraint,
 )
-
 from sqlalchemy.orm import backref, relationship
 
 from . import (
@@ -43,7 +42,6 @@ class fluxstd(Base):
     fluxstd_id = Column(
         BigInteger,
         primary_key=True,
-        unique=True,
         autoincrement=True,
         comment="Unique identifier for each flux standard star",
     )

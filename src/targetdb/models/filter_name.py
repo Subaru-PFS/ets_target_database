@@ -17,7 +17,6 @@ class filter_name(Base):
     filter_name = Column(
         String,
         primary_key=True,
-        unique=True,
         autoincrement=False,
         comment="Filter name (e.g., g_ps1)",
     )
