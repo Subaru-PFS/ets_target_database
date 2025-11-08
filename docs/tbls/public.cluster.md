@@ -13,7 +13,7 @@
 | dec_cluster | double precision |  | true |  |  | Mean Dec of targets in the cluster (ICRS, degree) |
 | d_ra | double precision |  | true |  |  | RA(target) - RA(cluster) (degree) |
 | d_dec | double precision |  | true |  |  | Dec(target) - Dec(cluster) (degree) |
-| input_catalog_id | integer |  | true |  |  | Input catalog ID from the input_catalog table |
+| input_catalog_id | integer |  | true |  | [public.input_catalog](public.input_catalog.md) | Input catalog ID from the input_catalog table |
 | created_at | timestamp without time zone | timezone('utc'::text, CURRENT_TIMESTAMP) | true |  |  | UTC |
 | updated_at | timestamp without time zone |  | true |  |  | UTC |
 
@@ -23,6 +23,7 @@
 | ---- | ---- | ---------- |
 | cluster_cluster_id_target_id_key | UNIQUE | UNIQUE (cluster_id, target_id) |
 | cluster_pkey | PRIMARY KEY | PRIMARY KEY (cluster_id, target_id) |
+| cluster_input_catalog_id_fkey | FOREIGN KEY | FOREIGN KEY (input_catalog_id) REFERENCES input_catalog(input_catalog_id) |
 | cluster_target_id_fkey | FOREIGN KEY | FOREIGN KEY (target_id) REFERENCES target(target_id) |
 
 ## Indexes
@@ -38,6 +39,7 @@
 erDiagram
 
 "public.cluster" }o--|| "public.target" : "FOREIGN KEY (target_id) REFERENCES target(target_id)"
+"public.cluster" }o--o| "public.input_catalog" : "FOREIGN KEY (input_catalog_id) REFERENCES input_catalog(input_catalog_id)"
 
 "public.cluster" {
   bigint cluster_id
@@ -47,7 +49,7 @@ erDiagram
   double_precision dec_cluster
   double_precision d_ra
   double_precision d_dec
-  integer input_catalog_id
+  integer input_catalog_id FK
   timestamp_without_time_zone created_at
   timestamp_without_time_zone updated_at
 }
@@ -64,7 +66,7 @@ erDiagram
   integer tract
   integer patch
   integer target_type_id FK
-  integer input_catalog_id
+  integer input_catalog_id FK
   double_precision fiber_mag_g
   double_precision fiber_mag_r
   double_precision fiber_mag_i
@@ -92,12 +94,12 @@ erDiagram
   boolean is_cluster
   timestamp_without_time_zone created_at
   timestamp_without_time_zone updated_at
-  varchar filter_g
-  varchar filter_r
-  varchar filter_i
-  varchar filter_z
-  varchar filter_y
-  varchar filter_j
+  varchar filter_g FK
+  varchar filter_r FK
+  varchar filter_i FK
+  varchar filter_z FK
+  varchar filter_y FK
+  varchar filter_j FK
   double_precision psf_mag_error_g
   double_precision psf_mag_error_r
   double_precision psf_mag_error_i
@@ -125,6 +127,17 @@ erDiagram
   double_precision total_flux_error_z
   double_precision total_flux_error_y
   double_precision total_flux_error_j
+}
+"public.input_catalog" {
+  varchar input_catalog_name
+  varchar input_catalog_description
+  timestamp_without_time_zone created_at
+  timestamp_without_time_zone updated_at
+  varchar_16_ upload_id
+  integer input_catalog_id
+  boolean active
+  boolean is_classical
+  boolean is_user_pointing
 }
 ```
 
