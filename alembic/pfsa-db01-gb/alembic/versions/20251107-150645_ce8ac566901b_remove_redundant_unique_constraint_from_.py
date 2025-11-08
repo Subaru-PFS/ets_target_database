@@ -25,8 +25,9 @@ def upgrade():
     # Note: Some of these unique constraints may be referenced by foreign keys.
     # PostgreSQL foreign keys can reference either unique constraints or primary keys.
     # When we drop a unique constraint that's referenced by a foreign key with CASCADE,
-    # the dependent foreign keys are automatically dropped and recreated to use the
-    # primary key index instead.
+    # the dependent foreign keys are automatically dropped.
+    # IMPORTANT: CASCADE does NOT automatically recreate these foreign keys.
+    # They must be manually recreated (see migration ae27ee4ad568).
 
     # Drop constraints that are NOT referenced by foreign keys
     op.drop_constraint(op.f("sky_sky_id_key"), "sky", type_="unique")
@@ -34,7 +35,7 @@ def upgrade():
     op.drop_constraint(op.f("target_target_id_key"), "target", type_="unique")
 
     # These constraints ARE referenced by foreign keys, so we use raw SQL with CASCADE
-    # CASCADE will automatically drop and recreate the dependent foreign keys to use the primary key
+    # CASCADE will drop the dependent foreign keys (they are recreated in migration ae27ee4ad568)
     op.execute("ALTER TABLE pfs_arm DROP CONSTRAINT IF EXISTS pfs_arm_name_key CASCADE")
     op.execute(
         "ALTER TABLE proposal DROP CONSTRAINT IF EXISTS proposal_proposal_id_key CASCADE"
@@ -55,8 +56,9 @@ def upgrade():
         "ALTER TABLE filter_name DROP CONSTRAINT IF EXISTS filter_name_filter_name_key CASCADE"
     )
 
-    # Recreate ONLY the foreign keys that were dropped by CASCADE
-    # (foreign keys that reference the unique constraints we just dropped)
+    # Recreate one of the foreign keys that was dropped by CASCADE
+    # Note: This is incomplete - 17 foreign keys were dropped but only 1 is recreated here.
+    # The remaining 16 foreign keys are recreated in migration ae27ee4ad568.
     op.create_foreign_key(
         "target_qa_reference_arm_fkey",
         "target",
