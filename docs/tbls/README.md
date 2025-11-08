@@ -74,14 +74,31 @@
 ```mermaid
 erDiagram
 
+"public.cluster" }o--o| "public.input_catalog" : "FOREIGN KEY (input_catalog_id) REFERENCES input_catalog(input_catalog_id)"
 "public.cluster" }o--|| "public.target" : "FOREIGN KEY (target_id) REFERENCES target(target_id)"
+"public.fluxstd" }o--o| "public.filter_name" : "FOREIGN KEY (filter_g) REFERENCES filter_name(filter_name)"
+"public.fluxstd" }o--o| "public.filter_name" : "FOREIGN KEY (filter_i) REFERENCES filter_name(filter_name)"
+"public.fluxstd" }o--o| "public.filter_name" : "FOREIGN KEY (filter_j) REFERENCES filter_name(filter_name)"
+"public.fluxstd" }o--o| "public.filter_name" : "FOREIGN KEY (filter_r) REFERENCES filter_name(filter_name)"
+"public.fluxstd" }o--o| "public.filter_name" : "FOREIGN KEY (filter_y) REFERENCES filter_name(filter_name)"
+"public.fluxstd" }o--o| "public.filter_name" : "FOREIGN KEY (filter_z) REFERENCES filter_name(filter_name)"
+"public.fluxstd" }o--|| "public.input_catalog" : "FOREIGN KEY (input_catalog_id) REFERENCES input_catalog(input_catalog_id)"
 "public.fluxstd" }o--o| "public.target_type" : "FOREIGN KEY (target_type_id) REFERENCES target_type(target_type_id)"
 "public.proposal" }o--o| "public.proposal_category" : "FOREIGN KEY (proposal_category_id) REFERENCES proposal_category(proposal_category_id)"
 "public.proposal" }o--o| "public.partner" : "FOREIGN KEY (partner_id) REFERENCES partner(partner_id)"
+"public.sky" }o--|| "public.input_catalog" : "FOREIGN KEY (input_catalog_id) REFERENCES input_catalog(input_catalog_id)"
 "public.sky" }o--o| "public.target_type" : "FOREIGN KEY (target_type_id) REFERENCES target_type(target_type_id)"
+"public.target" }o--o| "public.filter_name" : "FOREIGN KEY (filter_g) REFERENCES filter_name(filter_name)"
+"public.target" }o--o| "public.filter_name" : "FOREIGN KEY (filter_i) REFERENCES filter_name(filter_name)"
+"public.target" }o--o| "public.filter_name" : "FOREIGN KEY (filter_j) REFERENCES filter_name(filter_name)"
+"public.target" }o--o| "public.filter_name" : "FOREIGN KEY (filter_r) REFERENCES filter_name(filter_name)"
+"public.target" }o--o| "public.filter_name" : "FOREIGN KEY (filter_y) REFERENCES filter_name(filter_name)"
+"public.target" }o--o| "public.filter_name" : "FOREIGN KEY (filter_z) REFERENCES filter_name(filter_name)"
+"public.target" }o--|| "public.input_catalog" : "FOREIGN KEY (input_catalog_id) REFERENCES input_catalog(input_catalog_id)"
 "public.target" }o--o| "public.pfs_arm" : "FOREIGN KEY (qa_reference_arm) REFERENCES pfs_arm(name)"
 "public.target" }o--o| "public.proposal" : "FOREIGN KEY (proposal_id) REFERENCES proposal(proposal_id)"
 "public.target" }o--o| "public.target_type" : "FOREIGN KEY (target_type_id) REFERENCES target_type(target_type_id)"
+"public.user_pointing" }o--|| "public.input_catalog" : "FOREIGN KEY (input_catalog_id) REFERENCES input_catalog(input_catalog_id)"
 
 "public.alembic_version" {
   varchar_32_ version_num
@@ -94,7 +111,7 @@ erDiagram
   double_precision dec_cluster
   double_precision d_ra
   double_precision d_dec
-  integer input_catalog_id
+  integer input_catalog_id FK
   timestamp_without_time_zone created_at
   timestamp_without_time_zone updated_at
 }
@@ -119,7 +136,7 @@ erDiagram
   integer tract
   integer patch
   integer target_type_id FK
-  integer input_catalog_id
+  integer input_catalog_id FK
   double_precision psf_mag_g
   double_precision psf_mag_r
   double_precision psf_mag_i
@@ -138,12 +155,12 @@ erDiagram
   varchar version
   timestamp_without_time_zone created_at
   timestamp_without_time_zone updated_at
-  varchar filter_g
-  varchar filter_r
-  varchar filter_i
-  varchar filter_z
-  varchar filter_y
-  varchar filter_j
+  varchar filter_g FK
+  varchar filter_r FK
+  varchar filter_i FK
+  varchar filter_z FK
+  varchar filter_y FK
+  varchar filter_j FK
   double_precision psf_mag_error_g
   double_precision psf_mag_error_r
   double_precision psf_mag_error_i
@@ -218,7 +235,7 @@ erDiagram
   integer tract
   integer patch
   integer target_type_id FK
-  integer input_catalog_id
+  integer input_catalog_id FK
   double_precision mag_thresh
   varchar version
   timestamp_without_time_zone created_at
@@ -237,7 +254,7 @@ erDiagram
   integer tract
   integer patch
   integer target_type_id FK
-  integer input_catalog_id
+  integer input_catalog_id FK
   double_precision fiber_mag_g
   double_precision fiber_mag_r
   double_precision fiber_mag_i
@@ -265,12 +282,12 @@ erDiagram
   boolean is_cluster
   timestamp_without_time_zone created_at
   timestamp_without_time_zone updated_at
-  varchar filter_g
-  varchar filter_r
-  varchar filter_i
-  varchar filter_z
-  varchar filter_y
-  varchar filter_j
+  varchar filter_g FK
+  varchar filter_r FK
+  varchar filter_i FK
+  varchar filter_z FK
+  varchar filter_y FK
+  varchar filter_j FK
   double_precision psf_mag_error_g
   double_precision psf_mag_error_r
   double_precision psf_mag_error_i
@@ -314,7 +331,7 @@ erDiagram
   double_precision ppc_pa
   resolutionmode ppc_resolution
   double_precision ppc_priority
-  integer input_catalog_id
+  integer input_catalog_id FK
   timestamp_without_time_zone created_at
   timestamp_without_time_zone updated_at
 }

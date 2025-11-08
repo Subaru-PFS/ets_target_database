@@ -49,7 +49,7 @@ erDiagram
   integer tract
   integer patch
   integer target_type_id FK
-  integer input_catalog_id
+  integer input_catalog_id FK
   double_precision fiber_mag_g
   double_precision fiber_mag_r
   double_precision fiber_mag_i
@@ -77,12 +77,12 @@ erDiagram
   boolean is_cluster
   timestamp_without_time_zone created_at
   timestamp_without_time_zone updated_at
-  varchar filter_g
-  varchar filter_r
-  varchar filter_i
-  varchar filter_z
-  varchar filter_y
-  varchar filter_j
+  varchar filter_g FK
+  varchar filter_r FK
+  varchar filter_i FK
+  varchar filter_z FK
+  varchar filter_y FK
+  varchar filter_j FK
   double_precision psf_mag_error_g
   double_precision psf_mag_error_r
   double_precision psf_mag_error_i

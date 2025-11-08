@@ -13,7 +13,7 @@
 | ppc_pa | double precision |  | false |  |  | Position angle of the pointing center (degree) |
 | ppc_resolution | resolutionmode |  | false |  |  | Resolution mode of the pointing ('L' or 'M') |
 | ppc_priority | double precision |  | false |  |  | Priority of the pointing calculated by the uploader |
-| input_catalog_id | integer |  | false |  |  | Input catalog ID from the input_catalog table |
+| input_catalog_id | integer |  | false |  | [public.input_catalog](public.input_catalog.md) | Input catalog ID from the input_catalog table |
 | created_at | timestamp without time zone | timezone('utc'::text, CURRENT_TIMESTAMP) | true |  |  | The date and time in UTC when the record was created |
 | updated_at | timestamp without time zone |  | true |  |  | The date and time in UTC when the record was last updated |
 
@@ -21,6 +21,7 @@
 
 | Name | Type | Definition |
 | ---- | ---- | ---------- |
+| user_pointing_input_catalog_id_fkey | FOREIGN KEY | FOREIGN KEY (input_catalog_id) REFERENCES input_catalog(input_catalog_id) |
 | user_pointing_pkey | PRIMARY KEY | PRIMARY KEY (user_pointing_id) |
 
 ## Indexes
@@ -34,6 +35,7 @@
 ```mermaid
 erDiagram
 
+"public.user_pointing" }o--|| "public.input_catalog" : "FOREIGN KEY (input_catalog_id) REFERENCES input_catalog(input_catalog_id)"
 
 "public.user_pointing" {
   bigint user_pointing_id
@@ -43,9 +45,20 @@ erDiagram
   double_precision ppc_pa
   resolutionmode ppc_resolution
   double_precision ppc_priority
-  integer input_catalog_id
+  integer input_catalog_id FK
   timestamp_without_time_zone created_at
   timestamp_without_time_zone updated_at
+}
+"public.input_catalog" {
+  varchar input_catalog_name
+  varchar input_catalog_description
+  timestamp_without_time_zone created_at
+  timestamp_without_time_zone updated_at
+  varchar_16_ upload_id
+  integer input_catalog_id
+  boolean active
+  boolean is_classical
+  boolean is_user_pointing
 }
 ```
 
