@@ -10,12 +10,10 @@ jobs:
     runs-on: [self-hosted, pfs-etc]
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
-      - name: Run commands
+      - name: Set up Python and build docs with uv
         run: |
-          pyenv local 3.11.9
-          python3 -m venv .venv
-          source .venv/bin/activate
-          python3 -m pip install -U mkdocs "mkdocs-material[imaging]"
-          mkdocs build --site-dir ${{ vars.DOC_PATH }}
+          uv python pin 3.12
+          uv sync --extra doc
+          uv run mkdocs build --site-dir ${{ vars.DOC_PATH }}
