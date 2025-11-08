@@ -15,14 +15,12 @@
 
 | Name | Type | Definition |
 | ---- | ---- | ---------- |
-| pfs_arm_name_key | UNIQUE | UNIQUE (name) |
 | pfs_arm_pkey | PRIMARY KEY | PRIMARY KEY (name) |
 
 ## Indexes
 
 | Name | Definition |
 | ---- | ---------- |
-| pfs_arm_name_key | CREATE UNIQUE INDEX pfs_arm_name_key ON public.pfs_arm USING btree (name) |
 | pfs_arm_pkey | CREATE UNIQUE INDEX pfs_arm_pkey ON public.pfs_arm USING btree (name) |
 
 ## Relations
@@ -51,7 +49,7 @@ erDiagram
   integer tract
   integer patch
   integer target_type_id FK
-  integer input_catalog_id FK
+  integer input_catalog_id
   double_precision fiber_mag_g
   double_precision fiber_mag_r
   double_precision fiber_mag_i
@@ -79,12 +77,12 @@ erDiagram
   boolean is_cluster
   timestamp_without_time_zone created_at
   timestamp_without_time_zone updated_at
-  varchar filter_g FK
-  varchar filter_r FK
-  varchar filter_i FK
-  varchar filter_z FK
-  varchar filter_y FK
-  varchar filter_j FK
+  varchar filter_g
+  varchar filter_r
+  varchar filter_i
+  varchar filter_z
+  varchar filter_y
+  varchar filter_j
   double_precision psf_mag_error_g
   double_precision psf_mag_error_r
   double_precision psf_mag_error_i
