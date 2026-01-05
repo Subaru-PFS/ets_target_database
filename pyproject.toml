@@ -1,44 +1,40 @@
 [project]
 # name = "targetdb"
 name = "ets_target_database"
+description = "PFS target database (targetDB) tools"
+readme = "README.md"
+requires-python = ">=3.11, <3.13"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Masato Onodera", email = "monodera@naoj.org" }]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Database",
+  "Topic :: Scientific/Engineering :: Astronomy",
+]
+dependencies = [
+  "alembic",
+  "astropy",
+  "loguru",
+  "numpy>=2.0",
+  "openpyxl",
+  "pandas",
+  "psycopg2-binary",
+  "pyarrow",
+  "sqlalchemy",
+  # "setuptools",
+  "sqlalchemy-utils",
+  "tabulate",
+  # "wheel",
+  'tomli >= 1.1.0 ; python_version < "3.11"',
+  "typer",
+]
 # version = "0.1.0"
 dynamic = ["version"]
-description = "PFS target database (targetDB) tools"
-authors = [{ name = "Masato Onodera", email = "monodera@naoj.org" }]
-dependencies = [
-    "alembic",
-    "astropy",
-    "loguru",
-    "numpy>=2.0",
-    "openpyxl",
-    "pandas",
-    "psycopg2-binary",
-    "pyarrow",
-    # "setuptools",
-    "sqlalchemy-utils",
-    "sqlalchemy",
-    "tabulate",
-    # "wheel",
-    'tomli >= 1.1.0 ; python_version < "3.11"',
-    "typer",
-]
-requires-python = ">=3.11, <3.13"
-readme = "README.md"
-license = { text = "MIT" }
-classifiers = [
-    "Development Status :: 4 - Beta",
-    "Intended Audience :: Developers",
-    "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Topic :: Database",
-    "Topic :: Scientific/Engineering :: Astronomy",
-]
-
-[project.optional-dependencies]
-dev = ["ipython", "pytest", "black", "ruff"]
-doc = ["mkdocs", "mkdocs-material[imaging]", "mkdocstrings-python"]
 
 [project.urls]
 homepage = "https://github.com/Subaru-PFS/ets_target_database"
@@ -47,17 +43,32 @@ source = "https://github.com/Subaru-PFS/ets_target_database"
 [project.scripts]
 pfs-targetdb-cli = "targetdb.cli.cli_main:app"
 
+[project.optional-dependencies]
+dev = ["ipython", "pytest", "black", "ruff"]
+doc = ["mkdocs", "mkdocs-material[imaging]", "mkdocstrings-python"]
 
 [build-system]
 requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools]
-package-dir = { "" = "src" }
-include-package-data = true
+[tool.black]
+line-length = 88
 
-[tool.setuptools.dynamic]
-version = { attr = "targetdb.__version__" }
+[tool.pdm.scripts]
+serve-doc = { shell = "mkdocs serve", help = "Start the dev server for doc preview" }
+build-doc = { shell = "mkdocs build", help = "Build documentation" }
+gen-requirements = { cmd = [
+  "pdm",
+  "export",
+  "--format",
+  "requirements",
+  "--without-hashes",
+  "--pyproject",
+  "--dev",
+  "--output",
+  "requirements.txt",
+  "--verbose",
+], help = "Generate requirements.txt" }
 
 [tool.ruff]
 target-version = "py312"
@@ -66,11 +77,11 @@ line-length = 88
 
 [tool.ruff.lint]
 ignore = [
-    "F401", # module imported but unused
-    "F841", # local variable is assigned to but never used
-    "E501", # line too long, handled by black
-    "B008", # do not perform function calls in argument defaults
-    "C901", # too complex
+  "F401",  # module imported but unused
+  "F841",  # local variable is assigned to but never used
+  "E501",  # line too long, handled by black
+  "B008",  # do not perform function calls in argument defaults
+  "C901",  # too complex
 ]
 # select = [
 #     "E",  # pycodestyle errors
@@ -82,21 +93,9 @@ ignore = [
 #     "UP", # pyupgrade
 # ]
 
-[tool.black]
-line-length = 88
+[tool.setuptools]
+package-dir = { "" = "src" }
+include-package-data = true
 
-[tool.pdm.scripts]
-serve-doc = { shell = "mkdocs serve", help = "Start the dev server for doc preview" }
-build-doc = { shell = "mkdocs build", help = "Build documentation" }
-gen-requirements = { cmd = [
-    "pdm",
-    "export",
-    "--format",
-    "requirements",
-    "--without-hashes",
-    "--pyproject",
-    "--dev",
-    "--output",
-    "requirements.txt",
-    "--verbose",
-], help = "Generate requirements.txt" }
+[tool.setuptools.dynamic]
+version = { attr = "targetdb.__version__" }
