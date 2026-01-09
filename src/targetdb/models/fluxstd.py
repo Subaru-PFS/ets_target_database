@@ -36,6 +36,8 @@ class fluxstd(Base):
             name="uq_obj_id_input_catalog_id_version",
         ),
         Index("fluxstd_q3c_ang2ipix_idx", sqlalchemy.text("q3c_ang2ipix(ra, dec)")),
+        Index("ix_fluxstd_version_fluxstdid", "version", "fluxstd_id"),
+        Index("ix_fluxstd_input_catalog_fluxstdid", "input_catalog_id", "fluxstd_id"),
         {},
     )
 

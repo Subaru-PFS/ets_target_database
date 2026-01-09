@@ -659,7 +659,9 @@ def make_target_df_from_uploader(
                 columns={f"flux_{band}": f"{flux_type}_flux_{band}"}, inplace=True
             )
         if f"flux_error_{band}" in df.columns:
-            logger.info("flux_error_{band} is renamed to {flux_type}_flux_error_{band}")
+            logger.info(
+                f"flux_error_{band} is renamed to {flux_type}_flux_error_{band}"
+            )
             df.rename(
                 columns={f"flux_error_{band}": f"{flux_type}_flux_error_{band}"},
                 inplace=True,
