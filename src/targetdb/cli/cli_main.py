@@ -25,6 +25,7 @@ from ..utils import (
     parse_allocation_file,
     prep_fluxstd_data,
     transfer_data_from_uploader,
+    transfer_data_from_uploader_via_webapi,
     update_input_catalog_active,
 )
 
@@ -196,7 +197,7 @@ def checkdups(
         typer.Option("--skip-save-merged", help="Do not save the merged DataFrame."),
     ] = False,
     additional_columns: Annotated[
-        List[str],
+        List[str] | None,
         typer.Option(
             "--additional-columns",
             help="Additional columns to output for the merged file.  (e.g., 'psf_mag_g' 'psf_mag_r'). "
@@ -217,7 +218,7 @@ def checkdups(
             "--format",
             help="File format of the merged data file.",
         ),
-    ] = "parquet",
+    ] = PyArrowFileFormat.parquet,
 ):
     if additional_columns is None:
         additional_columns = []
@@ -260,7 +261,7 @@ def prep_fluxstd(
         ),
     ],
     input_catalog_id: Annotated[
-        int,
+        int | None,
         typer.Option(
             "--input_catalog_id",
             show_default=False,
@@ -268,7 +269,7 @@ def prep_fluxstd(
         ),
     ] = None,
     input_catalog_name: Annotated[
-        str,
+        str | None,
         typer.Option(
             "--input_catalog_name",
             show_default=False,
@@ -276,7 +277,7 @@ def prep_fluxstd(
         ),
     ] = None,
     rename_cols: Annotated[
-        str,
+        str | None,
         typer.Option(
             "--rename-cols",
             help='Dictionary to rename columns (e.g., \'{"fstar_gaia": "is_fstar_gaia"}\').',
@@ -288,7 +289,7 @@ def prep_fluxstd(
             "--format",
             help="File format of the output data file.",
         ),
-    ] = "parquet",
+    ] = PyArrowFileFormat.parquet,
 ):
 
     if input_catalog_id is None and input_catalog_name is None:
@@ -419,7 +420,7 @@ def insert(
         ),
     ] = FluxType.total,
     upload_id: Annotated[
-        str,
+        str | None,
         typer.Option(
             "--upload_id",
             show_default=False,
@@ -427,7 +428,7 @@ def insert(
         ),
     ] = None,
     proposal_id: Annotated[
-        str,
+        str | None,
         typer.Option(
             "--proposal_id",
             show_default=False,
@@ -502,7 +503,7 @@ def update(
         ),
     ] = False,
     upload_id: Annotated[
-        str,
+        str | None,
         typer.Option(
             "--upload_id",
             show_default=False,
@@ -510,7 +511,7 @@ def update(
         ),
     ] = None,
     proposal_id: Annotated[
-        str,
+        str | None,
         typer.Option(
             "--proposal_id",
             show_default=False,
@@ -564,9 +565,9 @@ def parse_alloc(
             writable=True,
             help="Directory path to save output files.",
         ),
-    ] = ".",
+    ] = Path("."),
     outfile_prefix: Annotated[
-        str,
+        str | None,
         typer.Option(
             show_default=False,
             help="Prefix to the output files.",
@@ -603,12 +604,11 @@ def transfer_targets(
     local_dir: Annotated[
         Path,
         typer.Option(
-            exists=True,
             dir_okay=True,
             writable=True,
             help="Path to the data directory in the local machine",
         ),
-    ] = ".",
+    ] = Path("."),
     force: Annotated[bool, typer.Option(help="Force download.")] = False,
 ):
 
@@ -620,6 +620,55 @@ def transfer_targets(
     df = load_input_data(input_file)
 
     transfer_data_from_uploader(
+        df,
+        config,
+        local_dir=local_dir,
+        force=force,
+    )
+
+
+@app.command(
+    help="Download target lists from the uploader to the local machine via Web API."
+)
+def transfer_targets_api(
+    input_file: Annotated[
+        Path,
+        typer.Argument(
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            show_default=False,
+            help="Input catalog list file (csv).",
+        ),
+    ],
+    config_file: Annotated[
+        str,
+        typer.Option(
+            "-c",
+            "--config",
+            show_default=False,
+            help=config_help_msg,
+        ),
+    ],
+    local_dir: Annotated[
+        Path,
+        typer.Option(
+            dir_okay=True,
+            writable=True,
+            help="Path to the data directory in the local machine",
+        ),
+    ] = Path("."),
+    force: Annotated[bool, typer.Option(help="Force download.")] = False,
+):
+
+    logger.info(f"Loading config file: {config_file}")
+    config = load_config(config_file)
+
+    logger.info(f"Loading input data from {input_file} into a DataFrame")
+    df = load_input_data(input_file)
+
+    transfer_data_from_uploader_via_webapi(
         df,
         config,
         local_dir=local_dir,
@@ -657,7 +706,7 @@ def insert_targets(
             readable=True,
             help="Path to the data directory.",
         ),
-    ] = ".",
+    ] = Path("."),
     flux_type: Annotated[
         FluxType,
         typer.Option(
@@ -724,7 +773,7 @@ def insert_pointings(
             readable=True,
             help="Path to the data directory.",
         ),
-    ] = ".",
+    ] = Path("."),
     commit: Annotated[
         bool,
         typer.Option("--commit", help="Commit changes to the database."),

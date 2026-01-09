@@ -28,9 +28,17 @@ The command-line interface (CLI) tool `pfs-targetdb-cli` is provided to work wit
     host = "<hostname of uploader>"
     user = "<user name of uploader>"
     data_dir = "<path to the data directory on the uploader>"
+
+    # Optional section for Web API access
+    # The following parameters are used to download data via Web API instead of rsync.
+    [webapi]
+    url = "<base URL of the Web API endpoint>"  # e.g., "https://example.com/get-upload/"
+    api_key = "<API key for authentication>"  # Optional: leave empty ("") for no authentication
+    verify_ssl = true  # Optional: set to false to disable SSL certificate verification
     ```
 
     The `schemacrawler` section is required only if you want to draw an ER diagram of the database schema with SchemaCrawler.
+    The `webapi` section is used by the `transfer-targets-api` command to download data via Web API.
 
 ## `pfs-targetdb-cli`
 
@@ -60,6 +68,7 @@ $ pfs-targetdb-cli [OPTIONS] COMMAND [ARGS]...
 - `update`: Update rows in a table in the PFS Target...
 - `parse-alloc`: Parse an Excel file containing time...
 - `transfer-targets`: Download target lists from the uploader to...
+- `transfer-targets-api`: Download target lists from the uploader to...
 - `insert-targets`: Insert targets using a list of input...
 - `insert-pointings`: Insert user-defined pointings using a list...
 - `update-catalog-active`: Update active flag in the input_catalog...
@@ -314,6 +323,29 @@ Download target lists from the uploader to the local machine.
 
 ```console
 $ pfs-targetdb-cli transfer-targets [OPTIONS] INPUT_FILE
+```
+
+**Arguments**:
+
+- `INPUT_FILE`: Input catalog list file (csv). [required]
+
+**Options**:
+
+- `-c, --config TEXT`: Database configuration file in the TOML format. [required]
+- `--local-dir PATH`: Path to the data directory in the local machine [default: .]
+- `--force / --no-force`: Force download. [default: no-force]
+- `--help`: Show this message and exit.
+
+---
+
+### `transfer-targets-api`
+
+Download target lists from the uploader to the local machine via Web API.
+
+**Usage**:
+
+```console
+$ pfs-targetdb-cli transfer-targets-api [OPTIONS] INPUT_FILE
 ```
 
 **Arguments**:
