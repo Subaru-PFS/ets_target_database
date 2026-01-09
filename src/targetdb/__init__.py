@@ -2,6 +2,10 @@
 
 from .targetdb import TargetDB
 
-__version__ = "0.8.0"
+try:
+    from ._version import version as __version__
+except ImportError:
+    # Fallback for development without build
+    __version__ = "0.0.0+unknown"
 
 __all__ = ["TargetDB", "__version__"]

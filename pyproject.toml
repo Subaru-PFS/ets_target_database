@@ -45,11 +45,11 @@ source = "https://github.com/Subaru-PFS/ets_target_database"
 pfs-targetdb-cli = "targetdb.cli.cli_main:app"
 
 [project.optional-dependencies]
-dev = ["ipython", "pytest", "black", "ruff"]
+dev = ["ipython", "pytest", "black", "ruff", "setuptools-scm>=8.0"]
 doc = ["mkdocs", "mkdocs-material[imaging]", "mkdocstrings-python"]
 
 [build-system]
-requires = ["setuptools", "wheel"]
+requires = ["setuptools>=64", "setuptools-scm>=8.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.black]
@@ -98,5 +98,6 @@ ignore = [
 package-dir = { "" = "src" }
 include-package-data = true
 
-[tool.setuptools.dynamic]
-version = { attr = "targetdb.__version__" }
+[tool.setuptools_scm]
+version_file = "src/targetdb/_version.py"
+tag_regex = "^v\\.?(\\d+\\.\\d+\\.\\d+)$"
