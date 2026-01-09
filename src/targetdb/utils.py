@@ -1392,6 +1392,165 @@ def transfer_data_from_uploader(
         )
 
 
+def _setup_webapi_config(config):
+    """Setup Web API configuration and headers."""
+    webapi_url = config["webapi"]["url"]
+    api_key = config["webapi"].get("api_key", "")
+    verify_ssl = config["webapi"].get("verify_ssl", True)
+
+    # Normalize URL (ensure trailing slash)
+    if not webapi_url.endswith("/"):
+        webapi_url += "/"
+
+    # Setup request headers (only add Authorization if api_key is provided)
+    headers = {}
+    if api_key:
+        headers["Authorization"] = f"Bearer {api_key}"
+
+    # Log SSL verification status
+    if not verify_ssl:
+        logger.warning("SSL certificate verification is disabled")
+        import urllib3
+
+        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+    return webapi_url, headers, verify_ssl
+
+
+def _check_existing_directory(local_dir, upload_id, force):
+    """Check for existing directory and determine if transfer should be skipped."""
+    datadirs = list(local_dir.glob(f"*-*-{upload_id}"))
+
+    if len(datadirs) == 1:
+        skip_transfer = not force
+        if skip_transfer:
+            logger.info(
+                f"Data directory, {datadirs[0]}, is found locally. Skip transfer"
+            )
+        else:
+            logger.info(
+                f"Data directory, {datadirs[0]}, is found locally, but force transfer"
+            )
+        return skip_transfer
+    elif len(datadirs) > 1:
+        logger.error(
+            f"Multiple data directories are found in the destination directory: {datadirs}."
+        )
+        raise ValueError(
+            f"Multiple data directories are found in the destination directory for {upload_id}: {datadirs}"
+        )
+    else:
+        logger.info(
+            f"Data directory for upload_id: {upload_id} is not found locally. Try transfer"
+        )
+        return False
+
+
+def _download_zip_from_api(url, headers, verify_ssl, local_dir):
+    """Download ZIP file from Web API."""
+    response = requests.get(url, headers=headers, stream=True, timeout=300, verify=verify_ssl)
+    response.raise_for_status()
+
+    with tempfile.NamedTemporaryFile(
+        mode="wb", suffix=".zip", delete=False, dir=local_dir
+    ) as tmp_zip:
+        tmp_zip_path = Path(tmp_zip.name)
+        for chunk in response.iter_content(chunk_size=8192):
+            tmp_zip.write(chunk)
+
+    logger.info(f"Downloaded ZIP file to {tmp_zip_path}")
+    return tmp_zip_path
+
+
+def _extract_and_validate_zip(zip_path, upload_id, local_dir, force):
+    """Extract ZIP and validate directory structure."""
+    with tempfile.TemporaryDirectory(dir=local_dir) as tmp_extract_dir:
+        tmp_extract_path = Path(tmp_extract_dir)
+
+        with zipfile.ZipFile(zip_path, "r") as zip_ref:
+            zip_ref.extractall(tmp_extract_path)
+
+        logger.info("Extracted ZIP to temporary directory")
+
+        # Validate directory structure
+        pattern = re.compile(r"^pfs_target-\d{8}-\d{6}-" + re.escape(upload_id) + r"$")
+        extracted_dirs = [
+            d for d in tmp_extract_path.iterdir() if d.is_dir() and pattern.match(d.name)
+        ]
+
+        if len(extracted_dirs) == 0:
+            logger.error(
+                f"No directory matching pattern 'pfs_target-????????-??????-{upload_id}' found in ZIP"
+            )
+            return 0, "WARNING"
+        elif len(extracted_dirs) > 1:
+            logger.error(
+                f"Multiple directories matching pattern found in ZIP: {extracted_dirs}"
+            )
+            return len(extracted_dirs), "WARNING"
+        else:
+            # Move extracted directory to destination
+            extracted_dir = extracted_dirs[0]
+            final_dest = local_dir / extracted_dir.name
+
+            if final_dest.exists():
+                logger.info(f"Removing existing directory: {final_dest}")
+                shutil.rmtree(final_dest)
+
+            shutil.move(str(extracted_dir), str(final_dest))
+            logger.info(f"Moved extracted directory to {final_dest}")
+
+            return 1, "success"
+
+
+def _process_single_upload(upload_id, webapi_url, headers, verify_ssl, local_dir, force):
+    """Process a single upload_id download."""
+    # Skip empty or invalid upload_id
+    if pd.isna(upload_id) or str(upload_id).strip() == "":
+        logger.warning("Skipping empty or invalid upload_id")
+        return "skipped", 0
+
+    # Check existing directory
+    try:
+        skip_transfer = _check_existing_directory(local_dir, upload_id, force)
+    except ValueError:
+        raise
+
+    if skip_transfer:
+        return "skipped", 0
+
+    # Download and extract
+    logger.info(f"Downloading data for upload_id: {upload_id} from the Web API")
+    full_url = f"{webapi_url}{upload_id}"
+    logger.info(f"API endpoint: {full_url}")
+
+    try:
+        zip_path = _download_zip_from_api(full_url, headers, verify_ssl, local_dir)
+        try:
+            n_transfer, status = _extract_and_validate_zip(zip_path, upload_id, local_dir, force)
+            return status, n_transfer
+        finally:
+            zip_path.unlink()
+            logger.info("Cleaned up temporary ZIP file")
+
+    except requests.exceptions.HTTPError as e:
+        logger.error(f"HTTP error while downloading data for upload_id: {upload_id}")
+        logger.error(f"Status code: {e.response.status_code}, Message: {str(e)}")
+        return "FAILED", 0
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Network error while downloading data for upload_id: {upload_id}")
+        logger.error(str(e))
+        return "FAILED", 0
+    except zipfile.BadZipFile as e:
+        logger.error(f"Invalid ZIP file for upload_id: {upload_id}")
+        logger.error(str(e))
+        return "FAILED", 0
+    except Exception as e:
+        logger.error(f"Unexpected error while transferring data for upload_id: {upload_id}")
+        logger.error(str(e))
+        return "FAILED", 0
+
+
 def transfer_data_from_uploader_via_webapi(
     df,
     config,
@@ -1459,181 +1618,21 @@ def transfer_data_from_uploader_via_webapi(
         logger.info(f"Creating local directory: {local_dir}")
         local_dir.mkdir(parents=True, exist_ok=True)
 
+    # Setup Web API configuration
+    webapi_url, headers, verify_ssl = _setup_webapi_config(config)
+
+    # Process each upload_id
     status = []
     n_transfer = []
 
-    # Extract config values (move outside loop to avoid bug)
-    webapi_url = config["webapi"]["url"]
-    api_key = config["webapi"].get("api_key", "")
-    verify_ssl = config["webapi"].get("verify_ssl", True)
-
-    # Normalize URL (ensure trailing slash)
-    if not webapi_url.endswith("/"):
-        webapi_url += "/"
-
-    # Setup request headers (only add Authorization if api_key is provided)
-    headers = {}
-    if api_key:
-        headers["Authorization"] = f"Bearer {api_key}"
-
-    # Log SSL verification status
-    if not verify_ssl:
-        logger.warning("SSL certificate verification is disabled")
-        import urllib3
-
-        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
     for upload_id in df["upload_id"]:
-        # Skip empty or invalid upload_id
-        if pd.isna(upload_id) or str(upload_id).strip() == "":
-            logger.warning("Skipping empty or invalid upload_id")
-            status.append("skipped")
-            n_transfer.append(0)
-            continue
+        upload_status, upload_n_transfer = _process_single_upload(
+            upload_id, webapi_url, headers, verify_ssl, local_dir, force
+        )
+        status.append(upload_status)
+        n_transfer.append(upload_n_transfer)
 
-        # Check local directory existence
-        # Pattern: pfs_target-YYYYMMDD-HHMMSS-{upload_id}
-        datadirs = list(local_dir.glob(f"*-*-{upload_id}"))
-        skip_transfer = False
-
-        if len(datadirs) == 1:
-            skip_transfer = True if not force else False
-            if skip_transfer:
-                logger.info(
-                    f"Data directory, {datadirs[0]}, is found locally. Skip transfer"
-                )
-            else:
-                logger.info(
-                    f"Data directory, {datadirs[0]}, is found locally, but force transfer"
-                )
-        elif len(datadirs) > 1:
-            logger.error(
-                f"Multiple data directories are found in the destination directory: {datadirs}."
-            )
-            raise ValueError(
-                f"Multiple data directories are found in the destination directory for {upload_id}: {datadirs}"
-            )
-        else:
-            logger.info(
-                f"Data directory for upload_id: {upload_id} is not found locally. Try transfer"
-            )
-
-        if not skip_transfer:
-            logger.info(f"Downloading data for upload_id: {upload_id} from the Web API")
-
-            full_url = f"{webapi_url}{upload_id}"
-            logger.info(f"API endpoint: {full_url}")
-
-            try:
-                # Step 1: HTTP GET request with streaming for large files
-                response = requests.get(
-                    full_url,
-                    headers=headers,
-                    stream=True,
-                    timeout=300,
-                    verify=verify_ssl,
-                )
-                response.raise_for_status()  # Raises HTTPError for bad status codes
-
-                # Step 2: Save ZIP to temporary file
-                with tempfile.NamedTemporaryFile(
-                    mode="wb",
-                    suffix=".zip",
-                    delete=False,
-                    dir=local_dir,  # Keep temp file in destination for atomic move
-                ) as tmp_zip:
-                    tmp_zip_path = Path(tmp_zip.name)
-                    # Write in chunks to handle large files
-                    for chunk in response.iter_content(chunk_size=8192):
-                        tmp_zip.write(chunk)
-
-                logger.info(f"Downloaded ZIP file to {tmp_zip_path}")
-
-                # Step 3: Extract ZIP to temporary directory
-                with tempfile.TemporaryDirectory(dir=local_dir) as tmp_extract_dir:
-                    tmp_extract_path = Path(tmp_extract_dir)
-
-                    with zipfile.ZipFile(tmp_zip_path, "r") as zip_ref:
-                        zip_ref.extractall(tmp_extract_path)
-
-                    logger.info("Extracted ZIP to temporary directory")
-
-                    # Step 4: Validate directory structure
-                    # Expected pattern: pfs_target-YYYYMMDD-HHMMSS-{upload_id}
-                    pattern = re.compile(
-                        r"^pfs_target-\d{8}-\d{6}-" + re.escape(upload_id) + r"$"
-                    )
-                    extracted_dirs = [
-                        d
-                        for d in tmp_extract_path.iterdir()
-                        if d.is_dir() and pattern.match(d.name)
-                    ]
-
-                    if len(extracted_dirs) == 0:
-                        logger.error(
-                            f"No directory matching pattern 'pfs_target-????????-??????-{upload_id}' found in ZIP"
-                        )
-                        n_transfer.append(0)
-                        status.append("WARNING")
-                    elif len(extracted_dirs) > 1:
-                        logger.error(
-                            f"Multiple directories matching pattern found in ZIP: {extracted_dirs}"
-                        )
-                        n_transfer.append(len(extracted_dirs))
-                        status.append("WARNING")
-                    else:
-                        # Step 5: Move extracted directory to destination
-                        extracted_dir = extracted_dirs[0]
-                        final_dest = local_dir / extracted_dir.name
-
-                        # If force=True and directory exists, remove it first
-                        if final_dest.exists():
-                            logger.info(f"Removing existing directory: {final_dest}")
-                            shutil.rmtree(final_dest)
-
-                        shutil.move(str(extracted_dir), str(final_dest))
-                        logger.info(f"Moved extracted directory to {final_dest}")
-
-                        n_transfer.append(1)
-                        status.append("success")
-
-                # Step 6: Cleanup temporary ZIP file
-                tmp_zip_path.unlink()
-                logger.info("Cleaned up temporary ZIP file")
-
-            except requests.exceptions.HTTPError as e:
-                logger.error(
-                    f"HTTP error while downloading data for upload_id: {upload_id}"
-                )
-                logger.error(
-                    f"Status code: {e.response.status_code}, Message: {str(e)}"
-                )
-                n_transfer.append(0)
-                status.append("FAILED")
-            except requests.exceptions.RequestException as e:
-                logger.error(
-                    f"Network error while downloading data for upload_id: {upload_id}"
-                )
-                logger.error(str(e))
-                n_transfer.append(0)
-                status.append("FAILED")
-            except zipfile.BadZipFile as e:
-                logger.error(f"Invalid ZIP file for upload_id: {upload_id}")
-                logger.error(str(e))
-                n_transfer.append(0)
-                status.append("FAILED")
-            except Exception as e:
-                logger.error(
-                    f"Unexpected error while transferring data for upload_id: {upload_id}"
-                )
-                logger.error(str(e))
-                n_transfer.append(0)
-                status.append("FAILED")
-        else:
-            status.append("skipped")
-            n_transfer.append(0)
-
-    # Return status DataFrame (identical to rsync version)
+    # Generate status report
     custom_status_dict = {"success": 0, "WARNING": 1, "skipped": 2, "FAILED": 3}
     df_status = pd.DataFrame(
         {
