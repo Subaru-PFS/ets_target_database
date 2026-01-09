@@ -25,6 +25,7 @@ dependencies = [
   "pandas",
   "psycopg2-binary",
   "pyarrow",
+  "requests",
   "sqlalchemy",
   # "setuptools",
   "sqlalchemy-utils",
