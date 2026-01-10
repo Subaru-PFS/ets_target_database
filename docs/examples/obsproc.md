@@ -179,7 +179,7 @@ WIP
 
 ## Working with target lists
 
-### (Obosolete) Parse an allocation summary file
+### (Obsolete) Parse an allocation summary file
 
 !!! warning
 
