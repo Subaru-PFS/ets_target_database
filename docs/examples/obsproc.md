@@ -23,20 +23,29 @@ dialect = "postgresql"
 [schemacrawler]
 SCHEMACRAWLERDIR = "<path to SchemaCrawler directory>"
 
-# The following parameters for the uploader will be used to rsync as follows.
-# $ rsync -avz -e ssh user@host:data_dir/????/??/????????-??????-{upload_id}
-# user can be omitted or blank ("") if the user name is the same as the local user name or an alias is defined in ~/.ssh/config.
-[uploader]
-host = "<hostname of uploader>"
-user = "<user name of uploader>"
-data_dir = "<path to the data directory on the uploader>"
+# (Optional) rsync donwload is obsolete. Use 'pfs-targetdb-cli transfer-targets-api' instead.
+# # The following parameters for the uploader will be used to rsync as follows.
+# # $ rsync -avz -e ssh user@host:data_dir/????/??/????????-??????-{upload_id}
+# # user can be omitted or blank ("") if the user name is the same as the local user name or an alias is defined in ~/.ssh/config.
+# [uploader]
+# host = "<hostname of uploader>"
+# user = "<user name of uploader>"
+# data_dir = "<path to the data directory on the uploader>"
+
+
+# Optional section for Web API access
+# The following parameters are used to download data via Web API instead of rsync.
+[webapi]
+url = "<base URL of the Web API endpoint>"  # e.g., "https://example.com/get-upload/"
+api_key = "<API key for authentication>"  # Optional: leave empty ("") for no authentication
+verify_ssl = false  # Optional: set to false to disable SSL certificate verification
 ```
 
 ## Working with filter names, proposal categories, and target types
 
-### Insert to the `filter_name`, `proposal_category`, `pfs_arm`, and `target_type` tables
+### Insert to the `filter_name`, `partner`, `proposal_category`, `pfs_arm`, and `target_type` tables
 
-`filter_name`, `proposal_category`, `pfs_arm`, and `target_type` tables are expected to be very static and not frequently updated.
+`filter_name`, `partner`, `proposal_category`, `pfs_arm`, and `target_type` tables are expected to be very static and not frequently updated.
 Note that you are most likely to skip this step as these tables are already populated in the database.
 
 The contents of CSV files to be inserted for these tables are as follows:
@@ -65,17 +74,17 @@ i_sdss,SDSS i filter
 z_sdss,SDSS z filter
 ```
 
-```csv title="proposal_categories.csv"
-proposal_category_id,proposal_category_name,proposal_category_description
-1,openuse,Subaru openuse proposal
-```
-
 ```csv title="partner.csv"
 partner_id,partner_name,partner_description
 1,subaru,Subaru Telescope
 2,keck,"W. M. Keck Observatory"
 3,gemini,Gemini Telescope
 4,uh,University of Hawaii
+```
+
+```csv title="proposal_categories.csv"
+proposal_category_id,proposal_category_name,proposal_category_description
+1,openuse,Subaru openuse proposal
 ```
 
 ```csv title="pfs_arm.csv"
@@ -98,6 +107,8 @@ target_type_id,target_type_name,target_type_description
 8,DCB,fiber goes to DCB/DCB2
 9,HOME,cobra is going to home position
 10,BLACKSPOT,cobra is going to black spot position
+11,AFL,"The fiber is fed by all fiber lamp cable"
+12,SCIENCE_MASKED,"The fiber is on a science target redacted for privacy"
 ```
 
 You can insert these data into the database using the following commands:
@@ -168,7 +179,12 @@ WIP
 
 ## Working with target lists
 
-### Parse an allocation summary file
+### (Obosolete) Parse an allocation summary file
+
+!!! warning
+
+    Parsing an Excel file is obsolete at this point. Currently, the output CSV files are directly made from the spreadsheet.
+    See the formats of `proposal.csv` and `input_catalogs.csv` in the following sections.
 
 Suppose you have an Excel file named `pfs_allocation_summary.xlsx` with 2 sheets, `Proposals` and `Allocation`, as shown below.
 
@@ -176,17 +192,17 @@ Suppose you have an Excel file named `pfs_allocation_summary.xlsx` with 2 sheets
 
 | proposal_id | input_catalog_name | input_catalog_description | group_id | pi_first_name | pi_last_name | pi_middle_name | proposal_category_name | upload_id        | n_obj | fiberhour_total | fiberhour_lr | fiberhour_mr | rot_total | rot_lr | rot_mr |
 | ----------- | ------------------ | ------------------------- | -------- | ------------- | ------------ | -------------- | ---------------------- | ---------------- | ----- | --------------- | ------------ | ------------ | --------- | ------ | ------ |
-| S99A-QT001  | pfs_example_1      | Example target list 1     | o99101   | Eiichi        | Shibusawa    |                | openuse                | d6e94eae259faf4e | 1572  | 379.5           | 379.5        |              | 5.2       | 5.2    |        |
-| S99A-QT002  | pfs_example_2      | Example target list 2     | o99102   | Umeko         | Tsuda        |                | openuse                | 5f695375c60f34c7 | 9712  | 17504           | 17504        |              | 15.83     | 15.83  |        |
-| S99A-QT003  | pfs_example_3      | Example target list 3     | o99103   | Shibasaburo   | Kitasato     |                | openuse                | ba59115da8084653 | 2047  | 395.25          | 395.25       |              | 12.7      | 12.7   |        |
+| S99A-QT001  | pfs_example_1      | Example target list 1     | o99101   | Eiichi        | Shibusawa    |                | openuse                | d6e94eae259faf4e | 1572  | 379.5           | 379.5        | 0.0          | 5.2       | 5.2    | 0.0    |
+| S99A-QT002  | pfs_example_2      | Example target list 2     | o99102   | Umeko         | Tsuda        |                | openuse                | 5f695375c60f34c7 | 9712  | 17504           | 17504        | 0.0          | 15.83     | 15.83  | 0.0    |
+| S99A-QT003  | pfs_example_3      | Example target list 3     | o99103   | Shibasaburo   | Kitasato     |                | openuse                | ba59115da8084653 | 2047  | 395.25          | 395.25       | 0.0          | 12.7      | 12.7   | 0.0    |
 
 **`Allocation` Sheet**:
 
 | proposal_id | grade | rank | allocated_rot_total | allocated_rot_lr | allocated_rot_mr | allocated_time_total | allocated_time_lr | allocated_time_mr | n_ppc | allocation_rate_lr | allocation_rate_mr | completion_rate_lr | completion_rate_mr |
 | ----------- | ----- | ---- | ------------------- | ---------------- | ---------------- | -------------------- | ----------------- | ----------------- | ----- | ------------------ | ------------------ | ------------------ | ------------------ |
-| S99A-QT001  | A     | 9    | 2.8                 |                  | 2.8              | 284.25               | 0                 | 284.25            | 9     | 0.749011858        |                    | 0.723              |                    |
-| S99A-QT002  | B     | 6.5  | 6.5                 | 6.5              |                  | 8140.5               | 8140.5            | 0                 | 21    | 0.465065128        |                    | 0.279              |                    |
-| S99A-QT003  | B     | 6    | 9.6                 | 9.6              |                  | 350.25               | 350.25            | 0                 | 31    | 0.886148008        |                    | 0.684              |                    |
+| S99A-QT001  | A     | 9    | 2.8                 | 0.0              | 2.8              | 284.25               | 0                 | 284.25            | 9     | 0.749011858        |                    | 0.723              |                    |
+| S99A-QT002  | B     | 6.5  | 6.5                 | 6.5              | 0.0              | 8140.5               | 8140.5            | 0                 | 21    | 0.465065128        |                    | 0.279              |                    |
+| S99A-QT003  | B     | 6    | 9.6                 | 9.6              | 0.0              | 350.25               | 350.25            | 0                 | 31    | 0.886148008        |                    | 0.684              |                    |
 
 Then, execute the following command to parse the Excel file and generate CSV files to be used to insert data into the database.:
 
@@ -194,7 +210,11 @@ Then, execute the following command to parse the Excel file and generate CSV fil
 $ pfs-targetdb-cli parse-alloc pfs_allocation_summary.xlsx
 ```
 
-The command will generate the following CSV files in the current directory.
+### Generate CSV files for `proposal` and `input_catalog` tables
+
+The command above will generate the following CSV files in the current directory.
+It is also possible to directly create these CSV files from the time allocation information without using the Excel file.
+Note that the order of the columns can be different from the examples below, but the content should be the same.
 
 ```csv title="proposal.csv"
 proposal_id,group_id,pi_first_name,pi_last_name,pi_middle_name,rank,grade,allocated_time_total,allocated_time_lr,allocated_time_mr,proposal_category_name,is_too
@@ -222,9 +242,10 @@ $ pfs-targetdb-cli insert input_catalogs.csv -c db_config.toml --table input_cat
 ### Transfer target lists from the uploader to local storage
 
 You need to transfer the target lists from the uploader to the local storage.
+The following command uses the Web API to download the target lists based on the `upload_id` specified in the `input_catalogs.csv` file. You must be within the network that can access the uploader's Web API.
 
 ```console
-$ pfs-targetdb-cli transfer-targets input_catalogs.csv -c db_config.toml
+$ pfs-targetdb-cli transfer-targets-api input_catalogs.csv -c db_config.toml
 ```
 
 At the end of the command, a summary will be shown as follows.
@@ -269,9 +290,11 @@ $ pfs-targetdb-cli insert 20240229-013729-ba59115da8084653/target_ba59115da80846
 
 When there is a user-defined pointing list, it can be inserted into the `user_pointing` table in the `targetdb` database.
 
-```bash
-pfs-targetdb-cli insert -c dbconf.toml -t user_pointing pointing_list.ecsv \
+```
+$ pfs-targetdb-cli insert-pointings ./input_catalogs.csv -c db_config.toml --commit
+
+# or insert manually
+
+$ pfs-targetdb-cli insert -c dbconf.toml -t user_pointing pointing_list.ecsv \
     --commit --upload_id "aabbccddeeffgghh"
 ```
-
-Currently, you need to insert the custom pointing list one by one. We are planning to support batch insertion in the future.

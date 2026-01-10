@@ -4,7 +4,7 @@ Welcome to the documentation for the PFS Target Database. This database is desig
 
 ## Overview
 
-The PFS Target Database stores information about targets for science observations as well as calibration objects.  The database also contains information about observation proposals and the filters used for quality assurance.
+The PFS Target Database stores information about targets for science observations as well as calibration objects. The database also contains information about observation proposals and the filters used for quality assurance.
 
 The database is implemented in PostgreSQL built with Python/SQLAlchemy. It also includes a set of command-line tools hopefully useful for database management and science operations.
 
@@ -15,7 +15,9 @@ We hope this documentation will be a valuable resource as you work with the PFS 
 This package is distributed under the MIT License.
 
 ```
-Copyright (c) 2021 Masato Onodera
+MIT License
+
+Copyright (c) 2023-2026 Subaru PFS Project
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

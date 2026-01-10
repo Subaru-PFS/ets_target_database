@@ -2,7 +2,6 @@
 
 This guide will help you get started with the PFS Target Database.
 
-
 ## Prerequisites
 
 ### PostgreSQL database
@@ -19,36 +18,32 @@ The Q3C extension is required for the database. You can install it by the follow
 
 Python and the following packages as well as their dependencies will be required for `targetdb`.
 The dependencies are automatically installed when you install the `targetdb` package via `pip`.
-Package versions shown here are those used for the development (as of April 2025).
+Package versions shown here are those used for the development (as of January 2026).
 Newer (and somewhat older) versions should also work.
 
 | Package                                                                | Version |
-|------------------------------------------------------------------------|--------:|
-| [Python](https://www.python.org/)                                      |  3.11.x |
-| [SQLAlchemy](https://www.sqlalchemy.org/)                              |   2.0.x |
-| [pandas](https://pandas.pydata.org/)                                   |   2.2.3 |
-| [NumPy](https://numpy.org)                                             |  1.26.4 |
-| [Astropy](https://www.astropy.org/)                                    |   7.0.1 |
+| ---------------------------------------------------------------------- | ------: |
+| [Python](https://www.python.org/)                                      | 3.12.12 |
+| [alembic](https://alembic.sqlalchemy.org/en/latest/)                   |  1.18.0 |
+| [Astropy](https://www.astropy.org/)                                    |    7.20 |
 | [loguru](https://loguru.readthedocs.io/)                               |   0.7.3 |
-| [SQLAlchemy-Utils](https://sqlalchemy-utils.readthedocs.io/en/latest/) |  0.41.2 |
+| [NumPy](https://numpy.org)                                             |   2.4.0 |
+| [openpyxl](https://openpyxl.readthedocs.io/en/stable/)                 |   3.1.5 |
+| [pandas](https://pandas.pydata.org/)                                   |   2.3.3 |
+| [psycopg2-binary](https://www.psycopg.org/)                            |  2.9.11 |
+| [pyarrow](https://arrow.apache.org/docs/python/)                       |  22.0.0 |
+| [requests](https://requests.readthedocs.io/en/latest/)                 |  2.32.5 |
+| [SQLAlchemy](https://www.sqlalchemy.org/)                              |  2.0.45 |
+| [SQLAlchemy-Utils](https://sqlalchemy-utils.readthedocs.io/en/latest/) |  0.42.1 |
 | [tabulate](https://pypi.org/project/tabulate/)                         |   0.9.0 |
-| [alembic](https://alembic.sqlalchemy.org/en/latest/)                   |  1.13.1 |
-| [pyarrow](https://arrow.apache.org/docs/python/)                       |  15.0.2 |
-| [Typer](https://typer.tiangolo.com/)                                   |  0.15.2 |
-| [openpyxl](https://openpyxl.readthedocs.io/en/stable/)                 |   3.1.2 |
-
-If you are using Python 3.10 or earlier, you may need to install [tomli](https://github.com/hukkin/tomli) package.
-
-| Package                                  | Version |
-|------------------------------------------|--------:|
-| [tomli](https://github.com/hukkin/tomli) |   2.0.1 |
+| [Typer](https://typer.tiangolo.com/)                                   |  0.21.1 |
 
 For building the documentation, the following packages are required.
 
 | Package                                                         | Version |
-|-----------------------------------------------------------------|--------:|
+| --------------------------------------------------------------- | ------: |
 | [MkDocs](https://www.mkdocs.org/)                               |   1.6.1 |
-| [mkdocs-material](https://squidfunk.github.io/mkdocs-material/) |  9.6.11 |
+| [mkdocs-material](https://squidfunk.github.io/mkdocs-material/) |   9.7.1 |
 
 Additionally, the following tools may be useful for testing and development.
 
@@ -69,18 +64,13 @@ git clone https://github.com/Subaru-PFS/ets_target_database.git
 # move to the directory
 cd ets_target_database
 
-# (optional but recommended) create a virtual environment and activate it
+# Install with uv
+uv sync
+
+# (optional) create a virtual environment and activate it
 # python3 -m venv .venv
 # source .venv/bin/activate
-
-# install the package
-python3 -m pip install .
-
-# You can also install the package in the editable mode
 # python3 -m pip install -e .
-
-# refresh the shell for command-line tools
-hash -r
 ```
 
 ## Quick Start
@@ -115,6 +105,11 @@ pfs-targetdb-cli install-q3c -c dbconf.toml
 
 # create tables in the database
 pfs-targetdb-cli create-schema -c dbconf.toml
+
+# when installed via uv, the command can be run as
+# uv run pfs-targetdb-cli create-db -c dbconf.toml
+# uv run pfs-targetdb-cli install-q3c -c dbconf.toml
+# uv run pfs-targetdb-cli create-schema -c dbconf.toml
 ```
 
 ### Generate an ER diagram
@@ -158,8 +153,14 @@ The documentation can be built by the following command:
 # Install the required packages for building the documentation
 python3 -m pip install -e ".[doc]"
 
+# or via uv
+# uv sync --extra doc
+
 # Build the documentation with MkDocs
 mkdocs build
+
+# or via uv
+# uv run mkdocs build
 ```
 
 The documentation will be generated in the `site` directory.
