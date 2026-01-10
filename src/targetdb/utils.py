@@ -1491,7 +1491,9 @@ def _extract_and_validate_zip(zip_path, upload_id, local_dir, force):
         else:
             # Move extracted directory to destination
             extracted_dir = extracted_dirs[0]
-            final_dest = local_dir / extracted_dir.name
+            # Remove 'pfs_target-' prefix to match rsync version format
+            dir_name_without_prefix = extracted_dir.name.replace("pfs_target-", "", 1)
+            final_dest = local_dir / dir_name_without_prefix
 
             if final_dest.exists():
                 logger.info(f"Removing existing directory: {final_dest}")
