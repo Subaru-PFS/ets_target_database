@@ -298,3 +298,25 @@ $ pfs-targetdb-cli insert-pointings ./input_catalogs.csv -c db_config.toml --com
 $ pfs-targetdb-cli insert -c dbconf.toml -t user_pointing pointing_list.ecsv \
     --commit --upload_id "aabbccddeeffgghh"
 ```
+
+## Change `active` status of an `input_catalog`
+
+When an `input_catalog` is no longer active, you can change its `active` status to `false` by the following command:
+
+```console
+$ pfs-targetdb-cli update-catalog-active INPUT_CATALOG_ID false -c db_config.toml --commit
+```
+
+This is useful and necessary, when a PI updates the target list before the observing run.
+
+In order to check the `input_catalog_id` and `active` status, you can use the following queries on the target database:
+
+```sql
+-- with proposal ID pattern
+SELECT input_catalog_id, input_catalog_name, upload_id, active
+FROM input_catalog WHERE input_catalog_name LIKE '%S25A%' ORDER BY input_catalog_id;
+
+-- or with an upload_id
+SELECT input_catalog_id, input_catalog_name, upload_id, active
+FROM input_catalog WHERE upload_id='d6e94eae259faf4e';
+```
