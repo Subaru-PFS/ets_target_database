@@ -51,8 +51,8 @@ class fluxstd(Base):
     obj_id = Column(
         BigInteger,
         nullable=False,
-        comment="Gaia EDR3 sourceid",
-    )  # xxxx: need to understand more
+        comment="source_id (e.g., Gaia EDR3, DR3, etc.)",
+    )
 
     ra = Column(Float, nullable=False, comment="RA (ICRS, degree)")
     dec = Column(Float, nullable=False, comment="Dec (ICRS, degree)")
@@ -209,6 +209,16 @@ class fluxstd(Base):
         default=False,
         comment="Flag for F-star from Gaia (Teff=6000-7500K if True)",
     )
+    is_gc_neighbor = Column(
+        Boolean,
+        default=False,
+        comment="Flag for globular cluster neighbor",
+    )
+    is_dense_region = Column(
+        Boolean,
+        default=False,
+        comment="Flag for dense stellar region",
+    )
 
     # version string
     version = Column(
@@ -302,6 +312,8 @@ class fluxstd(Base):
         teff_gspphot_lower,
         teff_gspphot_upper,
         is_fstar_gaia,
+        is_gc_neighbor,
+        is_dense_region,
         version,
         created_at,
         updated_at,
@@ -364,5 +376,7 @@ class fluxstd(Base):
         self.teff_gspphot_lower = teff_gspphot_lower
         self.teff_gspphot_upper = teff_gspphot_upper
         self.is_fstar_gaia = is_fstar_gaia
+        self.is_gc_neighbor = is_gc_neighbor
+        self.is_dense_region = is_dense_region
         self.created_at = created_at
         self.updated_at = updated_at
