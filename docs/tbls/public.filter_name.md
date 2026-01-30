@@ -109,6 +109,8 @@ erDiagram
   double_precision teff_gspphot_lower
   double_precision teff_gspphot_upper
   boolean is_fstar_gaia
+  boolean is_gc_neighbor
+  boolean is_dense_region
 }
 "public.target" {
   bigint target_id

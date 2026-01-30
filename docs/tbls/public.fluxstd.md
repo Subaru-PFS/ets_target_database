@@ -7,7 +7,7 @@
 | Name | Type | Default | Nullable | Children | Parents | Comment |
 | ---- | ---- | ------- | -------- | -------- | ------- | ------- |
 | fluxstd_id | bigint | nextval('fluxstd_fluxstd_id_seq'::regclass) | false |  |  | Unique identifier for each flux standard star |
-| obj_id | bigint |  | false |  |  | Gaia EDR3 sourceid |
+| obj_id | bigint |  | false |  |  | source_id (e.g., Gaia EDR3, DR3, etc.) |
 | ra | double precision |  | false |  |  | RA (ICRS, degree) |
 | dec | double precision |  | false |  |  | Dec (ICRS, degree) |
 | epoch | varchar |  | true |  |  | Epoch (e.g., J2000.0, J2015.5, etc.) |
@@ -67,6 +67,8 @@
 | teff_gspphot_lower | double precision |  | true |  |  | Lower confidence level (16%) of effective temperature inferred by GSP-phot Aeneas [K] |
 | teff_gspphot_upper | double precision |  | true |  |  | Upper confidence level (84%) of effective temperature inferred by GSP-phot Aeneas [K] |
 | is_fstar_gaia | boolean |  | true |  |  | Flag for F-star from Gaia (Teff=6000-7500K if True) |
+| is_gc_neighbor | boolean |  | true |  |  | Flag for globular cluster neighbor |
+| is_dense_region | boolean |  | true |  |  | Flag for dense stellar region |
 
 ## Constraints
 
@@ -170,6 +172,8 @@ erDiagram
   double_precision teff_gspphot_lower
   double_precision teff_gspphot_upper
   boolean is_fstar_gaia
+  boolean is_gc_neighbor
+  boolean is_dense_region
 }
 "public.target_type" {
   integer target_type_id
