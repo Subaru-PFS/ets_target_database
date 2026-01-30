@@ -7,7 +7,7 @@
 | [public.alembic_version](public.alembic_version.md) | 1 |  | BASE TABLE |
 | [public.cluster](public.cluster.md) | 10 |  | BASE TABLE |
 | [public.filter_name](public.filter_name.md) | 4 |  | BASE TABLE |
-| [public.fluxstd](public.fluxstd.md) | 61 |  | BASE TABLE |
+| [public.fluxstd](public.fluxstd.md) | 63 |  | BASE TABLE |
 | [public.input_catalog](public.input_catalog.md) | 9 |  | BASE TABLE |
 | [public.pfs_arm](public.pfs_arm.md) | 4 |  | BASE TABLE |
 | [public.proposal](public.proposal.md) | 15 |  | BASE TABLE |
@@ -183,6 +183,8 @@ erDiagram
   double_precision teff_gspphot_lower
   double_precision teff_gspphot_upper
   boolean is_fstar_gaia
+  boolean is_gc_neighbor
+  boolean is_dense_region
 }
 "public.input_catalog" {
   varchar input_catalog_name
