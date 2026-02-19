@@ -36,3 +36,5 @@ The `target_type` table contains information about the different types of target
 |              8 | DCB              | fiber goes to DCB/DCB2                                                        |
 |              9 | HOME             | cobra is going to home position                                               |
 |             10 | BLACKSPOT        | cobra is going to black spot position                                         |
+|             11 | AFL              | the fiber is fed by all fiber lamp cable                                      |
+|             12 | SCIENCE_MASKED   | the fiber is on a science target redacted for privacy                         |
