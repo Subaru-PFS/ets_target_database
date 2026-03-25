@@ -46,7 +46,7 @@ pfs-targetdb-cli = "targetdb.cli.cli_main:app"
 
 [project.optional-dependencies]
 dev = ["ipython", "pytest", "black", "ruff", "setuptools-scm>=8.0"]
-doc = ["mkdocs", "mkdocs-material[imaging]", "mkdocstrings-python"]
+doc = ["mkdocs<2", "mkdocs-material[imaging]"]
 
 [build-system]
 requires = ["setuptools>=64", "setuptools-scm>=8.0", "wheel"]
