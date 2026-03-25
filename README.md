@@ -4,7 +4,7 @@
 
 PFS Target Database (targetdb) is a Python package to manage and interact with a [PostgreSQL](https://www.postgresql.org/) database for Prime Focus Spectrograph at [Subaru Telescope](https://subarutelescope.org/). The `targetdb` is designed to store information from the observatory and observers on proposals and science targets. It also stores information on sky positions and flux standard stars required for PFS observation.
 
-Please see [the documentation](https://pfs-etc.naoj.hawaii.edu/targetdb/) for more details.
+Please see [the documentation](https://subaru-pfs.github.io/ets_target_database/) for more details.
 
 ## Prerequisites
 
