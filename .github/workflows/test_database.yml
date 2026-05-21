@@ -187,6 +187,7 @@ jobs:
           git add docs/tbls/ diagrams/
           git diff --staged --quiet || (
             git commit -m "chore: update ER diagrams [skip ci]" &&
+            git restore . &&
             git pull --rebase origin main &&
             git push origin main
           )
