@@ -117,6 +117,7 @@ class target(Base):
     )
 
     fiber_mag_u = Column(Float, comment="u-band magnitude within a fiber (AB mag)")
+    fiber_mag_v = Column(Float, comment="v-band magnitude within a fiber (AB mag)")
     fiber_mag_g = Column(Float, comment="g-band magnitude within a fiber (AB mag)")
     fiber_mag_r = Column(Float, comment="r-band magnitude within a fiber (AB mag)")
     fiber_mag_i = Column(Float, comment="i-band magnitude within a fiber (AB mag)")
@@ -125,6 +126,7 @@ class target(Base):
     fiber_mag_j = Column(Float, comment="J band magnitude within a fiber (AB mag)")
 
     psf_mag_u = Column(Float, comment="u-band PSF magnitude (AB mag)")
+    psf_mag_v = Column(Float, comment="v-band PSF magnitude (AB mag)")
     psf_mag_g = Column(Float, comment="g-band PSF magnitude (AB mag)")
     psf_mag_r = Column(Float, comment="r-band PSF magnitude (AB mag)")
     psf_mag_i = Column(Float, comment="i-band PSF magnitude (AB mag)")
@@ -133,6 +135,7 @@ class target(Base):
     psf_mag_j = Column(Float, comment="J band PSF magnitude (AB mag)")
 
     psf_mag_error_u = Column(Float, comment="Error in u-band PSF magnitude (AB mag)")
+    psf_mag_error_v = Column(Float, comment="Error in v-band PSF magnitude (AB mag)")
     psf_mag_error_g = Column(Float, comment="Error in g-band PSF magnitude (AB mag)")
     psf_mag_error_r = Column(Float, comment="Error in r-band PSF magnitude (AB mag)")
     psf_mag_error_i = Column(Float, comment="Error in i-band PSF magnitude (AB mag)")
@@ -141,6 +144,7 @@ class target(Base):
     psf_mag_error_j = Column(Float, comment="Error in J band PSF magnitude (AB mag)")
 
     psf_flux_u = Column(Float, comment="u-band PSF flux (nJy)")
+    psf_flux_v = Column(Float, comment="v-band PSF flux (nJy)")
     psf_flux_g = Column(Float, comment="g-band PSF flux (nJy)")
     psf_flux_r = Column(Float, comment="r-band PSF flux (nJy)")
     psf_flux_i = Column(Float, comment="i-band PSF flux (nJy)")
@@ -149,6 +153,7 @@ class target(Base):
     psf_flux_j = Column(Float, comment="J band PSF flux (nJy)")
 
     psf_flux_error_u = Column(Float, comment="Error in u-band PSF flux (nJy)")
+    psf_flux_error_v = Column(Float, comment="Error in v-band PSF flux (nJy)")
     psf_flux_error_g = Column(Float, comment="Error in g-band PSF flux (nJy)")
     psf_flux_error_r = Column(Float, comment="Error in r-band PSF flux (nJy)")
     psf_flux_error_i = Column(Float, comment="Error in i-band PSF flux (nJy)")
@@ -157,6 +162,7 @@ class target(Base):
     psf_flux_error_j = Column(Float, comment="Error in J band PSF flux (nJy)")
 
     total_flux_u = Column(Float, comment="u-band total flux (nJy)")
+    total_flux_v = Column(Float, comment="v-band total flux (nJy)")
     total_flux_g = Column(Float, comment="g-band total flux (nJy)")
     total_flux_r = Column(Float, comment="r-band total flux (nJy)")
     total_flux_i = Column(Float, comment="i-band total flux (nJy)")
@@ -165,6 +171,7 @@ class target(Base):
     total_flux_j = Column(Float, comment="J band total flux (nJy)")
 
     total_flux_error_u = Column(Float, comment="Error in u-band total flux (nJy)")
+    total_flux_error_v = Column(Float, comment="Error in v-band total flux (nJy)")
     total_flux_error_g = Column(Float, comment="Error in g-band total flux (nJy)")
     total_flux_error_r = Column(Float, comment="Error in r-band total flux (nJy)")
     total_flux_error_i = Column(Float, comment="Error in i-band total flux (nJy)")
@@ -175,7 +182,12 @@ class target(Base):
     filter_u = Column(
         String,
         ForeignKey("filter_name.filter_name"),
-        comment="u-band filter (u_sdss, u_cfht, etc.)",
+        comment="u-band filter (u_sdss, u_cfht, u_skymapper, etc.)",
+    )
+    filter_v = Column(
+        String,
+        ForeignKey("filter_name.filter_name"),
+        comment="v-band filter (v_skymapper, v_splus, etc.)",
     )
     filter_g = Column(
         String,
@@ -281,6 +293,7 @@ class target(Base):
     # tried to make a relationship to filter_name table
     # ref: https://docs.sqlalchemy.org/en/14/orm/join_conditions.html
     filter_u_rels = relationship(filter_name, foreign_keys=[filter_u])
+    filter_v_rels = relationship(filter_name, foreign_keys=[filter_v])
     filter_g_rels = relationship(filter_name, foreign_keys=[filter_g])
     filter_r_rels = relationship(filter_name, foreign_keys=[filter_r])
     filter_i_rels = relationship(filter_name, foreign_keys=[filter_i])
@@ -310,6 +323,7 @@ class target(Base):
         input_catalog_id,
         #
         fiber_mag_u,
+        fiber_mag_v,
         fiber_mag_g,
         fiber_mag_r,
         fiber_mag_i,
@@ -318,6 +332,7 @@ class target(Base):
         fiber_mag_j,
         #
         psf_mag_u,
+        psf_mag_v,
         psf_mag_g,
         psf_mag_r,
         psf_mag_i,
@@ -326,6 +341,7 @@ class target(Base):
         psf_mag_j,
         #
         psf_mag_error_u,
+        psf_mag_error_v,
         psf_mag_error_g,
         psf_mag_error_r,
         psf_mag_error_i,
@@ -334,6 +350,7 @@ class target(Base):
         psf_mag_error_j,
         #
         psf_flux_u,
+        psf_flux_v,
         psf_flux_g,
         psf_flux_r,
         psf_flux_i,
@@ -342,6 +359,7 @@ class target(Base):
         psf_flux_j,
         #
         psf_flux_error_u,
+        psf_flux_error_v,
         psf_flux_error_g,
         psf_flux_error_r,
         psf_flux_error_i,
@@ -350,6 +368,7 @@ class target(Base):
         psf_flux_error_j,
         #
         total_flux_u,
+        total_flux_v,
         total_flux_g,
         total_flux_r,
         total_flux_i,
@@ -358,6 +377,7 @@ class target(Base):
         total_flux_j,
         #
         total_flux_error_u,
+        total_flux_error_v,
         total_flux_error_g,
         total_flux_error_r,
         total_flux_error_i,
@@ -366,6 +386,7 @@ class target(Base):
         total_flux_error_j,
         #
         filter_u,
+        filter_v,
         filter_g,
         filter_r,
         filter_i,
@@ -406,6 +427,7 @@ class target(Base):
         self.input_catalog_id = input_catalog_id
         #
         self.fiber_mag_u = fiber_mag_u
+        self.fiber_mag_v = fiber_mag_v
         self.fiber_mag_g = fiber_mag_g
         self.fiber_mag_r = fiber_mag_r
         self.fiber_mag_i = fiber_mag_i
@@ -414,6 +436,7 @@ class target(Base):
         self.fiber_mag_j = fiber_mag_j
         #
         self.psf_mag_u = psf_mag_u
+        self.psf_mag_v = psf_mag_v
         self.psf_mag_g = psf_mag_g
         self.psf_mag_r = psf_mag_r
         self.psf_mag_i = psf_mag_i
@@ -422,6 +445,7 @@ class target(Base):
         self.psf_mag_j = psf_mag_j
         #
         self.psf_mag_error_u = psf_mag_error_u
+        self.psf_mag_error_v = psf_mag_error_v
         self.psf_mag_error_g = psf_mag_error_g
         self.psf_mag_error_r = psf_mag_error_r
         self.psf_mag_error_i = psf_mag_error_i
@@ -430,6 +454,7 @@ class target(Base):
         self.psf_mag_error_j = psf_mag_error_j
         #
         self.psf_flux_u = psf_flux_u
+        self.psf_flux_v = psf_flux_v
         self.psf_flux_g = psf_flux_g
         self.psf_flux_r = psf_flux_r
         self.psf_flux_i = psf_flux_i
@@ -438,6 +463,7 @@ class target(Base):
         self.psf_flux_j = psf_flux_j
         #
         self.psf_flux_error_u = psf_flux_error_u
+        self.psf_flux_error_v = psf_flux_error_v
         self.psf_flux_error_g = psf_flux_error_g
         self.psf_flux_error_r = psf_flux_error_r
         self.psf_flux_error_i = psf_flux_error_i
@@ -446,6 +472,7 @@ class target(Base):
         self.psf_flux_error_j = psf_flux_error_j
         #
         self.total_flux_u = total_flux_u
+        self.total_flux_v = total_flux_v
         self.total_flux_g = total_flux_g
         self.total_flux_r = total_flux_r
         self.total_flux_i = total_flux_i
@@ -454,6 +481,7 @@ class target(Base):
         self.total_flux_j = total_flux_j
         #
         self.total_flux_error_u = total_flux_error_u
+        self.total_flux_error_v = total_flux_error_v
         self.total_flux_error_g = total_flux_error_g
         self.total_flux_error_r = total_flux_error_r
         self.total_flux_error_i = total_flux_error_i
@@ -462,6 +490,7 @@ class target(Base):
         self.total_flux_error_j = total_flux_error_j
         #
         self.filter_u = filter_u
+        self.filter_v = filter_v
         self.filter_g = filter_g
         self.filter_r = filter_r
         self.filter_i = filter_i
