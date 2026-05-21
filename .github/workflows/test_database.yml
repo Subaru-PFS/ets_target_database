@@ -5,9 +5,6 @@ on:
     branches: [main]
   push:
     branches: [main]
-    paths-ignore:
-      - 'diagrams/**'
-      - 'docs/tbls/**'
 
 jobs:
   test:
@@ -180,7 +177,7 @@ jobs:
             --portable-names
 
       - name: Commit and push updated ER diagrams
-        if: github.event_name == 'push'
+        if: github.event_name == 'pull_request'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -188,8 +185,7 @@ jobs:
           git diff --staged --quiet || (
             git commit -m "chore: update ER diagrams [skip ci]" &&
             git restore . &&
-            git pull --rebase origin main &&
-            git push origin main
+            git push origin HEAD:${{ github.head_ref }}
           )
 
       #   - name: Run tests
