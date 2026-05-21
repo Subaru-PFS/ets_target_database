@@ -5,10 +5,15 @@ on:
     branches: [main]
   push:
     branches: [main]
+    paths-ignore:
+      - 'diagrams/**'
+      - 'docs/tbls/**'
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     services:
       postgres:
@@ -27,13 +32,15 @@ jobs:
           --health-retries 5
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up tbls
-        uses: k1low/setup-tbls@v1
+        uses: k1low/setup-tbls@f25e3d013a596865b2db90dac7ee19e9f15b5780 # v1.4.0
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v4
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
         with:
           enable-cache: true
 
@@ -142,9 +149,47 @@ jobs:
         run: |
           uv run pfs-targetdb-cli update-catalog-active 1004 true -c ~/.pfs/test_db_config.toml --verbose --commit
 
-      - name: Generate ER diagram
+      - name: Generate tbls ER diagram
         run: |
-          uv run pfs-targetdb-cli diagram -c ~/.pfs/test_db_config.toml --generator tbls --output-dir ./diagram-test
+          uv run pfs-targetdb-cli diagram \
+            -c ~/.pfs/test_db_config.toml \
+            --generator tbls \
+            --output-dir docs/tbls
+
+      - name: Generate SchemaCrawler ER diagram
+        run: |
+          docker run \
+            --network host \
+            --user "$(id -u):$(id -g)" \
+            --mount type=bind,source="${GITHUB_WORKSPACE}",target=/home/schcrwlr \
+            --rm \
+            schemacrawler/schemacrawler:v16.22.2 \
+            /opt/schemacrawler/bin/schemacrawler.sh \
+            --server=postgresql \
+            --host=localhost \
+            --port=5432 \
+            --database=test_targetdb \
+            --schemas=public \
+            --user=postgres \
+            --password=postgres \
+            --info-level=standard \
+            --command=schema \
+            --output-format=pdf \
+            --output-file=/home/schcrwlr/diagrams/erdiagram_targetdb_latest.pdf \
+            --title="PFS Target Database" \
+            --portable-names
+
+      - name: Commit and push updated ER diagrams
+        if: github.event_name == 'push'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/tbls/ diagrams/
+          git diff --staged --quiet || (
+            git commit -m "chore: update ER diagrams [skip ci]" &&
+            git pull --rebase origin main &&
+            git push origin main
+          )
 
       #   - name: Run tests
       #     run: |
