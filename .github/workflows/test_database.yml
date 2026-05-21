@@ -160,6 +160,7 @@ jobs:
         run: |
           docker run \
             --network host \
+            --user "$(id -u):$(id -g)" \
             --mount type=bind,source="${GITHUB_WORKSPACE}",target=/home/schcrwlr \
             --rm \
             schemacrawler/schemacrawler:v16.22.2 \
