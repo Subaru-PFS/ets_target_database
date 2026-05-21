@@ -1,7 +1,5 @@
 # public.sky
 
-## Description
-
 ## Columns
 
 | Name | Type | Default | Nullable | Children | Parents | Comment |
@@ -26,18 +24,18 @@
 | Name | Type | Definition |
 | ---- | ---- | ---------- |
 | sky_input_catalog_id_fkey | FOREIGN KEY | FOREIGN KEY (input_catalog_id) REFERENCES input_catalog(input_catalog_id) |
-| sky_obj_id_input_catalog_id_version_key | UNIQUE | UNIQUE (obj_id, input_catalog_id, version) |
-| sky_pkey | PRIMARY KEY | PRIMARY KEY (sky_id) |
 | sky_target_type_id_fkey | FOREIGN KEY | FOREIGN KEY (target_type_id) REFERENCES target_type(target_type_id) |
+| sky_pkey | PRIMARY KEY | PRIMARY KEY (sky_id) |
+| sky_obj_id_input_catalog_id_version_key | UNIQUE | UNIQUE (obj_id, input_catalog_id, version) |
 
 ## Indexes
 
 | Name | Definition |
 | ---- | ---------- |
-| sky_obj_id_input_catalog_id_version_key | CREATE UNIQUE INDEX sky_obj_id_input_catalog_id_version_key ON public.sky USING btree (obj_id, input_catalog_id, version) |
 | sky_pkey | CREATE UNIQUE INDEX sky_pkey ON public.sky USING btree (sky_id) |
-| ix_sky_input_catalog_id | CREATE INDEX ix_sky_input_catalog_id ON public.sky USING btree (input_catalog_id) |
+| sky_obj_id_input_catalog_id_version_key | CREATE UNIQUE INDEX sky_obj_id_input_catalog_id_version_key ON public.sky USING btree (obj_id, input_catalog_id, version) |
 | ix_sky_version | CREATE INDEX ix_sky_version ON public.sky USING btree (version) |
+| ix_sky_input_catalog_id | CREATE INDEX ix_sky_input_catalog_id ON public.sky USING btree (input_catalog_id) |
 | sky_q3c_ang2ipix_idx | CREATE INDEX sky_q3c_ang2ipix_idx ON public.sky USING btree (q3c_ang2ipix(ra, "dec")) |
 
 ## Relations
@@ -72,15 +70,15 @@ erDiagram
   timestamp_without_time_zone updated_at
 }
 "public.input_catalog" {
+  integer input_catalog_id
   varchar input_catalog_name
   varchar input_catalog_description
-  timestamp_without_time_zone created_at
-  timestamp_without_time_zone updated_at
   varchar_16_ upload_id
-  integer input_catalog_id
   boolean active
   boolean is_classical
   boolean is_user_pointing
+  timestamp_without_time_zone created_at
+  timestamp_without_time_zone updated_at
 }
 ```
 

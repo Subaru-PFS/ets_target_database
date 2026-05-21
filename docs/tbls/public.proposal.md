@@ -1,7 +1,5 @@
 # public.proposal
 
-## Description
-
 ## Columns
 
 | Name | Type | Default | Nullable | Children | Parents | Comment |
@@ -14,21 +12,21 @@
 | rank | double precision |  | false |  |  | TAC score |
 | grade | varchar |  | false |  |  | TAC grade (A/B/C/F and N/A) |
 | allocated_time_total | double precision |  | true |  |  | Total fiberhours allocated by TAC (hour) |
-| proposal_category_id | integer |  | true |  | [public.proposal_category](public.proposal_category.md) |  |
-| created_at | timestamp without time zone | timezone('utc'::text, CURRENT_TIMESTAMP) | true |  |  | The date and time in UTC when the record was created |
-| updated_at | timestamp without time zone |  | true |  |  | The date and time in UTC when the record was last updated |
 | allocated_time_lr | double precision |  | true |  |  | Total fiberhours for the low-resolution mode allocated by TAC (hour) |
 | allocated_time_mr | double precision |  | true |  |  | Total fiberhours for the medium-resolution mode allocated by TAC (hour) |
-| is_too | boolean |  | true |  |  | True when the proposal is ToO |
+| proposal_category_id | integer |  | true |  | [public.proposal_category](public.proposal_category.md) |  |
 | partner_id | integer |  | true |  | [public.partner](public.partner.md) |  |
+| is_too | boolean |  | true |  |  | True when the proposal is ToO |
+| created_at | timestamp without time zone | timezone('utc'::text, CURRENT_TIMESTAMP) | true |  |  | The date and time in UTC when the record was created |
+| updated_at | timestamp without time zone |  | true |  |  | The date and time in UTC when the record was last updated |
 
 ## Constraints
 
 | Name | Type | Definition |
 | ---- | ---- | ---------- |
 | proposal_proposal_category_id_fkey | FOREIGN KEY | FOREIGN KEY (proposal_category_id) REFERENCES proposal_category(proposal_category_id) |
-| proposal_pkey | PRIMARY KEY | PRIMARY KEY (proposal_id) |
 | proposal_partner_id_fkey | FOREIGN KEY | FOREIGN KEY (partner_id) REFERENCES partner(partner_id) |
+| proposal_pkey | PRIMARY KEY | PRIMARY KEY (proposal_id) |
 
 ## Indexes
 
@@ -55,17 +53,18 @@ erDiagram
   double_precision rank
   varchar grade
   double_precision allocated_time_total
-  integer proposal_category_id FK
-  timestamp_without_time_zone created_at
-  timestamp_without_time_zone updated_at
   double_precision allocated_time_lr
   double_precision allocated_time_mr
-  boolean is_too
+  integer proposal_category_id FK
   integer partner_id FK
+  boolean is_too
+  timestamp_without_time_zone created_at
+  timestamp_without_time_zone updated_at
 }
 "public.target" {
   bigint target_id
   varchar proposal_id FK
+  varchar ob_code
   bigint obj_id
   double_precision ra
   double_precision dec
@@ -77,66 +76,81 @@ erDiagram
   integer patch
   integer target_type_id FK
   integer input_catalog_id FK
+  double_precision fiber_mag_u
+  double_precision fiber_mag_v
   double_precision fiber_mag_g
   double_precision fiber_mag_r
   double_precision fiber_mag_i
   double_precision fiber_mag_z
   double_precision fiber_mag_y
   double_precision fiber_mag_j
+  double_precision psf_mag_u
+  double_precision psf_mag_v
   double_precision psf_mag_g
   double_precision psf_mag_r
   double_precision psf_mag_i
   double_precision psf_mag_z
   double_precision psf_mag_y
   double_precision psf_mag_j
-  double_precision psf_flux_g
-  double_precision psf_flux_r
-  double_precision psf_flux_i
-  double_precision psf_flux_z
-  double_precision psf_flux_y
-  double_precision psf_flux_j
-  double_precision priority
-  double_precision effective_exptime
-  boolean is_medium_resolution
-  double_precision qa_relative_throughput
-  double_precision qa_relative_noise
-  double_precision qa_reference_lambda
-  boolean is_cluster
-  timestamp_without_time_zone created_at
-  timestamp_without_time_zone updated_at
-  varchar filter_g FK
-  varchar filter_r FK
-  varchar filter_i FK
-  varchar filter_z FK
-  varchar filter_y FK
-  varchar filter_j FK
+  double_precision psf_mag_error_u
+  double_precision psf_mag_error_v
   double_precision psf_mag_error_g
   double_precision psf_mag_error_r
   double_precision psf_mag_error_i
   double_precision psf_mag_error_z
   double_precision psf_mag_error_y
   double_precision psf_mag_error_j
+  double_precision psf_flux_u
+  double_precision psf_flux_v
+  double_precision psf_flux_g
+  double_precision psf_flux_r
+  double_precision psf_flux_i
+  double_precision psf_flux_z
+  double_precision psf_flux_y
+  double_precision psf_flux_j
+  double_precision psf_flux_error_u
+  double_precision psf_flux_error_v
   double_precision psf_flux_error_g
   double_precision psf_flux_error_r
   double_precision psf_flux_error_i
   double_precision psf_flux_error_z
   double_precision psf_flux_error_y
   double_precision psf_flux_error_j
-  varchar ob_code
-  double_precision single_exptime
-  varchar qa_reference_arm FK
+  double_precision total_flux_u
+  double_precision total_flux_v
   double_precision total_flux_g
   double_precision total_flux_r
   double_precision total_flux_i
   double_precision total_flux_z
   double_precision total_flux_y
   double_precision total_flux_j
+  double_precision total_flux_error_u
+  double_precision total_flux_error_v
   double_precision total_flux_error_g
   double_precision total_flux_error_r
   double_precision total_flux_error_i
   double_precision total_flux_error_z
   double_precision total_flux_error_y
   double_precision total_flux_error_j
+  varchar filter_u FK
+  varchar filter_v FK
+  varchar filter_g FK
+  varchar filter_r FK
+  varchar filter_i FK
+  varchar filter_z FK
+  varchar filter_y FK
+  varchar filter_j FK
+  double_precision priority
+  double_precision effective_exptime
+  double_precision single_exptime
+  boolean is_medium_resolution
+  double_precision qa_relative_throughput
+  double_precision qa_relative_noise
+  double_precision qa_reference_lambda
+  varchar qa_reference_arm FK
+  boolean is_cluster
+  timestamp_without_time_zone created_at
+  timestamp_without_time_zone updated_at
 }
 "public.proposal_category" {
   integer proposal_category_id

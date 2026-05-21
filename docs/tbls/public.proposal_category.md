@@ -1,7 +1,5 @@
 # public.proposal_category
 
-## Description
-
 ## Columns
 
 | Name | Type | Default | Nullable | Children | Parents | Comment |
@@ -49,13 +47,13 @@ erDiagram
   double_precision rank
   varchar grade
   double_precision allocated_time_total
-  integer proposal_category_id FK
-  timestamp_without_time_zone created_at
-  timestamp_without_time_zone updated_at
   double_precision allocated_time_lr
   double_precision allocated_time_mr
-  boolean is_too
+  integer proposal_category_id FK
   integer partner_id FK
+  boolean is_too
+  timestamp_without_time_zone created_at
+  timestamp_without_time_zone updated_at
 }
 ```
 

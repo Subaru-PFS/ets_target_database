@@ -1,7 +1,5 @@
 # public.filter_name
 
-## Description
-
 ## Columns
 
 | Name | Type | Default | Nullable | Children | Parents | Comment |
@@ -32,12 +30,16 @@ erDiagram
 "public.fluxstd" }o--o| "public.filter_name" : "FOREIGN KEY (filter_i) REFERENCES filter_name(filter_name)"
 "public.fluxstd" }o--o| "public.filter_name" : "FOREIGN KEY (filter_j) REFERENCES filter_name(filter_name)"
 "public.fluxstd" }o--o| "public.filter_name" : "FOREIGN KEY (filter_r) REFERENCES filter_name(filter_name)"
+"public.fluxstd" }o--o| "public.filter_name" : "FOREIGN KEY (filter_u) REFERENCES filter_name(filter_name)"
+"public.fluxstd" }o--o| "public.filter_name" : "FOREIGN KEY (filter_v) REFERENCES filter_name(filter_name)"
 "public.fluxstd" }o--o| "public.filter_name" : "FOREIGN KEY (filter_y) REFERENCES filter_name(filter_name)"
 "public.fluxstd" }o--o| "public.filter_name" : "FOREIGN KEY (filter_z) REFERENCES filter_name(filter_name)"
 "public.target" }o--o| "public.filter_name" : "FOREIGN KEY (filter_g) REFERENCES filter_name(filter_name)"
 "public.target" }o--o| "public.filter_name" : "FOREIGN KEY (filter_i) REFERENCES filter_name(filter_name)"
 "public.target" }o--o| "public.filter_name" : "FOREIGN KEY (filter_j) REFERENCES filter_name(filter_name)"
 "public.target" }o--o| "public.filter_name" : "FOREIGN KEY (filter_r) REFERENCES filter_name(filter_name)"
+"public.target" }o--o| "public.filter_name" : "FOREIGN KEY (filter_u) REFERENCES filter_name(filter_name)"
+"public.target" }o--o| "public.filter_name" : "FOREIGN KEY (filter_v) REFERENCES filter_name(filter_name)"
 "public.target" }o--o| "public.filter_name" : "FOREIGN KEY (filter_y) REFERENCES filter_name(filter_name)"
 "public.target" }o--o| "public.filter_name" : "FOREIGN KEY (filter_z) REFERENCES filter_name(filter_name)"
 
@@ -63,42 +65,49 @@ erDiagram
   integer patch
   integer target_type_id FK
   integer input_catalog_id FK
+  double_precision psf_mag_u
+  double_precision psf_mag_v
   double_precision psf_mag_g
   double_precision psf_mag_r
   double_precision psf_mag_i
   double_precision psf_mag_z
   double_precision psf_mag_y
   double_precision psf_mag_j
-  double_precision psf_flux_g
-  double_precision psf_flux_r
-  double_precision psf_flux_i
-  double_precision psf_flux_z
-  double_precision psf_flux_y
-  double_precision psf_flux_j
-  double_precision prob_f_star
-  boolean flags_dist
-  boolean flags_ebv
-  varchar version
-  timestamp_without_time_zone created_at
-  timestamp_without_time_zone updated_at
-  varchar filter_g FK
-  varchar filter_r FK
-  varchar filter_i FK
-  varchar filter_z FK
-  varchar filter_y FK
-  varchar filter_j FK
+  double_precision psf_mag_error_u
+  double_precision psf_mag_error_v
   double_precision psf_mag_error_g
   double_precision psf_mag_error_r
   double_precision psf_mag_error_i
   double_precision psf_mag_error_z
   double_precision psf_mag_error_y
   double_precision psf_mag_error_j
+  double_precision psf_flux_u
+  double_precision psf_flux_v
+  double_precision psf_flux_g
+  double_precision psf_flux_r
+  double_precision psf_flux_i
+  double_precision psf_flux_z
+  double_precision psf_flux_y
+  double_precision psf_flux_j
+  double_precision psf_flux_error_u
+  double_precision psf_flux_error_v
   double_precision psf_flux_error_g
   double_precision psf_flux_error_r
   double_precision psf_flux_error_i
   double_precision psf_flux_error_z
   double_precision psf_flux_error_y
   double_precision psf_flux_error_j
+  varchar filter_u FK
+  varchar filter_v FK
+  varchar filter_g FK
+  varchar filter_r FK
+  varchar filter_i FK
+  varchar filter_z FK
+  varchar filter_y FK
+  varchar filter_j FK
+  double_precision prob_f_star
+  boolean flags_dist
+  boolean flags_ebv
   double_precision teff_brutus
   double_precision teff_brutus_low
   double_precision teff_brutus_high
@@ -111,10 +120,14 @@ erDiagram
   boolean is_fstar_gaia
   boolean is_gc_neighbor
   boolean is_dense_region
+  varchar version
+  timestamp_without_time_zone created_at
+  timestamp_without_time_zone updated_at
 }
 "public.target" {
   bigint target_id
   varchar proposal_id FK
+  varchar ob_code
   bigint obj_id
   double_precision ra
   double_precision dec
@@ -126,66 +139,81 @@ erDiagram
   integer patch
   integer target_type_id FK
   integer input_catalog_id FK
+  double_precision fiber_mag_u
+  double_precision fiber_mag_v
   double_precision fiber_mag_g
   double_precision fiber_mag_r
   double_precision fiber_mag_i
   double_precision fiber_mag_z
   double_precision fiber_mag_y
   double_precision fiber_mag_j
+  double_precision psf_mag_u
+  double_precision psf_mag_v
   double_precision psf_mag_g
   double_precision psf_mag_r
   double_precision psf_mag_i
   double_precision psf_mag_z
   double_precision psf_mag_y
   double_precision psf_mag_j
-  double_precision psf_flux_g
-  double_precision psf_flux_r
-  double_precision psf_flux_i
-  double_precision psf_flux_z
-  double_precision psf_flux_y
-  double_precision psf_flux_j
-  double_precision priority
-  double_precision effective_exptime
-  boolean is_medium_resolution
-  double_precision qa_relative_throughput
-  double_precision qa_relative_noise
-  double_precision qa_reference_lambda
-  boolean is_cluster
-  timestamp_without_time_zone created_at
-  timestamp_without_time_zone updated_at
-  varchar filter_g FK
-  varchar filter_r FK
-  varchar filter_i FK
-  varchar filter_z FK
-  varchar filter_y FK
-  varchar filter_j FK
+  double_precision psf_mag_error_u
+  double_precision psf_mag_error_v
   double_precision psf_mag_error_g
   double_precision psf_mag_error_r
   double_precision psf_mag_error_i
   double_precision psf_mag_error_z
   double_precision psf_mag_error_y
   double_precision psf_mag_error_j
+  double_precision psf_flux_u
+  double_precision psf_flux_v
+  double_precision psf_flux_g
+  double_precision psf_flux_r
+  double_precision psf_flux_i
+  double_precision psf_flux_z
+  double_precision psf_flux_y
+  double_precision psf_flux_j
+  double_precision psf_flux_error_u
+  double_precision psf_flux_error_v
   double_precision psf_flux_error_g
   double_precision psf_flux_error_r
   double_precision psf_flux_error_i
   double_precision psf_flux_error_z
   double_precision psf_flux_error_y
   double_precision psf_flux_error_j
-  varchar ob_code
-  double_precision single_exptime
-  varchar qa_reference_arm FK
+  double_precision total_flux_u
+  double_precision total_flux_v
   double_precision total_flux_g
   double_precision total_flux_r
   double_precision total_flux_i
   double_precision total_flux_z
   double_precision total_flux_y
   double_precision total_flux_j
+  double_precision total_flux_error_u
+  double_precision total_flux_error_v
   double_precision total_flux_error_g
   double_precision total_flux_error_r
   double_precision total_flux_error_i
   double_precision total_flux_error_z
   double_precision total_flux_error_y
   double_precision total_flux_error_j
+  varchar filter_u FK
+  varchar filter_v FK
+  varchar filter_g FK
+  varchar filter_r FK
+  varchar filter_i FK
+  varchar filter_z FK
+  varchar filter_y FK
+  varchar filter_j FK
+  double_precision priority
+  double_precision effective_exptime
+  double_precision single_exptime
+  boolean is_medium_resolution
+  double_precision qa_relative_throughput
+  double_precision qa_relative_noise
+  double_precision qa_reference_lambda
+  varchar qa_reference_arm FK
+  boolean is_cluster
+  timestamp_without_time_zone created_at
+  timestamp_without_time_zone updated_at
 }
 ```
 
