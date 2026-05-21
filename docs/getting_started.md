@@ -18,7 +18,7 @@ The Q3C extension is required for the database. You can install it by the follow
 
 Python and the following packages as well as their dependencies will be required for `targetdb`.
 The dependencies are automatically installed when you install the `targetdb` package via `pip`.
-Package versions shown here are those used for the development (as of January 2026).
+Package versions shown here are those used for the development (as of May 2026).
 Newer (and somewhat older) versions should also work.
 
 | Package                                                                | Version |
@@ -114,7 +114,7 @@ pfs-targetdb-cli create-schema -c dbconf.toml
 
 ### Generate an ER diagram
 
-```
+```bash
 # draw the ER diagram
 pfs-targetdb-cli diagram -c dbconf.toml
 ```
