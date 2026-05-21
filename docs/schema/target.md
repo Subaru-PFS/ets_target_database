@@ -24,48 +24,64 @@ Here are the columns in the `target` table:
 | patch                  | int       | Patch defined by, e.g., the HSC pipeline                                                         |        |              |         |
 | target_type_id         | int       | `target_type_id` in the `target_type` table                                                      |        |              |         |
 | input_catalog_id       | int       | `input_catalog_id` in the `input_catalog` table                                                  |        |              |         |
+| fiber_mag_u            | float     | (Obsolete) Fiber magnitude in _u_-band                                                           | AB mag |              |         |
+| fiber_mag_v            | float     | (Obsolete) Fiber magnitude in _v_-band                                                           | AB mag |              |         |
 | fiber_mag_g            | float     | (Obsolete) Fiber magnitude in _g_-band                                                           | AB mag |              |         |
 | fiber_mag_r            | float     | (Obsolete) Fiber magnitude in _r_-band                                                           | AB mag |              |         |
 | fiber_mag_i            | float     | (Obsolete) Fiber magnitude in _i_-band                                                           | AB mag |              |         |
 | fiber_mag_z            | float     | (Obsolete) Fiber magnitude in _z_-band                                                           | AB mag |              |         |
 | fiber_mag_y            | float     | (Obsolete) Fiber magnitude in _y_-band                                                           | AB mag |              |         |
 | fiber_mag_j            | float     | (Obsolete) Fiber magnitude in _j_-band                                                           | AB mag |              |         |
+| psf_mag_u              | float     | (Obsolete) PSF magnitude in _u_-band                                                             | AB mag |              |         |
+| psf_mag_v              | float     | (Obsolete) PSF magnitude in _v_-band                                                             | AB mag |              |         |
 | psf_mag_g              | float     | (Obsolete) PSF magnitude in _g_-band                                                             | AB mag |              |         |
 | psf_mag_r              | float     | (Obsolete) PSF magnitude in _r_-band                                                             | AB mag |              |         |
 | psf_mag_i              | float     | (Obsolete) PSF magnitude in _i_-band                                                             | AB mag |              |         |
 | psf_mag_z              | float     | (Obsolete) PSF magnitude in _z_-band                                                             | AB mag |              |         |
 | psf_mag_y              | float     | (Obsolete) PSF magnitude in _y_-band                                                             | AB mag |              |         |
 | psf_mag_j              | float     | (Obsolete) PSF magnitude in _j_-band                                                             | AB mag |              |         |
+| psf_mag_error_u        | float     | (Obsolete) Error in PSF magnitude in _u_-band                                                    | AB mag |              |         |
+| psf_mag_error_v        | float     | (Obsolete) Error in PSF magnitude in _v_-band                                                    | AB mag |              |         |
 | psf_mag_error_g        | float     | (Obsolete) Error in PSF magnitude in _g_-band                                                    | AB mag |              |         |
 | psf_mag_error_r        | float     | (Obsolete) Error in PSF magnitude in _r_-band                                                    | AB mag |              |         |
 | psf_mag_error_i        | float     | (Obsolete) Error in PSF magnitude in _i_-band                                                    | AB mag |              |         |
 | psf_mag_error_z        | float     | (Obsolete) Error in PSF magnitude in _z_-band                                                    | AB mag |              |         |
 | psf_mag_error_y        | float     | (Obsolete) Error in PSF magnitude in _y_-band                                                    | AB mag |              |         |
 | psf_mag_error_j        | float     | (Obsolete) Error in PSF magnitude in _j_-band                                                    | AB mag |              |         |
+| psf_flux_u             | float     | PSF flux in _u_-band                                                                             | nJy    | (\*)         |         |
+| psf_flux_v             | float     | PSF flux in _v_-band                                                                             | nJy    | (\*)         |         |
 | psf_flux_g             | float     | PSF flux in _g_-band                                                                             | nJy    | (\*)         |         |
 | psf_flux_r             | float     | PSF flux in _r_-band                                                                             | nJy    | (\*)         |         |
 | psf_flux_i             | float     | PSF flux in _i_-band                                                                             | nJy    | (\*)         |         |
 | psf_flux_z             | float     | PSF flux in _z_-band                                                                             | nJy    | (\*)         |         |
 | psf_flux_y             | float     | PSF flux in _y_-band                                                                             | nJy    | (\*)         |         |
 | psf_flux_j             | float     | PSF flux in _j_-band                                                                             | nJy    | (\*)         |         |
+| psf_flux_error_u       | float     | Error in PSF flux in _u_-band                                                                    | nJy    | (\*)         |         |
+| psf_flux_error_v       | float     | Error in PSF flux in _v_-band                                                                    | nJy    | (\*)         |         |
 | psf_flux_error_g       | float     | Error in PSF flux in _g_-band                                                                    | nJy    | (\*)         |         |
 | psf_flux_error_r       | float     | Error in PSF flux in _r_-band                                                                    | nJy    | (\*)         |         |
 | psf_flux_error_i       | float     | Error in PSF flux in _i_-band                                                                    | nJy    | (\*)         |         |
 | psf_flux_error_z       | float     | Error in PSF flux in _z_-band                                                                    | nJy    | (\*)         |         |
 | psf_flux_error_y       | float     | Error in PSF flux in _y_-band                                                                    | nJy    | (\*)         |         |
 | psf_flux_error_j       | float     | Error in PSF flux in _j_-band                                                                    | nJy    | (\*)         |         |
+| total_flux_u           | float     | Total flux in _u_-band                                                                           | nJy    | (\*)         |         |
+| total_flux_v           | float     | Total flux in _v_-band                                                                           | nJy    | (\*)         |         |
 | total_flux_g           | float     | Total flux in _g_-band                                                                           | nJy    | (\*)         |         |
 | total_flux_r           | float     | Total flux in _r_-band                                                                           | nJy    | (\*)         |         |
 | total_flux_i           | float     | Total flux in _i_-band                                                                           | nJy    | (\*)         |         |
 | total_flux_z           | float     | Total flux in _z_-band                                                                           | nJy    | (\*)         |         |
 | total_flux_y           | float     | Total flux in _y_-band                                                                           | nJy    | (\*)         |         |
 | total_flux_j           | float     | Total flux in _j_-band                                                                           | nJy    | (\*)         |         |
+| total_flux_error_u     | float     | Error in total flux in _u_-band                                                                  | nJy    | (\*)         |         |
+| total_flux_error_v     | float     | Error in total flux in _v_-band                                                                  | nJy    | (\*)         |         |
 | total_flux_error_g     | float     | Error in total flux in _g_-band                                                                  | nJy    | (\*)         |         |
 | total_flux_error_r     | float     | Error in total flux in _r_-band                                                                  | nJy    | (\*)         |         |
 | total_flux_error_i     | float     | Error in total flux in _i_-band                                                                  | nJy    | (\*)         |         |
 | total_flux_error_z     | float     | Error in total flux in _z_-band                                                                  | nJy    | (\*)         |         |
 | total_flux_error_y     | float     | Error in total flux in _y_-band                                                                  | nJy    | (\*)         |         |
 | total_flux_error_j     | float     | Error in total flux in _j_-band                                                                  | nJy    | (\*)         |         |
+| filter_u               | str       | Photometric band used to measure the PSF flux in _u_-band                                        |        | (\*)         |         |
+| filter_v               | str       | Photometric band used to measure the PSF flux in _v_-band                                        |        | (\*)         |         |
 | filter_g               | str       | Photometric band used to measure the PSF flux in _g_-band                                        |        | (\*)         |         |
 | filter_r               | str       | Photometric band used to measure the PSF flux in _r_-band                                        |        | (\*)         |         |
 | filter_i               | str       | Photometric band used to measure the PSF flux in _i_-band                                        |        | (\*)         |         |
@@ -97,7 +113,7 @@ Here are the columns in the `target` table:
 - `proposal_id` references the `proposal_id` in the `proposal` table.
 - `target_type_id` references the `target_type_id` in the `target_type` table.
 - `input_catalog_id` references the `input_catalog_id` in the `input_catalog` table.
-- `filter_{g,r,i,z,y,j}` references the `filter_name` in the `filter_name` table.
+- `filter_{u,v,g,r,i,z,y,j}` references the `filter_name` in the `filter_name` table.
 - `qa_reference_arm` references the `name` in the `pfs_arm` table.
 
 ## Notes

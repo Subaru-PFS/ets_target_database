@@ -96,6 +96,8 @@ class fluxstd(Base):
         comment="input_catalog_id from the input_catalog table",
     )
 
+    psf_mag_u = Column(Float, comment="u-band PSF magnitude (AB mag)")
+    psf_mag_v = Column(Float, comment="v-band PSF magnitude (AB mag)")
     psf_mag_g = Column(Float, comment="g-band PSF magnitude (AB mag)")
     psf_mag_r = Column(Float, comment="r-band PSF magnitude (AB mag)")
     psf_mag_i = Column(Float, comment="i-band PSF magnitude (AB mag)")
@@ -103,6 +105,8 @@ class fluxstd(Base):
     psf_mag_y = Column(Float, comment="y-band PSF magnitude (AB mag)")
     psf_mag_j = Column(Float, comment="J band PSF magnitude (AB mag)")
 
+    psf_mag_error_u = Column(Float, comment="Error in u-band PSF magnitude (AB mag)")
+    psf_mag_error_v = Column(Float, comment="Error in v-band PSF magnitude (AB mag)")
     psf_mag_error_g = Column(Float, comment="Error in g-band PSF magnitude (AB mag)")
     psf_mag_error_r = Column(Float, comment="Error in r-band PSF magnitude (AB mag)")
     psf_mag_error_i = Column(Float, comment="Error in i-band PSF magnitude (AB mag)")
@@ -110,6 +114,8 @@ class fluxstd(Base):
     psf_mag_error_y = Column(Float, comment="Error in y-band PSF magnitude (AB mag)")
     psf_mag_error_j = Column(Float, comment="Error in J band PSF magnitude (AB mag)")
 
+    psf_flux_u = Column(Float, comment="u-band PSF flux (nJy)")
+    psf_flux_v = Column(Float, comment="v-band PSF flux (nJy)")
     psf_flux_g = Column(Float, comment="g-band PSF flux (nJy)")
     psf_flux_r = Column(Float, comment="r-band PSF flux (nJy)")
     psf_flux_i = Column(Float, comment="i-band PSF flux (nJy)")
@@ -117,6 +123,8 @@ class fluxstd(Base):
     psf_flux_y = Column(Float, comment="y-band PSF flux (nJy)")
     psf_flux_j = Column(Float, comment="J band PSF flux (nJy)")
 
+    psf_flux_error_u = Column(Float, comment="Error in u-band PSF flux (nJy)")
+    psf_flux_error_v = Column(Float, comment="Error in v-band PSF flux (nJy)")
     psf_flux_error_g = Column(Float, comment="Error in g-band PSF flux (nJy)")
     psf_flux_error_r = Column(Float, comment="Error in r-band PSF flux (nJy)")
     psf_flux_error_i = Column(Float, comment="Error in i-band PSF flux (nJy)")
@@ -124,13 +132,16 @@ class fluxstd(Base):
     psf_flux_error_y = Column(Float, comment="Error in y-band PSF flux (nJy)")
     psf_flux_error_j = Column(Float, comment="Error in J band PSF flux (nJy)")
 
-    # filter_g = Column(String, comment="g-band filter (g_hsc, g_ps1, g_sdss, etc.)")
-    # filter_r = Column(String, comment="r-band filter (r_hsc, r_ps1, r_sdss, etc.)")
-    # filter_i = Column(String, comment="i-band filter (i_hsc, i_ps1, i_sdss, etc.)")
-    # filter_z = Column(String, comment="z-band filter (z_hsc, z_ps1, z_sdss, etc.)")
-    # filter_y = Column(String, comment="y-band filter (y_hsc, y_ps1, y_sdss, etc.)")
-    # filter_j = Column(String, comment="j-band filter (j_mko, etc.)")
-
+    filter_u = Column(
+        String,
+        ForeignKey("filter_name.filter_name"),
+        comment="u-band filter (u_sdss, u_cfht, u_skymapper, etc.)",
+    )
+    filter_v = Column(
+        String,
+        ForeignKey("filter_name.filter_name"),
+        comment="v-band filter (v_skymapper, v_splus, etc.)",
+    )
     filter_g = Column(
         String,
         ForeignKey("filter_name.filter_name"),
@@ -246,6 +257,8 @@ class fluxstd(Base):
 
     # tried to make a relationship to filter_name table
     # ref: https://docs.sqlalchemy.org/en/14/orm/join_conditions.html
+    filter_u_rels = relationship(filter_name, foreign_keys=[filter_u])
+    filter_v_rels = relationship(filter_name, foreign_keys=[filter_v])
     filter_g_rels = relationship(filter_name, foreign_keys=[filter_g])
     filter_r_rels = relationship(filter_name, foreign_keys=[filter_r])
     filter_i_rels = relationship(filter_name, foreign_keys=[filter_i])
@@ -269,30 +282,40 @@ class fluxstd(Base):
         patch,
         target_type_id,
         input_catalog_id,
+        psf_mag_u,
+        psf_mag_v,
         psf_mag_g,
         psf_mag_r,
         psf_mag_i,
         psf_mag_z,
         psf_mag_y,
         psf_mag_j,
+        psf_mag_error_u,
+        psf_mag_error_v,
         psf_mag_error_g,
         psf_mag_error_r,
         psf_mag_error_i,
         psf_mag_error_z,
         psf_mag_error_y,
         psf_mag_error_j,
+        psf_flux_u,
+        psf_flux_v,
         psf_flux_g,
         psf_flux_r,
         psf_flux_i,
         psf_flux_z,
         psf_flux_y,
         psf_flux_j,
+        psf_flux_error_u,
+        psf_flux_error_v,
         psf_flux_error_g,
         psf_flux_error_r,
         psf_flux_error_i,
         psf_flux_error_z,
         psf_flux_error_y,
         psf_flux_error_j,
+        filter_u,
+        filter_v,
         filter_g,
         filter_r,
         filter_i,
@@ -332,30 +355,40 @@ class fluxstd(Base):
         self.patch = patch
         self.target_type_id = target_type_id
         self.input_catalog_id = input_catalog_id
+        self.psf_mag_u = psf_mag_u
+        self.psf_mag_v = psf_mag_v
         self.psf_mag_g = psf_mag_g
         self.psf_mag_r = psf_mag_r
         self.psf_mag_i = psf_mag_i
         self.psf_mag_z = psf_mag_z
         self.psf_mag_y = psf_mag_y
         self.psf_mag_j = psf_mag_j
+        self.psf_mag_error_u = psf_mag_error_u
+        self.psf_mag_error_v = psf_mag_error_v
         self.psf_mag_error_g = psf_mag_error_g
         self.psf_mag_error_r = psf_mag_error_r
         self.psf_mag_error_i = psf_mag_error_i
         self.psf_mag_error_z = psf_mag_error_z
         self.psf_mag_error_y = psf_mag_error_y
         self.psf_mag_error_j = psf_mag_error_j
+        self.psf_flux_u = psf_flux_u
+        self.psf_flux_v = psf_flux_v
         self.psf_flux_g = psf_flux_g
         self.psf_flux_r = psf_flux_r
         self.psf_flux_i = psf_flux_i
         self.psf_flux_z = psf_flux_z
         self.psf_flux_y = psf_flux_y
         self.psf_flux_j = psf_flux_j
+        self.psf_flux_error_u = psf_flux_error_u
+        self.psf_flux_error_v = psf_flux_error_v
         self.psf_flux_error_g = psf_flux_error_g
         self.psf_flux_error_r = psf_flux_error_r
         self.psf_flux_error_i = psf_flux_error_i
         self.psf_flux_error_z = psf_flux_error_z
         self.psf_flux_error_y = psf_flux_error_y
         self.psf_flux_error_j = psf_flux_error_j
+        self.filter_u = filter_u
+        self.filter_v = filter_v
         self.filter_g = filter_g
         self.filter_r = filter_r
         self.filter_i = filter_i
