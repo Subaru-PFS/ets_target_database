@@ -32,15 +32,15 @@ jobs:
           --health-retries 5
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up tbls
-        uses: k1low/setup-tbls@v1
+        uses: k1low/setup-tbls@f25e3d013a596865b2db90dac7ee19e9f15b5780 # v1.4.0
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v4
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
         with:
           enable-cache: true
 
