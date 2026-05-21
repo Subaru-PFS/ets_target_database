@@ -32,6 +32,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          ref: ${{ github.head_ref || github.ref_name }}
 
       - name: Set up tbls
         uses: k1low/setup-tbls@f25e3d013a596865b2db90dac7ee19e9f15b5780 # v1.4.0
@@ -185,7 +186,7 @@ jobs:
           git diff --staged --quiet || (
             git commit -m "chore: update ER diagrams [skip ci]" &&
             git restore . &&
-            git push origin HEAD:${{ github.head_ref }}
+            git push origin HEAD:${{ github.head_ref || github.ref_name }}
           )
 
       #   - name: Run tests
