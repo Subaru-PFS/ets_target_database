@@ -38,8 +38,26 @@ class TargetDB(object):
         # print('connection to {0} started'.format(self.dbinfo))
 
     def close(self):
-        self.session.close()
+        try:
+            self.session.close()
+        finally:
+            # Dispose the engine to release all pooled connections back to the database
+            # server. Without this, SQLAlchemy's connection pool keeps the underlying
+            # TCP sockets open until the engine is garbage-collected, which may never
+            # happen on abnormal process termination.
+            self.engine.dispose()
         # print('connection to {0} closed'.format(self.dbinfo))
+
+    def __enter__(self):
+        """Support usage as a context manager: ``with TargetDB(...) as db:``."""
+        if not hasattr(self, "session"):
+            self.connect()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """Ensure close() is called even if an exception occurs inside the block."""
+        self.close()
+        return False  # re-raise any exception
 
     def reset_all(self, full=True):
         #
