@@ -37,7 +37,7 @@ def test_input_catalogs_registered_with_upload_id(engine, target_data, catalogs_
                 "WHERE upload_id IS NOT NULL"
             )
         ).fetchall()
-    registered = {name: upload_id for name, upload_id in rows}
+    registered = dict(rows)
 
     for _, row in catalogs_df.iterrows():
         assert registered.get(row["input_catalog_name"]) == row["upload_id"]

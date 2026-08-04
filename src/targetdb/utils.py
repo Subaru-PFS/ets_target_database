@@ -239,7 +239,7 @@ def generate_schema_markdown(output_file=None):
 
     for t in Base.metadata.sorted_tables:
 
-        out_md += "\n## {:s}\n\n".format(t.name)
+        out_md += f"\n## {t.name:s}\n\n"
 
         df = pd.DataFrame(
             [], columns=["name", "type", "primary_key", "autoincrement", "comment"]

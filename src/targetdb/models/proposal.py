@@ -16,7 +16,7 @@ from . import (
     Base,
     comment_created_at,
     comment_updated_at,
-    partner,
+    partner,  # noqa: F401 -- defensive: __init__ imports partner first; FK order-safe
     proposal_category,
     # proposal_grade,
     utcnow,
