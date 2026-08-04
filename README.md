@@ -81,6 +81,17 @@ If you want to install the package under the Python library directory, you can e
 
 The installation process will install some command-line tools under the directory where your Python executable is located.
 
+### Development setup
+
+If you are going to contribute, install the development dependencies and enable the pre-commit hooks:
+
+```console
+python3 -m pip install -e ".[dev]"
+pre-commit install
+```
+
+The hooks run `ruff` and `black` when you commit. CI enforces the same two checks, so passing the hooks locally means the `Lint` workflow will pass.
+
 
 ## Usage Examples
 

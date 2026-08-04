@@ -1,0 +1,30 @@
+# Keep ruff and black revs in step with the versions in the dev extra of
+# pyproject.toml. Drift between them produces the "passes locally, fails in
+# CI" failure mode.
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.14.11
+    hooks:
+      - id: ruff
+        args: [--fix]
+        # Match the Lint workflow, which checks src and tests only.
+        # alembic/ migrations are historical and deliberately unlinted.
+        files: ^(src|tests)/
+
+  - repo: https://github.com/psf/black
+    rev: 25.12.0
+    hooks:
+      - id: black
+        files: ^(src|tests)/
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+        # mkdocs-material's config uses !!python/name: tags, which
+        # yaml.safe_load cannot construct.
+        exclude: ^mkdocs\.yml$
+      - id: check-toml
+      - id: check-added-large-files
