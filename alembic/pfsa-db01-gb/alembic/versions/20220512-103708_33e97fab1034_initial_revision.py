@@ -1,7 +1,7 @@
 """initial revision
 
 Revision ID: 33e97fab1034
-Revises: 
+Revises:
 Create Date: 2022-05-12 10:37:08.039899
 
 """
