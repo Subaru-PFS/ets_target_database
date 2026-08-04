@@ -45,12 +45,18 @@ source = "https://github.com/Subaru-PFS/ets_target_database"
 pfs-targetdb-cli = "targetdb.cli.cli_main:app"
 
 [project.optional-dependencies]
-dev = ["ipython", "pytest", "black", "ruff", "setuptools-scm>=8.0"]
+dev = ["ipython", "pytest", "pytest-cov", "black", "ruff", "setuptools-scm>=8.0"]
 doc = ["mkdocs<2", "mkdocs-material[imaging]"]
 
 [build-system]
 requires = ["setuptools>=64", "setuptools-scm>=8.0", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+  "integration: tests requiring a PostgreSQL container via Docker",
+]
 
 [tool.black]
 line-length = 88
