@@ -371,6 +371,101 @@ disableOutputSchema: true"""
         raise ValueError(f"Unsupported generator: {generator}")
 
 
+FILTER_BANDS = ["u", "v", "g", "r", "i", "z", "y", "j"]
+
+
+def normalize_filter_columns(df):
+    """
+    Normalize filter_* columns (e.g., filter_g, filter_i) in place so that
+    missing values are stored as None instead of being passed through to the
+    database as-is.
+
+    filter_* columns are ForeignKey columns referencing filter_name.filter_name.
+    Depending on how the input was loaded, a missing value may show up as a
+    float NaN (e.g., from a masked ecsv column) or as an empty string (e.g.,
+    from a CSV column read with keep_default_na=False). Either one fails the
+    foreign key constraint if inserted as-is (NaN is even coerced to the
+    literal string "NaN" by the database driver), so both are normalized to
+    None here.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        The DataFrame to normalize. Modified in place.
+
+    Returns
+    -------
+    df : pandas.DataFrame
+        The same DataFrame, for convenience.
+    """
+    for band in FILTER_BANDS:
+        col = f"filter_{band}"
+        if col not in df.columns:
+            continue
+        df.loc[df[col].isna() | (df[col] == ""), col] = None
+    return df
+
+
+FLUX_COLUMN_PREFIXES = ["", "psf_", "total_"]
+
+
+def check_filter_flux_consistency(df):
+    """
+    Raise an error if a band has a flux value but no filter.
+
+    A flux (or flux error) measurement is meaningless without knowing which
+    filter it was measured through, so filter_{band} being None while
+    flux_{band} (or psf_flux_{band}, total_flux_{band}, and their
+    *_error_* counterparts) is set indicates a problem upstream in the input
+    data rather than something to silently accept.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        The DataFrame to check. filter_* columns are expected to already be
+        normalized (see `normalize_filter_columns`), i.e., missing filters
+        are represented as None rather than NaN or "".
+
+    Returns
+    -------
+    df : pandas.DataFrame
+        The same DataFrame, unmodified, for convenience.
+
+    Raises
+    ------
+    ValueError
+        If any row has a flux value for a band whose filter is None.
+    """
+    for band in FILTER_BANDS:
+        filter_col = f"filter_{band}"
+        if filter_col not in df.columns:
+            continue
+
+        missing_filter = df[filter_col].isna()
+        if not missing_filter.any():
+            continue
+
+        for prefix in FLUX_COLUMN_PREFIXES:
+            for kind in ["flux", "flux_error"]:
+                flux_col = f"{prefix}{kind}_{band}"
+                if flux_col not in df.columns:
+                    continue
+
+                inconsistent = missing_filter & df[flux_col].notna()
+                if inconsistent.any():
+                    bad_indices = df.index[inconsistent].tolist()
+                    logger.error(
+                        f"{flux_col} has values but {filter_col} is missing "
+                        f"for rows {bad_indices}."
+                    )
+                    raise ValueError(
+                        f"{flux_col} has values but {filter_col} is missing "
+                        f"for rows {bad_indices}. A flux value without a "
+                        "filter is not allowed."
+                    )
+    return df
+
+
 def join_backref_values(df, db=None, table=None, key=None, check_key=None):
     """
     Joins a DataFrame with a table from a database on a specified key and checks for non-existing keys.
@@ -445,6 +540,8 @@ def add_backref_values(df, db=None, table=None, upload_id=None):
     """
 
     df_tmp = df.copy()
+    normalize_filter_columns(df_tmp)
+    check_filter_flux_consistency(df_tmp)
     backref_tables, backref_keys, backref_check_keys = [], [], []
 
     if table == "target":
@@ -649,15 +746,10 @@ def make_target_df_from_uploader(
         logger.error(f"flux_type must be 'total' or 'psf'. {flux_type=}")
         raise ValueError(f"flux_type must be 'total' or 'psf'. {flux_type=}")
 
-    # fill missing values with None or NaN for filters and fluxes
+    normalize_filter_columns(df)
+
+    # rename flux columns to match the flux_type
     for band in ["g", "r", "i", "z", "y", "j"]:
-        if f"filter_{band}" in df.columns:
-            # if the table is a masked table, fill the masked values with None for filters
-            # if the table is not a masked table, just pass
-            try:
-                df.loc[df[f"filter_{band}"].isna(), f"filter_{band}"] = None
-            except AttributeError:
-                pass
         if f"flux_{band}" in df.columns:
             logger.info(f"flux_{band} is renamed to {flux_type}_flux_{band}")
             df.rename(
