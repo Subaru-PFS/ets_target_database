@@ -121,11 +121,11 @@
 | target_pkey | CREATE UNIQUE INDEX target_pkey ON public.target USING btree (target_id) |
 | target_propid_obcode_catid_objid_resolution_key | CREATE UNIQUE INDEX target_propid_obcode_catid_objid_resolution_key ON public.target USING btree (proposal_id, ob_code, input_catalog_id, obj_id, is_medium_resolution) |
 | target_propid_obcode_key | CREATE UNIQUE INDEX target_propid_obcode_key ON public.target USING btree (proposal_id, ob_code) |
-| target_proposal_id_idx | CREATE INDEX target_proposal_id_idx ON public.target USING btree (proposal_id) |
 | target_obj_id_input_catalog_id_idx | CREATE INDEX target_obj_id_input_catalog_id_idx ON public.target USING btree (obj_id, input_catalog_id) |
 | target_input_catalog_id_idx | CREATE INDEX target_input_catalog_id_idx ON public.target USING btree (input_catalog_id) |
 | target_proposal_id_obj_id_idx | CREATE INDEX target_proposal_id_obj_id_idx ON public.target USING btree (proposal_id, obj_id) |
 | target_q3c_ang2ipix_idx | CREATE INDEX target_q3c_ang2ipix_idx ON public.target USING btree (q3c_ang2ipix(ra, "dec")) |
+| target_proposal_id_idx | CREATE INDEX target_proposal_id_idx ON public.target USING btree (proposal_id) |
 
 ## Relations
 
