@@ -145,6 +145,46 @@ print(df.head())
 db.close()
 ```
 
+## Running Tests Locally
+
+The unit tests (`tests/test_*.py`, excluding `tests/integration/`) do not require a database
+and can be run at any time:
+
+```bash
+uv run pytest tests -m "not integration"
+```
+
+The integration tests (`tests/integration/`) exercise the same sequence of `pfs-targetdb-cli`
+commands as the `Test Database` GitHub Actions workflow
+(`.github/workflows/test_database.yml`): creating the database, installing the Q3C extension,
+creating the schema, and inserting the example data in `examples/data/`, this time also
+verifying the inserted rows with SQL queries. They require Docker (for a disposable
+PostgreSQL + Q3C container) and are skipped automatically, with a reason, if Docker is not
+available.
+
+```bash
+# Docker must be running (e.g. Docker Desktop or OrbStack on macOS)
+uv run pytest tests/integration -v
+```
+
+A dedicated PostgreSQL container is built from `tests/docker/Dockerfile` and started/stopped
+automatically for the test session by `docker compose` (`tests/docker/docker-compose.test.yml`).
+It listens on `localhost:15433` by default; set `TARGETDB_TEST_PG_PORT` to use a different port.
+Its data directory is a tmpfs mount, so nothing is left on disk once the tests finish, and all
+generated files (converted flux standard catalogs, transferred target lists) are written under a
+pytest-managed temporary directory rather than into `examples/data/`.
+
+If a test fails and you want to inspect the database afterwards, pass `--keep-db` to leave the
+container running:
+
+```bash
+uv run pytest tests/integration -v --keep-db
+psql -h localhost -p 15433 -U postgres -d test_targetdb
+
+# once done, stop the container manually
+docker compose -f tests/docker/docker-compose.test.yml down -v
+```
+
 ## Build the Documentation
 
 The documentation can be built by the following command:

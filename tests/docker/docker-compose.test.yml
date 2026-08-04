@@ -1,0 +1,26 @@
+# Standalone PostgreSQL + Q3C stack used by the pytest integration tests
+# (tests/integration/). Kept separate from examples/docker/, which is a
+# developer-facing, persistent local database and not meant to be
+# started/stopped/discarded by the test suite.
+name: targetdb-test
+
+services:
+  postgres:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - "${TARGETDB_TEST_PG_PORT:-15433}:5432"
+    # Data lives in tmpfs: each test session starts from a clean database
+    # and nothing is left on disk after teardown.
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
