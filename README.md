@@ -90,7 +90,7 @@ python3 -m pip install -e ".[dev]"
 pre-commit install
 ```
 
-The hooks run `ruff` and `black` when you commit. CI enforces the same two checks, so passing the hooks locally means the `Lint` workflow will pass.
+The hooks run `ruff` and `black` on the files you stage, plus whitespace and syntax checks. CI runs `ruff` and `black` over all of `src` and `tests`; run `pre-commit run --all-files` to check the whole tree the way CI does.
 
 
 ## Usage Examples

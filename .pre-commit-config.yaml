@@ -5,8 +5,11 @@ repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.14.11
     hooks:
-      - id: ruff
-        args: [--fix]
+      - id: ruff-check
+        # No --fix: this package uses deliberate registration-only imports
+        # (e.g. models/proposal.py's `partner # noqa: F401`) that F401's
+        # autofix would silently delete. Report-only also matches the
+        # check-only Lint workflow.
         # Match the Lint workflow, which checks src and tests only.
         # alembic/ migrations are historical and deliberately unlinted.
         files: ^(src|tests)/
@@ -21,10 +24,18 @@ repos:
     rev: v5.0.0
     hooks:
       - id: trailing-whitespace
+        # Vendored Bokeh-generated HTML fixtures; rewriting them on every
+        # regeneration produces a phantom whitespace-only diff.
+        exclude: ^examples/data/uploader/
       - id: end-of-file-fixer
+        # Same vendored fixtures as trailing-whitespace above.
+        exclude: ^examples/data/uploader/
       - id: check-yaml
         # mkdocs-material's config uses !!python/name: tags, which
         # yaml.safe_load cannot construct.
         exclude: ^mkdocs\.yml$
       - id: check-toml
       - id: check-added-large-files
+        # Uploader example fixtures (e.g. ppp_figure_*.html) legitimately
+        # exceed the default 500kb limit and are committed on purpose.
+        exclude: ^examples/data/uploader/
