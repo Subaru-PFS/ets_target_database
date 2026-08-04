@@ -10,7 +10,9 @@ from .conftest import EXAMPLES_DATA, MASTER_TABLE_FILES, count_rows, csv_row_cou
 # input_catalogs.csv, so it is checked separately below rather than via the
 # generic 1:1 CSV-to-table comparison.
 SIMPLE_MASTER_TABLES = [
-    (table, filename) for table, filename in MASTER_TABLE_FILES if table != "input_catalog"
+    (table, filename)
+    for table, filename in MASTER_TABLE_FILES
+    if table != "input_catalog"
 ]
 
 

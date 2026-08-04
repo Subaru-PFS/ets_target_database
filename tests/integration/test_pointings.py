@@ -46,7 +46,9 @@ def test_user_pointing_only_for_flagged_catalogs(engine, pointing_data, target_d
             assert actual == 0
 
 
-def test_user_pointing_total_matches_flagged_catalogs(engine, pointing_data, target_data):
+def test_user_pointing_total_matches_flagged_catalogs(
+    engine, pointing_data, target_data
+):
     catalogs_df = pd.read_csv(INPUT_CATALOGS_CSV)
     flagged = catalogs_df[catalogs_df["is_user_pointing"]]
 

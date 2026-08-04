@@ -1540,7 +1540,9 @@ def _check_existing_directory(local_dir, upload_id, force):
 
 def _download_zip_from_api(url, headers, verify_ssl, local_dir):
     """Download ZIP file from Web API."""
-    response = requests.get(url, headers=headers, stream=True, timeout=300, verify=verify_ssl)
+    response = requests.get(
+        url, headers=headers, stream=True, timeout=300, verify=verify_ssl
+    )
     response.raise_for_status()
 
     with tempfile.NamedTemporaryFile(
@@ -1567,7 +1569,9 @@ def _extract_and_validate_zip(zip_path, upload_id, local_dir, force):
         # Validate directory structure
         pattern = re.compile(r"^pfs_target-\d{8}-\d{6}-" + re.escape(upload_id) + r"$")
         extracted_dirs = [
-            d for d in tmp_extract_path.iterdir() if d.is_dir() and pattern.match(d.name)
+            d
+            for d in tmp_extract_path.iterdir()
+            if d.is_dir() and pattern.match(d.name)
         ]
 
         if len(extracted_dirs) == 0:
@@ -1597,7 +1601,9 @@ def _extract_and_validate_zip(zip_path, upload_id, local_dir, force):
             return 1, "success"
 
 
-def _process_single_upload(upload_id, webapi_url, headers, verify_ssl, local_dir, force):
+def _process_single_upload(
+    upload_id, webapi_url, headers, verify_ssl, local_dir, force
+):
     """Process a single upload_id download."""
     # Skip empty or invalid upload_id
     if pd.isna(upload_id) or str(upload_id).strip() == "":
@@ -1621,7 +1627,9 @@ def _process_single_upload(upload_id, webapi_url, headers, verify_ssl, local_dir
     try:
         zip_path = _download_zip_from_api(full_url, headers, verify_ssl, local_dir)
         try:
-            n_transfer, status = _extract_and_validate_zip(zip_path, upload_id, local_dir, force)
+            n_transfer, status = _extract_and_validate_zip(
+                zip_path, upload_id, local_dir, force
+            )
             return status, n_transfer
         finally:
             zip_path.unlink()
@@ -1640,7 +1648,9 @@ def _process_single_upload(upload_id, webapi_url, headers, verify_ssl, local_dir
         logger.error(str(e))
         return "FAILED", 0
     except Exception as e:
-        logger.error(f"Unexpected error while transferring data for upload_id: {upload_id}")
+        logger.error(
+            f"Unexpected error while transferring data for upload_id: {upload_id}"
+        )
         logger.error(str(e))
         return "FAILED", 0
 
