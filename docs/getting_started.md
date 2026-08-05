@@ -210,6 +210,9 @@ secrets in it can be kept in the repository.
 When `TARGETDB_CONF` is not set, `env.py` falls back to the `sqlalchemy.url`
 entry in `alembic.ini` as before.
 
+See `alembic/README.md` for the full migration workflow and the gotchas specific
+to this schema.
+
 ## Running Tests Locally
 
 The unit tests (`tests/test_*.py`, excluding `tests/integration/`) do not require a database

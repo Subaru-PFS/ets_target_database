@@ -42,7 +42,8 @@ class TargetDB(DB):
                 logger.error(f"{name} is not provided")
                 raise ValueError(f"{name} is not provided")
 
-        # Set before super().__init__() because DB.__init__ logs self.url.
+        # Set before super().__init__(): the url property below reads both, and
+        # anything the base class does must already see them.
         # `password` is deliberately optional: when it is None it is left out
         # of the URL and libpq resolves it (PGPASSWORD, then ~/.pgpass), which
         # is exactly the arrangement DB itself documents.

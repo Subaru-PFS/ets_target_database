@@ -387,7 +387,6 @@ def draw_diagram(
             f"--database={config['targetdb']['db']['dbname']}",
             "--schemas=public",
             f"--user={config['targetdb']['db']['user']}",
-            f"--password={config['targetdb']['db']['password']}",
             f"--info-level={sc_info_level}",
             f"--log-level={sc_log_level}",
             "--portable-names",
@@ -396,7 +395,28 @@ def draw_diagram(
             f"--output-file={outfile}",
             "--no-remarks",
         ]
+
+        # Logged before the password is appended below, so it is not written to
+        # the log verbatim. It remains visible in the process list while
+        # SchemaCrawler runs.
         logger.debug(f"{comm}")
+
+        # `password` is optional in the config file, so it cannot be indexed
+        # directly -- doing so raised KeyError for password-less configs.
+        # Omitting --password is fine: SchemaCrawler connects over JDBC, and
+        # pgjdbc resolves the password from PGPASSFILE, or from ~/.pgpass via
+        # the JVM's user.home. Note that user.home is not taken from $HOME on
+        # macOS, so overriding HOME does not redirect the lookup -- use
+        # PGPASSFILE for that.
+        password = config["targetdb"]["db"].get("password")
+        if password is None:
+            logger.debug(
+                "No password in the config file; letting SchemaCrawler resolve "
+                "it from PGPASSFILE or ~/.pgpass."
+            )
+        else:
+            comm.append(f"--password={password}")
+
         subprocess.run(comm, shell=False)
     elif generator == "tbls":
         url_object = get_url_object(config)
