@@ -16,9 +16,9 @@ def _read_active_flags(engine):
 
 def test_update_catalog_active_only_affects_target_row(engine, master_data, db_config):
     before = _read_active_flags(engine)
-    assert TARGET_CATALOG_ID in before, (
-        f"expected input_catalog_id={TARGET_CATALOG_ID} from examples/data/input_catalogs.csv"
-    )
+    assert (
+        TARGET_CATALOG_ID in before
+    ), f"expected input_catalog_id={TARGET_CATALOG_ID} from examples/data/input_catalogs.csv"
 
     run_cli(
         "update-catalog-active",

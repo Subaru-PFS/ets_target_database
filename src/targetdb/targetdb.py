@@ -3,16 +3,15 @@
 import io
 
 import pandas as pd
+from loguru import logger
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import text
 
-from loguru import logger
-
 from . import models
 
 
-class TargetDB(object):
+class TargetDB:
     # url = "postgresql://pfs@db-ics:5432/opdb"
 
     def __init__(

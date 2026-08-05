@@ -24,7 +24,9 @@ def test_run_clustering():
     # returned_n_noises = []
 
     for th in threshs:
-        labels = clustering_targets.run_clustering(ra, dec, distance_threshold=th)  # noqa: F821
+        labels = clustering_targets.run_clustering(  # noqa: F821
+            ra, dec, distance_threshold=th
+        )
         print(f"{labels=}")
         n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
         # n_noise_ = list(labels).count(-1)

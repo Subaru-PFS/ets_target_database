@@ -4,7 +4,7 @@ Revision ID: c636e8e2ecc0
 Revises: 065b74905fb6
 Create Date: 2024-04-17 10:09:59.291914
 
-Note: 
+Note:
 Before upgrading the database, I run the following query to avoid the violation of the unique constaint:
 ```
 UPDATE sky SET obj_id = sky_id WHERE version = '20220915';

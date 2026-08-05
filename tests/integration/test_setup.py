@@ -8,7 +8,9 @@ from targetdb import models
 
 def test_q3c_extension_installed(engine, q3c_installed):
     with engine.connect() as conn:
-        extnames = {row[0] for row in conn.execute(text("SELECT extname FROM pg_extension"))}
+        extnames = {
+            row[0] for row in conn.execute(text("SELECT extname FROM pg_extension"))
+        }
     assert "q3c" in extnames
 
 

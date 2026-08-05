@@ -1,4 +1,4 @@
-"""add index in obj_id, input_catalog_id, and proposal_id for target table 
+"""add index in obj_id, input_catalog_id, and proposal_id for target table
 
 Revision ID: 89865530fdf1
 Revises: 3923581e4392

@@ -3,6 +3,7 @@
 # ref: https://github.com/Subaru-PFS/spt_operational_database/blob/master/tests/test_models.py
 
 from sqlalchemy.orm import aliased
+
 from targetdb import models
 
 

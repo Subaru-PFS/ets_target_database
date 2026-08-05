@@ -3,7 +3,7 @@ import json
 import time
 from enum import Enum
 from pathlib import Path
-from typing import Annotated, List, Optional
+from typing import Annotated
 
 import rich
 import typer
@@ -197,7 +197,7 @@ def checkdups(
         typer.Option("--skip-save-merged", help="Do not save the merged DataFrame."),
     ] = False,
     additional_columns: Annotated[
-        List[str] | None,
+        list[str] | None,
         typer.Option(
             "--additional-columns",
             help="Additional columns to output for the merged file.  (e.g., 'psf_mag_g' 'psf_mag_r'). "
@@ -206,12 +206,16 @@ def checkdups(
         ),
     ] = None,
     check_columns: Annotated[
-        List[str],
+        list[str],
         typer.Option(
             "--check-columns",
             help="Columns used to check for duplicates.",
         ),
-    ] = ["obj_id", "input_catalog_id", "version"],
+    ] = [  # noqa: B006 -- Typer option default; Typer does not mutate it
+        "obj_id",
+        "input_catalog_id",
+        "version",
+    ],
     file_format: Annotated[
         PyArrowFileFormat,
         typer.Option(
@@ -369,7 +373,7 @@ def diagram(
 )
 def mdtable(
     output_file: Annotated[
-        Optional[str], typer.Option("--output-file", "-o", help="Output file.")
+        str | None, typer.Option("--output-file", "-o", help="Output file.")
     ] = None,
 ):
     generate_schema_markdown(output_file=output_file)
