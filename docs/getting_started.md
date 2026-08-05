@@ -21,22 +21,27 @@ The dependencies are automatically installed when you install the `targetdb` pac
 Package versions shown here are those used for the development (as of May 2026).
 Newer (and somewhat older) versions should also work.
 
-| Package                                                                | Version |
-| ---------------------------------------------------------------------- | ------: |
-| [Python](https://www.python.org/)                                      | 3.12.12 |
-| [alembic](https://alembic.sqlalchemy.org/en/latest/)                   |  1.18.0 |
-| [Astropy](https://www.astropy.org/)                                    |    7.20 |
-| [loguru](https://loguru.readthedocs.io/)                               |   0.7.3 |
-| [NumPy](https://numpy.org)                                             |   2.4.0 |
-| [openpyxl](https://openpyxl.readthedocs.io/en/stable/)                 |   3.1.5 |
-| [pandas](https://pandas.pydata.org/)                                   |   2.3.3 |
-| [psycopg2-binary](https://www.psycopg.org/)                            |  2.9.11 |
-| [pyarrow](https://arrow.apache.org/docs/python/)                       |  22.0.0 |
-| [requests](https://requests.readthedocs.io/en/latest/)                 |  2.32.5 |
-| [SQLAlchemy](https://www.sqlalchemy.org/)                              |  2.0.45 |
-| [SQLAlchemy-Utils](https://sqlalchemy-utils.readthedocs.io/en/latest/) |  0.42.1 |
-| [tabulate](https://pypi.org/project/tabulate/)                         |   0.9.0 |
-| [Typer](https://typer.tiangolo.com/)                                   |  0.21.1 |
+| Package                                                                |     Version |
+| ---------------------------------------------------------------------- | ----------: |
+| [Python](https://www.python.org/)                                      |     3.12.12 |
+| [alembic](https://alembic.sqlalchemy.org/en/latest/)                   |      1.18.0 |
+| [Astropy](https://www.astropy.org/)                                    |        7.20 |
+| [loguru](https://loguru.readthedocs.io/)                               |       0.7.3 |
+| [NumPy](https://numpy.org)                                             |       2.4.0 |
+| [openpyxl](https://openpyxl.readthedocs.io/en/stable/)                 |       3.1.5 |
+| [pandas](https://pandas.pydata.org/)                                   |       2.3.3 |
+| [pfs-utils](https://github.com/Subaru-PFS/pfs_utils)                   | 7.2026.3100 |
+| [psycopg](https://www.psycopg.org/)                                    |       3.3.4 |
+| [pyarrow](https://arrow.apache.org/docs/python/)                       |      22.0.0 |
+| [requests](https://requests.readthedocs.io/en/latest/)                 |      2.32.5 |
+| [SQLAlchemy](https://www.sqlalchemy.org/)                              |      2.0.45 |
+| [SQLAlchemy-Utils](https://sqlalchemy-utils.readthedocs.io/en/latest/) |      0.42.1 |
+| [tabulate](https://pypi.org/project/tabulate/)                         |       0.9.0 |
+| [Typer](https://typer.tiangolo.com/)                                   |      0.21.1 |
+
+`pfs-utils` is installed straight from GitHub (`targetdb.TargetDB` subclasses
+`pfs.utils.database.db.DB`), so a `.git` directory and network access are needed
+at install time.
 
 For building the documentation, the following packages are required.
 
@@ -85,13 +90,49 @@ host = "localhost"  # database host
 port = 5432  # database port
 dbname = "targetdb"  # database name
 user = "admin"  # database user
-password = "admin"  # database password
+password = "admin"  # database password (optional, see below)
 dialect = "postgresql"  # database dialect
 
 
 [schemacrawler]
 SCHEMACRAWLERDIR = "<path to schemacrawler directory>"  # "_schemacrawler/bin/schemacrawler.sh" under the path will be used
 ```
+
+`dialect = "postgresql"` is resolved to the psycopg3 driver
+(`postgresql+psycopg`); psycopg2 is no longer used. Existing configuration
+files need no change.
+
+### Keeping the password out of `dbconf.toml`
+
+`password` is optional. Leave it out and it is omitted from the connection URL
+entirely, so libpq resolves the credential itself -- first `PGPASSWORD`, then
+`PGPASSFILE` or `~/.pgpass`. This lets a configuration file with no secrets in
+it be kept under version control.
+
+```toml title="dbconf.toml (no password)"
+[targetdb.db]
+host = "pfsa-db.example.org"
+port = 5433
+dbname = "targetdb"
+user = "admin"
+dialect = "postgresql"
+```
+
+```text title="~/.pgpass"
+pfsa-db.example.org:5433:targetdb:admin:the-actual-password
+```
+
+Two things to watch out for:
+
+- Each `~/.pgpass` field is matched against the corresponding TOML value **as a
+  literal string**. `localhost` and a fully qualified domain name are different
+  hosts as far as libpq is concerned, even when they resolve to the same server.
+  `*` may be used as a wildcard for any of the first four fields.
+- The file must be mode `0600`. libpq ignores it silently otherwise -- there is
+  no warning, only an authentication failure.
+
+When `password` *is* present in the TOML it is used as before and takes
+precedence, which is the same ordering libpq itself applies.
 
 The following commands are to create the `targetdb` database, install the Q3C extension,
 create tables, and generate an entity-relationship diagram of the database.
@@ -144,6 +185,30 @@ print(df.head())
 # close the connection
 db.close()
 ```
+
+## Database Migrations with Alembic
+
+Each deployment target has its own directory under `alembic/`
+(`local_test/`, `pfsa-db01-gb/`, `pfsa-db01-gb-dev/`), each with its own
+`alembic.ini` and revision history. Run alembic from within the relevant
+directory.
+
+The `env.py` scripts build the connection URL from the same TOML configuration
+file the CLI uses. Point `TARGETDB_CONF` at it:
+
+```bash
+cd alembic/local_test
+TARGETDB_CONF=~/database_configs/config_targetdb.toml alembic upgrade head
+```
+
+This keeps the credentials in one place instead of duplicating them between
+`dbconf.toml` and `alembic.ini`, and means the switch to psycopg3 is picked up
+automatically without hand-editing the `sqlalchemy.url` of each deployment.
+Combined with the `~/.pgpass` arrangement above, an `alembic.ini` with no
+secrets in it can be kept in the repository.
+
+When `TARGETDB_CONF` is not set, `env.py` falls back to the `sqlalchemy.url`
+entry in `alembic.ini` as before.
 
 ## Running Tests Locally
 

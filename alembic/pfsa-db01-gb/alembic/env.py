@@ -1,9 +1,10 @@
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config, pool
-from targetdb import models
+from sqlalchemy import create_engine, pool
 
 from alembic import context
+from targetdb import models
+from targetdb.utils import get_alembic_url
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -26,6 +27,23 @@ target_metadata = models.Base.metadata
 # ... etc.
 
 
+def get_url():
+    """Resolve the database URL, preferring the TARGETDB_CONF TOML file.
+
+    Point TARGETDB_CONF at a targetdb config file to keep the credentials in
+    one place (and out of alembic.ini):
+
+        TARGETDB_CONF=~/database_configs/config_targetdb.toml alembic upgrade head
+
+    Falling back to alembic.ini's sqlalchemy.url when it is unset.
+
+    Note that config.set_main_option() is deliberately not used: ConfigParser
+    treats "%" as an interpolation marker, so a password containing "%" would
+    be mangled. Building the engine directly avoids the problem entirely.
+    """
+    return get_alembic_url() or config.get_main_option("sqlalchemy.url")
+
+
 def run_migrations_offline():
     """Run migrations in 'offline' mode.
 
@@ -38,7 +56,7 @@ def run_migrations_offline():
     script output.
 
     """
-    url = config.get_main_option("sqlalchemy.url")
+    url = get_url()
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -58,11 +76,7 @@ def run_migrations_online():
     and associate a connection with the context.
 
     """
-    connectable = engine_from_config(
-        config.get_section(config.config_ini_section),
-        prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
-    )
+    connectable = create_engine(get_url(), poolclass=pool.NullPool)
 
     with connectable.connect() as connection:
         context.configure(
