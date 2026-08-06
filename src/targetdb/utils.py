@@ -490,7 +490,15 @@ def normalize_filter_columns(df):
         col = f"filter_{band}"
         if col not in df.columns:
             continue
-        df.loc[df[col].isna() | (df[col] == ""), col] = None
+        mask = df[col].isna() | (df[col] == "")
+        # Force object dtype before assigning None: pandas' default string
+        # dtype (used from pandas 3.0 on, and optionally via
+        # future.infer_string on 2.x) stores its own NA sentinel and silently
+        # rewrites an assigned None back to NaN, defeating the point of this
+        # function -- the caller needs a real None, not a NaN that the
+        # database driver would coerce to the literal string "NaN".
+        df[col] = df[col].astype(object)
+        df.loc[mask, col] = None
     return df
 
 
