@@ -98,11 +98,50 @@ class TestGetUrlObject:
         assert url == TargetDB(**config["targetdb"]["db"]).url
 
 
-class TestRequiredParameters:
-    @pytest.mark.parametrize("missing", ["dbname", "user"])
-    def test_missing_parameter_raises_with_its_name(self, missing):
-        with pytest.raises(ValueError, match=f"{missing} is not provided"):
-            TargetDB(**make_config(**{missing: None})["targetdb"]["db"])
+class TestClassDefaults:
+    """DB.__init__ resolves omitted parameters from type(self).DEFAULT_*.
+
+    These class attributes are the only thing that makes ``TargetDB()`` work
+    bare, and the only thing that makes the inherited
+    ``set_default_connection()`` classmethod do anything -- it was a silent
+    no-op while ``__init__`` carried non-None defaults in its own signature.
+    """
+
+    def test_bare_construction_uses_the_class_defaults(self):
+        db = TargetDB()
+        assert db.url == "postgresql+psycopg://obsproc@pfsa-db:5433/targetdb"
+
+    def test_the_default_user_is_the_read_only_one(self):
+        """Bare TargetDB() must not be able to write to production: every
+        write path passes an explicit user from a config file."""
+        assert TargetDB.DEFAULT_USER == "obsproc"
+
+    @pytest.mark.parametrize("missing", ["host", "port", "dbname", "user"])
+    def test_omitted_parameter_falls_back_to_its_default(self, missing):
+        db = TargetDB(**make_config(**{missing: None})["targetdb"]["db"])
+        assert getattr(db, missing) == getattr(TargetDB, f"DEFAULT_{missing.upper()}")
+
+    def test_explicit_values_win_over_the_defaults(self):
+        db = TargetDB(**make_config()["targetdb"]["db"])
+        assert (db.host, db.user, db.dbname) == (
+            "db.example.org",
+            "admin",
+            "targetdb",
+        )
+
+    def test_omitted_dialect_uses_the_default(self):
+        db = TargetDB(**make_config(dialect=None)["targetdb"]["db"])
+        assert db.url.startswith("postgresql+psycopg://")
+
+    def test_set_default_connection_is_honoured(self, monkeypatch):
+        # Setting each attribute to its current value first registers the
+        # undo, so the class-level mutation below does not leak into other
+        # tests.
+        monkeypatch.setattr(TargetDB, "DEFAULT_HOST", TargetDB.DEFAULT_HOST)
+        monkeypatch.setattr(TargetDB, "DEFAULT_PORT", TargetDB.DEFAULT_PORT)
+        TargetDB.set_default_connection(host="pfsa-db01-gb", port=5555)
+        db = TargetDB()
+        assert (db.host, db.port) == ("pfsa-db01-gb", 5555)
 
     def test_missing_password_does_not_raise(self):
         TargetDB(**make_config(password=None)["targetdb"]["db"])

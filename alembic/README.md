@@ -17,6 +17,14 @@ the database you are migrating** — the histories are not interchangeable.
 | `pfsa-db01-gb/`     | Production                                      |
 | `pfsa-db01-gb-dev/` | Development                                     |
 
+Directory names are historical and no longer match the current hostnames:
+`pfsa-db01-gb` and `pfsa-db` resolve to different machines (`.102` and
+`.110` respectively), and as of 2026-08 the production `targetdb` — the one
+`TargetDB`'s own `DEFAULT_HOST`/`DEFAULT_PORT` point at — is reachable at
+`pfsa-db:5433`, not `pfsa-db01-gb:5433`. Confirm which host actually holds
+the database you intend to migrate before running `alembic upgrade` from
+either directory.
+
 The revision scripts under `*/alembic/versions/` are historical records. They
 are deliberately excluded from `ruff` and `black` (see `pyproject.toml`) and
 should not be reformatted or "cleaned up" — only the `env.py` scripts are

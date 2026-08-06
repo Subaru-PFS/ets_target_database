@@ -26,35 +26,72 @@ class TargetDB(DB):
     The public methods kept for backwards compatibility (``connect``,
     ``close``, ``fetch_query``, ``fetch_all``, ``fetch_by_id``) are all used by
     downstream packages (``ets_pointing``, ``pfs_obsproc_planning_tools``).
+
+    Connection parameters default to ``DEFAULT_HOST``/``DEFAULT_USER``/
+    ``DEFAULT_DBNAME``/``DEFAULT_PORT`` below, the same convention
+    ``pfs.utils.database.db`` uses for ``OpDB`` and ``QaDB``: ``DB.__init__``
+    resolves any argument left as ``None`` from ``type(self).DEFAULT_*``, so
+    declaring these class attributes is also what makes the inherited
+    ``set_default_connection()`` classmethod usable on ``TargetDB``. The
+    default user, ``obsproc``, is read-only in production -- every write path
+    in this package (the CLI, ``utils.add_database_rows``, etc.) passes an
+    explicit ``user`` from a config file instead of relying on these
+    defaults, so a bare ``TargetDB()`` can read but never write.
     """
+
+    DEFAULT_HOST = "pfsa-db"
+    DEFAULT_USER = "obsproc"
+    DEFAULT_DBNAME = "targetdb"
+    DEFAULT_PORT = 5433
+    # Not part of DB: DB.url hardcodes postgresql+psycopg, TargetDB.url does
+    # not, so TargetDB needs its own default for the dialect argument below.
+    DEFAULT_DIALECT = "postgresql"
 
     def __init__(
         self,
-        host="localhost",
-        port: int = 5432,
-        dbname=None,
-        user=None,
-        password=None,
-        dialect="postgresql",
+        host: str | None = None,
+        port: int | None = None,
+        dbname: str | None = None,
+        user: str | None = None,
+        password: str | None = None,
+        dialect: str | None = None,
     ):
-        for name, value in [("dbname", dbname), ("user", user)]:
-            if value is None:
-                logger.error(f"{name} is not provided")
-                raise ValueError(f"{name} is not provided")
-
         # Set before super().__init__(): the url property below reads both, and
         # anything the base class does must already see them.
-        # `password` is deliberately optional: when it is None it is left out
-        # of the URL and libpq resolves it (PGPASSWORD, then ~/.pgpass), which
-        # is exactly the arrangement DB itself documents.
+        # `password` is deliberately optional and has no DEFAULT_PASSWORD:
+        # when it is None it is left out of the URL and libpq resolves it
+        # (PGPASSWORD, then ~/.pgpass), which is exactly the arrangement DB
+        # itself documents.
         self._password = password
         # Imported lazily to avoid a circular import (utils imports TargetDB).
         from .utils import normalize_drivername
 
-        self._drivername = normalize_drivername(dialect)
+        self._drivername = normalize_drivername(
+            dialect if dialect is not None else type(self).DEFAULT_DIALECT
+        )
         self._dry_run = False
 
         super().__init__(host=host, user=user, dbname=dbname, port=port)
+
+        # The CLI and every other write path splat a full [targetdb.db] table,
+        # so this never fires there. It fires exactly when a parameter was
+        # omitted and a class default therefore decided which database (and,
+        # for `user`, which privilege level) this instance talks to.
+        defaulted = [
+            name
+            for name, value in [
+                ("host", host),
+                ("port", port),
+                ("dbname", dbname),
+                ("user", user),
+            ]
+            if value is None
+        ]
+        if defaulted:
+            logger.info(
+                f"Using TargetDB class defaults for {', '.join(defaulted)}: "
+                f"{self.user}@{self.host}:{self.port}/{self.dbname}"
+            )
 
     @property
     def url(self) -> str:

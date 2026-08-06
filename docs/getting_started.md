@@ -131,7 +131,7 @@ Two things to watch out for:
 - The file must be mode `0600`. libpq ignores it silently otherwise -- there is
   no warning, only an authentication failure.
 
-When `password` *is* present in the TOML it is used as before and takes
+When `password` _is_ present in the TOML it is used as before and takes
 precedence, which is the same ordering libpq itself applies.
 
 The following commands are to create the `targetdb` database, install the Q3C extension,
@@ -170,7 +170,7 @@ To connect to the database with Python, you can use the following code snippet.
 from targetdb import TargetDB
 
 # create a database connection
-db = TargetDB(host="localhost", port= 5432, dbname="testdb", user="admin", password="admin")
+db = TargetDB(host="localhost", port=5432, dbname="testdb", user="admin", password="admin")
 db.connect()
 
 # fetch all data from the input_catalog table as pandas.DataFrame
@@ -184,6 +184,39 @@ print(df.head())
 
 # close the connection
 db.close()
+```
+
+### Connecting without arguments
+
+`TargetDB()` can be called with no arguments at all. Any parameter left
+unset falls back to a class default (`TargetDB.DEFAULT_HOST`,
+`DEFAULT_PORT`, `DEFAULT_DBNAME`, `DEFAULT_USER`), which point at the
+production database using `obsproc`, a **read-only** account:
+
+```python
+from targetdb import TargetDB
+
+with TargetDB() as db:
+    df = db.fetch_all("input_catalog")
+```
+
+Because `obsproc` has no password default, this only works once
+`~/.pgpass` has a matching entry (mode `0600`, as described above):
+
+```text title="~/.pgpass"
+pfsa-db:5433:targetdb:obsproc:<password>
+```
+
+`obsproc` can only `SELECT`; inserting or updating still requires a config
+file with an explicit, privileged `user` (as in the `pfs-targetdb-cli`
+examples above). To point the bare `TargetDB()` form at a different
+database for a whole process -- a dev instance, say -- call
+`TargetDB.set_default_connection(...)` once before constructing any
+instances:
+
+```python
+TargetDB.set_default_connection(host="pfsa-db", port=5437, dbname="targetdb_dev")
+db = TargetDB()  # now defaults to targetdb_dev
 ```
 
 ## Database Migrations with Alembic
