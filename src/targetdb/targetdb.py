@@ -1,56 +1,146 @@
 #!/usr/bin/env python
 
-import io
+from contextlib import contextmanager
 
 import pandas as pd
 from loguru import logger
-from sqlalchemy import create_engine, select
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.sql import text
+from pfs.utils.database.db import DB
+from sqlalchemy import URL, and_, bindparam, select
 
 from . import models
 
 
-class TargetDB:
-    # url = "postgresql://pfs@db-ics:5432/opdb"
+class TargetDB(DB):
+    """PFS targetDB accessor built on top of ``pfs.utils.database.db.DB``.
+
+    ``DB`` supplies the engine cache, ``pool_pre_ping``, ``COPY``-based bulk
+    inserts and the ``query_*`` family. Only what ``DB`` does not provide is
+    implemented here:
+
+    * a password and an explicit dialect in the URL (``DB`` always omits the
+      password and hardcodes ``postgresql+psycopg``),
+    * ``update()``,
+    * the ``dry_run=`` keyword that backs the CLI's ``--commit`` default,
+    * ``close()``.
+
+    The public methods kept for backwards compatibility (``connect``,
+    ``close``, ``fetch_query``, ``fetch_all``, ``fetch_by_id``) are all used by
+    downstream packages (``ets_pointing``, ``pfs_obsproc_planning_tools``).
+
+    Connection parameters default to ``DEFAULT_HOST``/``DEFAULT_USER``/
+    ``DEFAULT_DBNAME``/``DEFAULT_PORT`` below, the same convention
+    ``pfs.utils.database.db`` uses for ``OpDB`` and ``QaDB``: ``DB.__init__``
+    resolves any argument left as ``None`` from ``type(self).DEFAULT_*``, so
+    declaring these class attributes is also what makes the inherited
+    ``set_default_connection()`` classmethod usable on ``TargetDB``. The
+    default user, ``obsproc``, is read-only in production -- every write path
+    in this package (the CLI, ``utils.add_database_rows``, etc.) passes an
+    explicit ``user`` from a config file instead of relying on these
+    defaults, so a bare ``TargetDB()`` can read but never write.
+    """
+
+    DEFAULT_HOST = "pfsa-db"
+    DEFAULT_USER = "obsproc"
+    DEFAULT_DBNAME = "targetdb"
+    DEFAULT_PORT = 5433
+    # Not part of DB: DB.url hardcodes postgresql+psycopg, TargetDB.url does
+    # not, so TargetDB needs its own default for the dialect argument below.
+    DEFAULT_DIALECT = "postgresql"
 
     def __init__(
         self,
-        host="localhost",
-        port: int = 5432,
-        dbname=None,
-        user=None,
-        password=None,
-        dialect="postgresql",
+        host: str | None = None,
+        port: int | None = None,
+        dbname: str | None = None,
+        user: str | None = None,
+        password: str | None = None,
+        dialect: str | None = None,
     ):
-        for param in [dbname, user, password]:
-            if param is None:
-                logger.error(f"{param} is not provided")
-                raise ValueError(f"{param} is not provided")
+        # Set before super().__init__(): the url property below reads both, and
+        # anything the base class does must already see them.
+        # `password` is deliberately optional and has no DEFAULT_PASSWORD:
+        # when it is None it is left out of the URL and libpq resolves it
+        # (PGPASSWORD, then ~/.pgpass), which is exactly the arrangement DB
+        # itself documents.
+        self._password = password
+        # Imported lazily to avoid a circular import (utils imports TargetDB).
+        from .utils import normalize_drivername
 
-        self.dbinfo = f"{dialect}://{user}:{password}@{host}:{port}/{dbname}"
+        self._drivername = normalize_drivername(
+            dialect if dialect is not None else type(self).DEFAULT_DIALECT
+        )
+        self._dry_run = False
 
-    def connect(self):
-        self.engine = create_engine(self.dbinfo)
-        SessionClass = sessionmaker(self.engine)
-        self.session = SessionClass()
-        # print('connection to {0} started'.format(self.dbinfo))
+        super().__init__(host=host, user=user, dbname=dbname, port=port)
 
-    def close(self):
-        try:
-            self.session.close()
-        finally:
-            # Dispose the engine to release all pooled connections back to the database
-            # server. Without this, SQLAlchemy's connection pool keeps the underlying
-            # TCP sockets open until the engine is garbage-collected, which may never
-            # happen on abnormal process termination.
-            self.engine.dispose()
-        # print('connection to {0} closed'.format(self.dbinfo))
+        # The CLI and every other write path splat a full [targetdb.db] table,
+        # so this never fires there. It fires exactly when a parameter was
+        # omitted and a class default therefore decided which database (and,
+        # for `user`, which privilege level) this instance talks to.
+        defaulted = [
+            name
+            for name, value in [
+                ("host", host),
+                ("port", port),
+                ("dbname", dbname),
+                ("user", user),
+            ]
+            if value is None
+        ]
+        if defaulted:
+            logger.info(
+                f"Using TargetDB class defaults for {', '.join(defaulted)}: "
+                f"{self.user}@{self.host}:{self.port}/{self.dbname}"
+            )
+
+    @property
+    def url(self) -> str:
+        """Connection URL, including the password when one was configured.
+
+        Overrides ``DB.url``, which always omits the password and hardcodes the
+        ``postgresql+psycopg`` driver.
+
+        Note
+        ----
+        ``DB.engine`` caches engines in a process-global dict keyed by this
+        string, so a configured password is held in that key for the lifetime
+        of the process. Never log this value directly -- use
+        ``URL.create(...).render_as_string()`` (which masks it) instead.
+        """
+        return URL.create(
+            drivername=self._drivername,
+            username=self.user,
+            password=self._password,
+            host=self.host,
+            port=self.port,
+            database=self.dbname,
+        ).render_as_string(hide_password=False)
+
+    def connect(self) -> None:
+        """Materialize the engine. Deliberately returns nothing.
+
+        ``DB.connect()`` returns a pooled ``Connection``; callers here (and in
+        the downstream packages) discard the return value, which would leak one
+        checked-out connection per call. ``DB.connection()`` is the only
+        internal user of ``DB.connect()`` and is overridden below, so narrowing
+        this to "make sure the engine exists" is safe.
+        """
+        _ = self.engine
+
+    def close(self) -> None:
+        """Dispose the engine, closing every pooled connection.
+
+        ``DB`` has no ``close()``. Without this, connections linger until the
+        engine is garbage-collected and ``drop-db`` fails with "database is
+        being accessed by other users". ``Engine.dispose()`` replaces the pool
+        rather than invalidating the engine, so the instance cached in
+        ``pfs.utils.database.db._DB_ENGINES`` stays usable afterwards.
+        """
+        self.engine.dispose()
 
     def __enter__(self):
         """Support usage as a context manager: ``with TargetDB(...) as db:``."""
-        if not hasattr(self, "session"):
-            self.connect()
+        self.connect()
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -58,79 +148,62 @@ class TargetDB:
         self.close()
         return False  # re-raise any exception
 
-    def reset_all(self, full=True):
-        #
-        # Order of the resetting tables is important
-        #
-        self.session.query(models.cluster).delete()
-        self.session.query(models.target).delete()
-        self.session.query(models.fluxstd).delete()
-        self.session.query(models.sky).delete()
-        self.session.query(models.proposal).delete()
-        self.session.query(models.input_catalog).delete()
-        self.session.query(models.target_type).delete()
-        self.session.query(models.proposal_category).delete()
-        self.session.execute("ALTER SEQUENCE target_target_id_seq RESTART WITH 1")
-        self.session.execute("ALTER SEQUENCE fluxstd_fluxstd_id_seq RESTART WITH 1")
-        self.session.execute("ALTER SEQUENCE sky_sky_id_seq RESTART WITH 1")
-
-        self.session.commit()
-
-    def reset_target(self):
-        self.session.query(models.target).delete()
-        self.session.execute("ALTER SEQUENCE target_target_id_seq RESTART WITH 1")
-
-    def reset_fluxstd(self):
-        self.session.query(models.fluxstd).delete()
-        self.session.execute("ALTER SEQUENCE fluxstd_fluxstd_id_seq RESTART WITH 1")
-
-    def reset_sky(self):
-        self.session.query(models.sky).delete()
-        self.session.execute("ALTER SEQUENCE sky_sky_id_seq RESTART WITH 1")
-
-    def rollback(self):
-        self.session.rollback()
-
-    # functionality to insert/update information into the database
-
-    def insert_mappings(
-        self, tablename, mappings, return_defaults=False, dry_run=False
-    ):
-        """
-        Description
-        -----------
-            Insert information into a table
-        Parameters
-        ----------
-            tablename : `string`
-            mappings : `dictionnary list`
-        Returns
-        -------
-            None
-        """
-        model = getattr(models, tablename)
+    @contextmanager
+    def _dry_run_scope(self, dry_run):
+        """Temporarily flip the dry-run flag consulted by ``connection()``."""
+        previous = self._dry_run
+        self._dry_run = dry_run
         try:
-            # print(mappings)
-            self.session.bulk_insert_mappings(
-                model, mappings, return_defaults=return_defaults
-            )
-            if dry_run:
-                self.session.rollback()
-                return None
-            else:
-                self.session.commit()
+            yield
+        finally:
+            self._dry_run = previous
 
-            if return_defaults:
-                df_ret = pd.DataFrame.from_records(mappings)
-                return df_ret
-            else:
-                return None
-            # print(mappings)
-        except Exception as e:
-            self.session.rollback()
-            raise e
+    @contextmanager
+    def connection(self):
+        """Pooled connection that commits, or rolls back under dry-run.
 
-    def insert(self, tablename, dataframe, return_defaults=False, dry_run=False):
+        Overrides ``DB.connection()``, which always commits. Every ``DB`` method
+        that touches the database goes through here, so honouring ``_dry_run``
+        at this one point makes ``insert``/``update``/``execute_query`` all obey
+        the CLI's ``--commit`` contract -- including the ``COPY`` fast path,
+        whose raw cursor runs inside this same transaction.
+
+        The transaction is opened eagerly rather than left to SQLAlchemy's
+        implicit begin: ``pandas.DataFrame.to_sql`` starts *and commits* a
+        transaction of its own when handed a connection that is not already in
+        one, which would make the rollback below a no-op.
+        """
+        with self.engine.connect() as conn:
+            conn.begin()
+            yield conn
+            if self._dry_run:
+                conn.rollback()
+            else:
+                conn.commit()
+
+    # ##################################################
+    # functionality to insert/update information
+    # ##################################################
+
+    @staticmethod
+    def _drop_unknown_columns(tablename, dataframe):
+        """Drop DataFrame columns the table does not have.
+
+        `add_backref_values()` resolves foreign keys by merging whole reference
+        tables into the DataFrame, which leaves descriptive columns behind
+        (`partner_name` and `proposal_category_name` when inserting proposals,
+        for instance). The ORM `bulk_insert_mappings()` path this class used to
+        take ignored keys that were not mapped to a column; `COPY` and Core
+        `update()` do not, so the same leniency is applied explicitly here.
+        """
+        known = set(getattr(models, tablename).__table__.columns.keys())
+        extra = [column for column in dataframe.columns if column not in known]
+        if not extra:
+            return dataframe
+        logger.debug(f"Ignoring columns absent from the {tablename} table: {extra}")
+        return dataframe.drop(columns=extra)
+
+    def insert(self, tablename, dataframe, dry_run=False):
         """
         Description
         -----------
@@ -139,47 +212,20 @@ class TargetDB:
         ----------
             tablename : `string`
             dataframe : `pandas.DataFrame`
+            dry_run   : `bool`  roll back instead of committing
         Returns
         -------
-            None
+            n_inserted : `int` or `None`
         Note
         ----
-            Column labels of `dataframe` should be exactly the same as those of the table
+            Column labels of `dataframe` should be exactly the same as those of
+            the table. Delegates to `DB.insert_dataframe()`, which uses
+            PostgreSQL's `COPY`.
         """
-        mappings_dict = dataframe.to_dict(orient="records")
-        df_ret = self.insert_mappings(
-            tablename, mappings_dict, return_defaults=return_defaults, dry_run=dry_run
-        )
-        if return_defaults:
-            return df_ret
-        else:
-            return None
-
-    def insert_by_copy(self, tablename, data, colnames, dry_run=False):
-        """
-        Description
-        -----------
-            Insert information into a table using COPY FROM method
-        Parameters
-        ----------
-            tablename : `string`
-            data : `a text stream`
-            colnames: `list` of `string`
-        Returns
-        -------
-            None
-        Note
-        ----
-        """
-        conn = self.engine.raw_connection()
-        cur = conn.cursor()
-        cur.copy_from(data, tablename, ",", columns=colnames)
-        if dry_run:
-            conn.rollback()
-        else:
-            conn.commit()
-        cur.close()
-        conn.close()
+        with self._dry_run_scope(dry_run):
+            return self.insert_dataframe(
+                tablename, self._drop_unknown_columns(tablename, dataframe)
+            )
 
     def update(self, tablename, dataframe, dry_run=False):
         """
@@ -190,31 +236,71 @@ class TargetDB:
         ----------
             tablename : `string`
             dataframe : `pandas.DataFrame`
+            dry_run   : `bool`  roll back instead of committing
         Returns
         -------
             None
         Note
         ----
-            Column labels of `dataframe` should be exactly the same as those of the table
+            Column labels of `dataframe` should be exactly the same as those of
+            the table, and must include the primary key column(s), which are
+            matched on rather than written. `DB` has no equivalent, so this is a
+            single Core UPDATE statement executed once per row by executemany.
         """
-        model = getattr(models, tablename)
-        try:
-            self.session.bulk_update_mappings(
-                model, dataframe.to_dict(orient="records")
+        table = getattr(models, tablename).__table__
+        dataframe = self._drop_unknown_columns(tablename, dataframe)
+        records = dataframe.to_dict(orient="records")
+        if not records:
+            logger.warning(f"No rows to update in the {tablename} table.")
+            return
+
+        pk_names = [c.name for c in table.primary_key.columns]
+        missing = [name for name in pk_names if name not in dataframe.columns]
+        if missing:
+            raise ValueError(
+                f"Primary key column(s) {missing} missing from the DataFrame "
+                f"for the {tablename} table."
             )
-            if dry_run:
-                self.session.rollback()
-            else:
-                self.session.commit()
-        except:
-            self.session.rollback()
-            raise
+
+        value_names = [name for name in dataframe.columns if name not in pk_names]
+        if not value_names:
+            raise ValueError(
+                f"The DataFrame for the {tablename} table contains only primary "
+                "key columns; there is nothing to update."
+            )
+
+        # The primary key values are bound under a "_pk_" prefix so that they do
+        # not collide with the SET parameters of the same name.
+        for record in records:
+            for name in pk_names:
+                record[f"_pk_{name}"] = record.pop(name)
+
+        stmt = (
+            table.update()
+            .where(
+                and_(
+                    *[
+                        c == bindparam(f"_pk_{c.name}")
+                        for c in table.primary_key.columns
+                    ]
+                )
+            )
+            .values({name: bindparam(name) for name in value_names})
+        )
+
+        with self._dry_run_scope(dry_run), self.connection() as conn:
+            conn.execute(stmt, records)
 
     """
         ##################################################
         functionality to get information from the database
         ##################################################
     """
+
+    def _fetch(self, stmt):
+        """Run a Core SELECT and return the result as a DataFrame."""
+        with self.connection() as conn:
+            return pd.read_sql(stmt, con=conn)
 
     def fetch_all(self, tablename):
         """
@@ -229,23 +315,11 @@ class TargetDB:
             df : `pandas.DataFrame`
         Note
         ----
+            Uses a Core `select()` on the model's `Table` rather than
+            `DB.query_dataframe()`, which would require interpolating the table
+            name into a SQL string.
         """
-        model = getattr(models, tablename)
-        try:
-            # Use session.execute() with select() to avoid immutabledict issues with pd.read_sql()
-            stmt = select(model)
-            result = self.session.execute(stmt)
-            # Get column names from the model's mapper
-            columns = [c.key for c in model.__mapper__.columns]
-            data = result.fetchall()
-            # Extract values from Row objects (each row is a tuple with one element - the model instance)
-            rows = [[getattr(row[0], col) for col in columns] for row in data]
-            df = pd.DataFrame(rows, columns=columns)
-        except:
-            self.session.rollback()
-            raise
-
-        return df
+        return self._fetch(select(getattr(models, tablename).__table__))
 
     def fetch_by_id(self, tablename, **kwargs):
         """
@@ -262,24 +336,11 @@ class TargetDB:
         Note
         ----
         """
-        model = getattr(models, tablename)
-        try:
-            # Use session.execute() with select() to avoid immutabledict issues with pd.read_sql()
-            stmt = select(model)
-            for k, v in kwargs.items():
-                stmt = stmt.filter(getattr(model, k) == v)
-            result = self.session.execute(stmt)
-            # Get column names from the model's mapper
-            columns = [c.key for c in model.__mapper__.columns]
-            data = result.fetchall()
-            # Extract values from Row objects (each row is a tuple with one element - the model instance)
-            rows = [[getattr(row[0], col) for col in columns] for row in data]
-            df = pd.DataFrame(rows, columns=columns)
-        except:
-            self.session.rollback()
-            raise
-
-        return df
+        table = getattr(models, tablename).__table__
+        stmt = select(table)
+        for k, v in kwargs.items():
+            stmt = stmt.where(table.c[k] == v)
+        return self._fetch(stmt)
 
     def fetch_query(self, query):
         """
@@ -294,42 +355,9 @@ class TargetDB:
             df : `pandas.DataFrame`
         Note
         ----
+            Delegates to `DB.query_dataframe()`.
         """
-        try:
-            # Use session.execute() with text() to avoid immutabledict issues with pd.read_sql()
-            result = self.session.execute(text(query))
-            columns = result.keys()
-            data = result.fetchall()
-            df = pd.DataFrame(data, columns=columns)
-        except:
-            self.session.rollback()
-            raise
-
-        return df
-
-    def fetch_by_copy(self, tablename, colnames):
-        """
-        Description
-        -----------
-            Get selected records from a table by using COPY TO method
-        Parameters
-        ----------
-            tablename : `string`
-            colnames  : `list` of `string`
-        Returns
-        -------
-            data      : `io.StringIO` (comma-separated)
-        Note
-        ----
-        """
-        data = io.StringIO()
-        conn = self.engine.raw_connection()
-        cur = conn.cursor()
-        cur.copy_to(data, tablename, sep=",", null="\\N", columns=colnames)
-        cur.close()
-        conn.close()
-        data.seek(0)
-        return data
+        return self.query_dataframe(query)
 
     def execute_query(self, query, dry_run=False):
         """
@@ -338,19 +366,14 @@ class TargetDB:
             Execute a SQL query
         Parameters
         ----------
-            query : `string`
+            query   : `string`
+            dry_run : `bool`  roll back instead of committing
         Returns
         -------
             None
         Note
         ----
+            Delegates to `DB.commit()`.
         """
-        try:
-            self.session.execute(text(query))
-            if dry_run:
-                self.session.rollback()
-            else:
-                self.session.commit()
-        except Exception as e:
-            self.session.rollback()
-            raise e
+        with self._dry_run_scope(dry_run):
+            self.commit(query)

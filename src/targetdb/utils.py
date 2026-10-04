@@ -7,6 +7,7 @@ import shutil
 import subprocess
 import tempfile
 import time
+import tomllib
 import zipfile
 from datetime import datetime
 from pathlib import Path
@@ -25,11 +26,6 @@ from .models import (
     input_catalog_id_max,
     input_catalog_id_start,
 )
-
-try:
-    import tomllib
-except ModuleNotFoundError:
-    import tomli as tomllib
 
 
 def load_config(config_file):
@@ -177,6 +173,43 @@ def read_excel(input_file, sheetnames=None):
     # return {"proposal": df_proposal, "allocation": df_allocation}
 
 
+# targetdb speaks to PostgreSQL through psycopg3 only; psycopg2 is no longer a
+# dependency. Existing dbconf.toml files say `dialect = "postgresql"`, which
+# SQLAlchemy resolves to psycopg2 by default, so the bare dialect names are
+# mapped to the psycopg3 driver here. Doing it in one place means no deployed
+# configuration file has to be edited.
+_DRIVER_ALIASES = {
+    "postgresql": "postgresql+psycopg",
+    "postgres": "postgresql+psycopg",
+}
+
+
+def normalize_drivername(dialect):
+    """
+    Map a bare PostgreSQL dialect name onto the psycopg3 driver.
+
+    Parameters
+    ----------
+    dialect : str
+        The dialect string from the configuration file (e.g. ``"postgresql"``).
+
+    Returns
+    -------
+    drivername : str
+        ``"postgresql+psycopg"`` for the bare PostgreSQL dialect names, and the
+        input unchanged for anything else (an explicit ``dialect+driver`` value
+        is always honoured as written).
+
+    Examples
+    --------
+    >>> normalize_drivername("postgresql")
+    'postgresql+psycopg'
+    >>> normalize_drivername("postgresql+psycopg2")
+    'postgresql+psycopg2'
+    """
+    return _DRIVER_ALIASES.get(dialect, dialect)
+
+
 def get_url_object(config):
     """
     Create a URL object from the given configuration.
@@ -185,7 +218,8 @@ def get_url_object(config):
     ----------
     config : dict
         The configuration dictionary containing the database connection details.
-        Expected keys are 'targetdb'->'db'->'dialect', 'user', 'password', 'host', 'port', 'dbname'.
+        Expected keys are 'targetdb'->'db'->'dialect', 'user', 'host', 'port',
+        and 'dbname'. 'password' is optional.
 
     Returns
     -------
@@ -197,17 +231,23 @@ def get_url_object(config):
     KeyError
         If a necessary key is missing from the config dictionary.
 
+    Notes
+    -----
+    ``password`` is optional. When it is absent the password is left out of the
+    URL entirely and libpq resolves it itself (``PGPASSWORD``, then
+    ``PGPASSFILE`` / ``~/.pgpass``). See ``docs/getting_started.md``.
+
     Examples
     --------
     >>> config = {'targetdb': {'db': {'dialect':'postgresql', 'user':'username', 'password':'password', 'host':'localhost', 'port':5432, 'dbname':'test_db'}}}
     >>> url_object = get_url_object(config)
     >>> print(url_object)
-    postgresql://username:password@localhost:5432/test_db
+    postgresql+psycopg://username:***@localhost:5432/test_db
     """
     url_object = URL.create(
-        drivername=config["targetdb"]["db"]["dialect"],
+        drivername=normalize_drivername(config["targetdb"]["db"]["dialect"]),
         username=config["targetdb"]["db"]["user"],
-        password=config["targetdb"]["db"]["password"],
+        password=config["targetdb"]["db"].get("password"),
         host=config["targetdb"]["db"]["host"],
         port=config["targetdb"]["db"]["port"],
         database=config["targetdb"]["db"]["dbname"],
@@ -216,21 +256,47 @@ def get_url_object(config):
     return url_object
 
 
+def get_alembic_url(conf_file=None):
+    """
+    Resolve the database URL used by the alembic ``env.py`` scripts.
+
+    Parameters
+    ----------
+    conf_file : str or pathlib.Path, optional
+        Path to a targetdb TOML configuration file. When ``None`` the
+        ``TARGETDB_CONF`` environment variable is consulted instead.
+
+    Returns
+    -------
+    url : str or None
+        The rendered connection URL, or ``None`` when neither ``conf_file`` nor
+        ``TARGETDB_CONF`` is set. ``None`` tells the caller to fall back to the
+        ``sqlalchemy.url`` entry of its own ``alembic.ini``.
+
+    Notes
+    -----
+    This lives in ``targetdb.utils`` rather than in ``env.py`` so that the URL
+    resolution can be unit tested: ``env.py`` is executed by alembic and is
+    awkward to import directly.
+    """
+    if conf_file is None:
+        conf_file = os.environ.get("TARGETDB_CONF")
+    if not conf_file:
+        return None
+    return get_url_object(load_config(conf_file)).render_as_string(hide_password=False)
+
+
 def install_q3c_extension(config, dry_run=False):
 
-    # connect to the targetDB
-    db = TargetDB(**config["targetdb"]["db"])
-    db.connect()
-
     logger.info("Installing q3c extension.")
-    try:
-        db.execute_query("CREATE EXTENSION IF NOT EXISTS q3c", dry_run=dry_run)
-    except Exception as e:
-        logger.error(f"Error installing q3c extension: {e}")
-        raise e
 
-    # close the connection
-    db.close()
+    # connect to the targetDB
+    with TargetDB(**config["targetdb"]["db"]) as db:
+        try:
+            db.execute_query("CREATE EXTENSION IF NOT EXISTS q3c", dry_run=dry_run)
+        except Exception as e:
+            logger.error(f"Error installing q3c extension: {e}")
+            raise e
 
 
 def generate_schema_markdown(output_file=None):
@@ -321,7 +387,6 @@ def draw_diagram(
             f"--database={config['targetdb']['db']['dbname']}",
             "--schemas=public",
             f"--user={config['targetdb']['db']['user']}",
-            f"--password={config['targetdb']['db']['password']}",
             f"--info-level={sc_info_level}",
             f"--log-level={sc_log_level}",
             "--portable-names",
@@ -330,14 +395,37 @@ def draw_diagram(
             f"--output-file={outfile}",
             "--no-remarks",
         ]
+
+        # Logged before the password is appended below, so it is not written to
+        # the log verbatim. It remains visible in the process list while
+        # SchemaCrawler runs.
         logger.debug(f"{comm}")
+
+        # `password` is optional in the config file, so it cannot be indexed
+        # directly -- doing so raised KeyError for password-less configs.
+        # Omitting --password is fine: SchemaCrawler connects over JDBC, and
+        # pgjdbc resolves the password from PGPASSFILE, or from ~/.pgpass via
+        # the JVM's user.home. Note that user.home is not taken from $HOME on
+        # macOS, so overriding HOME does not redirect the lookup -- use
+        # PGPASSFILE for that.
+        password = config["targetdb"]["db"].get("password")
+        if password is None:
+            logger.debug(
+                "No password in the config file; letting SchemaCrawler resolve "
+                "it from PGPASSFILE or ~/.pgpass."
+            )
+        else:
+            comm.append(f"--password={password}")
+
         subprocess.run(comm, shell=False)
     elif generator == "tbls":
         url_object = get_url_object(config)
+        # tbls wants a plain `postgres://` DSN with no SQLAlchemy driver
+        # qualifier. Replacing the scheme on the rendered string would turn
+        # `postgresql+psycopg://` into `postgres+psycopg://`, which tbls cannot
+        # parse, so swap the drivername on the URL object instead.
         url_object_tbls = (
-            url_object.render_as_string(hide_password=False).replace(
-                "postgresql", "postgres", 1
-            )
+            url_object.set(drivername="postgres").render_as_string(hide_password=False)
             + "?sslmode=disable"
         )
 
@@ -402,7 +490,15 @@ def normalize_filter_columns(df):
         col = f"filter_{band}"
         if col not in df.columns:
             continue
-        df.loc[df[col].isna() | (df[col] == ""), col] = None
+        mask = df[col].isna() | (df[col] == "")
+        # Force object dtype before assigning None: pandas' default string
+        # dtype (used from pandas 3.0 on, and optionally via
+        # future.infer_string on 2.x) stores its own NA sentinel and silently
+        # rewrites an assigned None back to NaN, defeating the point of this
+        # function -- the caller needs a real None, not a NaN that the
+        # database driver would coerce to the literal string "NaN".
+        df[col] = df[col].astype(object)
+        df.loc[mask, col] = None
     return df
 
 
@@ -931,76 +1027,72 @@ def add_database_rows(
         raise ValueError(f"flux_type must be 'total' or 'psf'. {flux_type=}")
 
     logger.info("Connecting to targetDB")
-    db = TargetDB(**config["targetdb"]["db"])
-    db.connect()
-
-    t_begin = time.time()
-    if table in ["proposal", "fluxstd", "sky", "user_pointing"]:
-        df = add_backref_values(df, db=db, table=table, upload_id=upload_id)
-    elif table in ["target"]:
-        if from_uploader:
-            df = make_target_df_from_uploader(
+    # The context manager guarantees close() runs even if the insert/update
+    # raises, which otherwise leaves pooled connections open and makes a later
+    # drop-db fail with "database is being accessed by other users".
+    with TargetDB(**config["targetdb"]["db"]) as db:
+        t_begin = time.time()
+        if table in ["proposal", "fluxstd", "sky", "user_pointing"]:
+            df = add_backref_values(df, db=db, table=table, upload_id=upload_id)
+        elif table in ["target"]:
+            if from_uploader:
+                df = make_target_df_from_uploader(
+                    df,
+                    db=db,
+                    table=table,
+                    proposal_id=proposal_id,
+                    upload_id=upload_id,
+                    flux_type=flux_type,
+                    insert=insert,
+                    update=update,
+                )
+            else:
+                df = add_backref_values(df, db=db, table=table)
+        elif table in ["input_catalog"]:
+            check_input_catalog(
                 df,
                 db=db,
-                table=table,
-                proposal_id=proposal_id,
-                upload_id=upload_id,
-                flux_type=flux_type,
-                insert=insert,
-                update=update,
+                input_catalog_id_start=input_catalog_id_start,
+                input_catalog_id_max=input_catalog_id_max,
             )
-        else:
-            df = add_backref_values(df, db=db, table=table)
-    elif table in ["input_catalog"]:
-        check_input_catalog(
-            df,
-            db=db,
-            input_catalog_id_start=input_catalog_id_start,
-            input_catalog_id_max=input_catalog_id_max,
-        )
-    t_end = time.time()
-    logger.info(f"Added back reference values in {t_end - t_begin:.2f} s")
-
-    if verbose:
-        logger.debug(f"{df.columns=}")
-
-    if verbose:
-        logger.debug(f"Working on the following DataFrame: \n{df}")
-
-    try:
-        t_begin = time.time()
-        if commit:
-            dry_run = False
-            logger.info("Committing the changes to targetDB")
-        else:
-            dry_run = True
-            logger.info("No changes will be committed to targetDB (i.e., dry run)")
-
-        # logger.info(f"{df['total_flux_r'][:100]}")
-        # db.close()
-        # exit()
-
-        if insert:
-            db.insert(table, df, dry_run=dry_run)
-        elif update:
-            db.update(table, df, dry_run=dry_run)
         t_end = time.time()
-        logger.info(
-            f"Insert data to the {table} table successful for {df.index.size} rows in {input_file} ({t_end - t_begin:.2f} s)"
-            if insert
-            else f"Update data in the {table} table successful for {df.index.size} rows in {input_file} ({t_end - t_begin:.2f} s)"
-        )
-    except Exception as e:
-        logger.error(f"Operation failed: {e}: {input_file}")
-        raise
+        logger.info(f"Added back reference values in {t_end - t_begin:.2f} s")
 
-    if fetch:
-        logger.info("Fetching the first 100 table entries")
-        res = db.fetch_all(table)
-        logger.info(f"Fetched the first 100 entries in the {table} table: \n{res}")
+        if verbose:
+            logger.debug(f"{df.columns=}")
 
-    logger.info("Closing targetDB")
-    db.close()
+        if verbose:
+            logger.debug(f"Working on the following DataFrame: \n{df}")
+
+        try:
+            t_begin = time.time()
+            if commit:
+                dry_run = False
+                logger.info("Committing the changes to targetDB")
+            else:
+                dry_run = True
+                logger.info("No changes will be committed to targetDB (i.e., dry run)")
+
+            if insert:
+                db.insert(table, df, dry_run=dry_run)
+            elif update:
+                db.update(table, df, dry_run=dry_run)
+            t_end = time.time()
+            logger.info(
+                f"Insert data to the {table} table successful for {df.index.size} rows in {input_file} ({t_end - t_begin:.2f} s)"
+                if insert
+                else f"Update data in the {table} table successful for {df.index.size} rows in {input_file} ({t_end - t_begin:.2f} s)"
+            )
+        except Exception as e:
+            logger.error(f"Operation failed: {e}: {input_file}")
+            raise
+
+        if fetch:
+            logger.info("Fetching the first 100 table entries")
+            res = db.fetch_all(table)
+            logger.info(f"Fetched the first 100 entries in the {table} table: \n{res}")
+
+        logger.info("Closing targetDB")
 
 
 def check_duplicates(
@@ -1950,40 +2042,36 @@ def update_input_catalog_active(
     >>> update_input_catalog_active(123, True, config, commit=True, verbose=True)
     """
 
-    db = TargetDB(**config["targetdb"]["db"])
-    db.connect()
-
     df = pd.DataFrame(
         {"input_catalog_id": [input_catalog_id], "active": [active_flag]},
         # index="input_catalog_id",
     )
 
-    if verbose:
-        logger.info(
-            f"Updating input_catalog_id {input_catalog_id} to active={active_flag}"
-        )
-        df_res = db.fetch_by_id(
-            "input_catalog",
-            input_catalog_id=input_catalog_id,
-        )
-        logger.info(f"Original input_catalog table: \n{df_res}")
+    with TargetDB(**config["targetdb"]["db"]) as db:
+        if verbose:
+            logger.info(
+                f"Updating input_catalog_id {input_catalog_id} to active={active_flag}"
+            )
+            df_res = db.fetch_by_id(
+                "input_catalog",
+                input_catalog_id=input_catalog_id,
+            )
+            logger.info(f"Original input_catalog table: \n{df_res}")
 
-    if commit:
-        logger.info(
-            f"Updating input_catalog_id {input_catalog_id} to active={active_flag}"
-        )
-    else:
-        logger.info(
-            f"Updating input_catalog_id {input_catalog_id} to active={active_flag} (dry run)"
-        )
+        if commit:
+            logger.info(
+                f"Updating input_catalog_id {input_catalog_id} to active={active_flag}"
+            )
+        else:
+            logger.info(
+                f"Updating input_catalog_id {input_catalog_id} to active={active_flag} (dry run)"
+            )
 
-    db.update("input_catalog", df, dry_run=not commit)
+        db.update("input_catalog", df, dry_run=not commit)
 
-    if verbose:
-        df_res = db.fetch_by_id(
-            "input_catalog",
-            input_catalog_id=input_catalog_id,
-        )
-        logger.info(f"Updated input_catalog table: \n{df_res}")
-
-    db.close()
+        if verbose:
+            df_res = db.fetch_by_id(
+                "input_catalog",
+                input_catalog_id=input_catalog_id,
+            )
+            logger.info(f"Updated input_catalog table: \n{df_res}")

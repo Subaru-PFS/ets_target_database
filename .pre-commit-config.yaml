@@ -10,15 +10,16 @@ repos:
         # (e.g. models/proposal.py's `partner # noqa: F401`) that F401's
         # autofix would silently delete. Report-only also matches the
         # check-only Lint workflow.
-        # Match the Lint workflow, which checks src and tests only.
-        # alembic/ migrations are historical and deliberately unlinted.
-        files: ^(src|tests)/
+        # Match the Lint workflow, which checks src, tests and the alembic
+        # env.py scripts. The revision scripts under alembic/*/versions/ are
+        # historical and deliberately unlinted (see pyproject.toml).
+        files: ^(src|tests)/|^alembic/[^/]+/alembic/env\.py$
 
   - repo: https://github.com/psf/black
     rev: 25.12.0
     hooks:
       - id: black
-        files: ^(src|tests)/
+        files: ^(src|tests)/|^alembic/[^/]+/alembic/env\.py$
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0

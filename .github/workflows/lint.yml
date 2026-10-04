@@ -30,8 +30,10 @@ jobs:
 
       # --output-format=github renders findings as inline PR annotations,
       # which is the part of the Codacy integration worth keeping.
+      # alembic is passed as a directory so that the versions/ exclusion in
+      # pyproject.toml applies; only the env.py scripts are actually checked.
       - name: Run ruff
-        run: uv run ruff check --output-format=github src tests
+        run: uv run ruff check --output-format=github src tests alembic
 
       - name: Run black
-        run: uv run black --check --diff src tests
+        run: uv run black --check --diff src tests alembic

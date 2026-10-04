@@ -19,29 +19,28 @@ The Q3C extension is required for the database. You can install it by the follow
 ### Python environment
 
 Python and the following packages as well as their dependencies will be used by installing `targetdb`.
-Package versions shown here are those used for the development (as of April 2025).
+Package versions shown here are those used for the development (as of May 2026).
 Newer (and somewhat older) versions should also work.
 
-| Package                                                                | Version |
-|------------------------------------------------------------------------|--------:|
-| [Python](https://www.python.org/)                                      |  3.11.x |
-| [SQLAlchemy](https://www.sqlalchemy.org/)                              |   2.0.x |
-| [pandas](https://pandas.pydata.org/)                                   |   2.2.3 |
-| [NumPy](https://numpy.org)                                             |  1.26.4 |
-| [Astropy](https://www.astropy.org/)                                    |   7.0.1 |
-| [loguru](https://loguru.readthedocs.io/)                               |   0.7.3 |
-| [SQLAlchemy-Utils](https://sqlalchemy-utils.readthedocs.io/en/latest/) |  0.41.2 |
-| [tabulate](https://pypi.org/project/tabulate/)                         |   0.9.0 |
-| [alembic](https://alembic.sqlalchemy.org/en/latest/)                   |  1.13.1 |
-| [pyarrow](https://arrow.apache.org/docs/python/)                       |  15.0.2 |
-| [Typer](https://typer.tiangolo.com/)                                   |  0.15.2 |
-| [openpyxl](https://openpyxl.readthedocs.io/en/stable/)                 |   3.1.2 |
+| Package                                                                |     Version |
+|------------------------------------------------------------------------|------------:|
+| [Python](https://www.python.org/)                                      |      3.12.x |
+| [SQLAlchemy](https://www.sqlalchemy.org/)                              |       2.0.x |
+| [pandas](https://pandas.pydata.org/)                                   |       2.3.3 |
+| [NumPy](https://numpy.org)                                             |       2.4.0 |
+| [Astropy](https://www.astropy.org/)                                    |       7.2.0 |
+| [loguru](https://loguru.readthedocs.io/)                               |       0.7.3 |
+| [pfs-utils](https://github.com/Subaru-PFS/pfs_utils)                   | 7.2026.3100 |
+| [psycopg](https://www.psycopg.org/)                                    |       3.3.4 |
+| [SQLAlchemy-Utils](https://sqlalchemy-utils.readthedocs.io/en/latest/) |      0.42.1 |
+| [tabulate](https://pypi.org/project/tabulate/)                         |       0.9.0 |
+| [alembic](https://alembic.sqlalchemy.org/en/latest/)                   |      1.18.0 |
+| [pyarrow](https://arrow.apache.org/docs/python/)                       |      22.0.0 |
+| [Typer](https://typer.tiangolo.com/)                                   |      0.21.1 |
+| [openpyxl](https://openpyxl.readthedocs.io/en/stable/)                 |       3.1.5 |
 
-If you are using Python 3.10 or earlier, you may need to install [tomli](https://github.com/hukkin/tomli) package.
-
-| Package                                  | Version |
-|------------------------------------------|--------:|
-| [tomli](https://github.com/hukkin/tomli) |   2.0.1 |
+`targetdb.TargetDB` subclasses `pfs.utils.database.db.DB`, so `pfs-utils` is installed
+straight from GitHub and a `.git` directory plus network access are needed at install time.
 
 For building the documentation, the following packages are required.
 
