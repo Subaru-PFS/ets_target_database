@@ -26,6 +26,7 @@ from .models import (
     input_catalog_id_max,
     input_catalog_id_start,
 )
+from .targetdb import scalar_column_defaults
 
 
 def load_config(config_file):
@@ -499,6 +500,72 @@ def normalize_filter_columns(df):
         # database driver would coerce to the literal string "NaN".
         df[col] = df[col].astype(object)
         df.loc[mask, col] = None
+    return df
+
+
+def _null_like_mask(series):
+    """True where a value is NaN, None, pd.NA or an empty string."""
+    mask = series.isna()
+    if not (
+        pd.api.types.is_numeric_dtype(series) or pd.api.types.is_bool_dtype(series)
+    ):
+        # astype(object) first: mapping over pandas' string dtype can yield
+        # pd.NA, which astype(bool) refuses.
+        mask |= (
+            series.astype(object)
+            .map(lambda v: isinstance(v, str) and v == "")
+            .astype(bool)
+        )
+    return mask
+
+
+def fill_null_with_defaults(df, table):
+    """
+    Replace null-like values with the column's model default before an insert.
+
+    The models' ``default=`` values are client-side defaults that ``COPY``
+    never sees. ``TargetDB.insert()`` adds columns that are absent from the
+    input; this function covers columns that are present but left blank,
+    which is how bulk inputs (CSV with empty cells, masked ECSV columns)
+    usually arrive. NaN, None, pd.NA and "" count as null.
+
+    Columns whose default is "" are skipped: replacing "" with "" changes
+    nothing, and ``COPY`` stores both "" and NULL as NULL anyway.
+
+    Only call this for inserts: on an update it would overwrite stored values
+    with defaults.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        The rows to insert. Not modified.
+    table : str
+        The name of the target table.
+
+    Returns
+    -------
+    df : pandas.DataFrame
+        A copy of `df` with null-like values replaced.
+    """
+    df = df.copy()
+    for name, value in scalar_column_defaults(table).items():
+        if value == "" or name not in df.columns:
+            continue
+        mask = _null_like_mask(df[name])
+        n_filled = int(mask.sum())
+        if n_filled == 0:
+            continue
+        if not (
+            pd.api.types.is_numeric_dtype(df[name])
+            or pd.api.types.is_bool_dtype(df[name])
+        ):
+            # pandas' string dtype refuses non-string values; object takes any.
+            df[name] = df[name].astype(object)
+        df.loc[mask, name] = value
+        logger.info(
+            f"Filled {n_filled} null value(s) in {table}.{name} "
+            f"with the default {value!r}"
+        )
     return df
 
 
@@ -1057,6 +1124,10 @@ def add_database_rows(
             )
         t_end = time.time()
         logger.info(f"Added back reference values in {t_end - t_begin:.2f} s")
+
+        if insert:
+            # Inserts only: on an update this would overwrite stored values.
+            df = fill_null_with_defaults(df, table)
 
         if verbose:
             logger.debug(f"{df.columns=}")
