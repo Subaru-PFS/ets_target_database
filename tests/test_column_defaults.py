@@ -202,3 +202,21 @@ def test_add_database_rows_leaves_nulls_on_update(captured_writes):
     ((kind, _, written),) = captured_writes
     assert kind == "update"
     assert written["epoch"].tolist() == ["J2016.0", ""]
+
+
+@pytest.mark.filterwarnings("error::FutureWarning")
+@pytest.mark.parametrize(
+    "column, values, expected",
+    [
+        # An all-null input column comes back as float64 from parquet/feather.
+        ("epoch", [np.nan, np.nan], ["J2000.0", "J2000.0"]),
+        ("is_cluster", [1.0, np.nan], [1.0, False]),
+        ("parallax", pd.array([1, pd.NA], dtype="Int64"), [1, 1e-7]),
+    ],
+)
+def test_fill_null_accepts_defaults_the_dtype_cannot_hold(column, values, expected):
+    df = pd.DataFrame({column: values})
+
+    out = fill_null_with_defaults(df, "target")
+
+    assert out[column].tolist() == expected

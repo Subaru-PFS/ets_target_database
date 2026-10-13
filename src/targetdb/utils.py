@@ -555,13 +555,20 @@ def fill_null_with_defaults(df, table):
         n_filled = int(mask.sum())
         if n_filled == 0:
             continue
+        column = df[name]
         if not (
-            pd.api.types.is_numeric_dtype(df[name])
-            or pd.api.types.is_bool_dtype(df[name])
+            pd.api.types.is_numeric_dtype(column) or pd.api.types.is_bool_dtype(column)
         ):
             # pandas' string dtype refuses non-string values; object takes any.
-            df[name] = df[name].astype(object)
-        df.loc[mask, name] = value
+            column = column.astype(object)
+        # where() rather than .loc: a default the dtype cannot hold (a string
+        # into an all-NaN float64 column, say) upcasts to object instead of
+        # warning on pandas 2 and raising on pandas 3.
+        try:
+            df[name] = column.where(~mask, value)
+        except TypeError:
+            # Nullable extension dtypes (Int64 given 1e-7) still refuse.
+            df[name] = column.astype(object).where(~mask, value)
         logger.info(
             f"Filled {n_filled} null value(s) in {table}.{name} "
             f"with the default {value!r}"
