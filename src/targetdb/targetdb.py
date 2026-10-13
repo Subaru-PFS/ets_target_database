@@ -10,6 +10,23 @@ from sqlalchemy import URL, and_, bindparam, select
 from . import models
 
 
+def scalar_column_defaults(tablename):
+    """Return ``{column: value}`` for the columns of a table with a scalar default.
+
+    These are the models' client-side ``default=`` values: SQLAlchemy applies
+    them when it builds an INSERT from the model, but they are not part of the
+    table DDL. The ``COPY`` path behind ``DB.insert_dataframe()`` never sees
+    the model, so they have to be applied to the DataFrame explicitly.
+    Callable and SQL-expression defaults are skipped; no model defines one.
+    """
+    table = getattr(models, tablename).__table__
+    return {
+        column.name: column.default.arg
+        for column in table.columns
+        if column.default is not None and column.default.is_scalar
+    }
+
+
 class TargetDB(DB):
     """PFS targetDB accessor built on top of ``pfs.utils.database.db.DB``.
 
@@ -203,6 +220,26 @@ class TargetDB(DB):
         logger.debug(f"Ignoring columns absent from the {tablename} table: {extra}")
         return dataframe.drop(columns=extra)
 
+    @staticmethod
+    def _fill_absent_columns_with_defaults(tablename, dataframe):
+        """Add the columns the DataFrame lacks, set to their model default.
+
+        The ORM ``bulk_insert_mappings()`` path this class used to take filled
+        them in from the model; ``COPY`` leaves them NULL, or fails outright on
+        ``target.single_exptime``, which is NOT NULL. Columns that are present
+        are left alone, null values included: replacing those is the CLI's
+        decision (see ``utils.fill_null_with_defaults()``).
+        """
+        absent = {
+            name: value
+            for name, value in scalar_column_defaults(tablename).items()
+            if name not in dataframe.columns
+        }
+        if not absent:
+            return dataframe
+        logger.debug(f"Filling columns absent from the {tablename} input: {absent}")
+        return dataframe.assign(**absent)
+
     def insert(self, tablename, dataframe, dry_run=False):
         """
         Description
@@ -221,11 +258,13 @@ class TargetDB(DB):
             Column labels of `dataframe` should be exactly the same as those of
             the table. Delegates to `DB.insert_dataframe()`, which uses
             PostgreSQL's `COPY`.
+            Columns absent from `dataframe` are added with the model's
+            scalar `default=` value, which `COPY` would otherwise leave NULL.
         """
+        dataframe = self._drop_unknown_columns(tablename, dataframe)
+        dataframe = self._fill_absent_columns_with_defaults(tablename, dataframe)
         with self._dry_run_scope(dry_run):
-            return self.insert_dataframe(
-                tablename, self._drop_unknown_columns(tablename, dataframe)
-            )
+            return self.insert_dataframe(tablename, dataframe)
 
     def update(self, tablename, dataframe, dry_run=False):
         """
