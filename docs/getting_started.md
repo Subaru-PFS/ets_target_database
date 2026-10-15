@@ -221,10 +221,10 @@ db = TargetDB()  # now defaults to targetdb_dev
 
 ## Database Migrations with Alembic
 
-Each deployment target has its own directory under `alembic/`
-(`local_test/`, `pfsa-db01-gb/`, `pfsa-db01-gb-dev/`), each with its own
-`alembic.ini` and revision history. Run alembic from within the relevant
-directory.
+Each directory under `alembic/` (`local_test/`, `pfsa-db01-gb/`,
+`pfsa-db01-gb-dev/`) has its own `alembic.ini` and revision history. Run
+alembic from within the relevant directory. The production and development
+databases share the `pfsa-db01-gb/` history; `pfsa-db01-gb-dev/` is stale.
 
 The `env.py` scripts build the connection URL from the same TOML configuration
 file the CLI uses. Point `TARGETDB_CONF` at it:
