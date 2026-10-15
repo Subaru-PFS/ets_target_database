@@ -37,7 +37,6 @@ EXPECTED_TARGET_DEFAULTS = {
     "is_medium_resolution": False,
     "qa_relative_throughput": 1.0,
     "qa_relative_noise": 1.0,
-    "is_cluster": False,
 }
 
 

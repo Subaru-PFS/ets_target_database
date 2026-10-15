@@ -96,7 +96,6 @@ Here are the columns in the `target` table:
 | qa_relative_noise      | float     | Quality assurance metric for relative noise.                                                     |        |              | 1.0     |
 | qa_reference_lambda    | float     | Quality assurance reference wavelength                                                           | nm     |              |         |
 | qa_reference_arm       | str       | Quality assurance reference arm [b\|r\|n\|m]                                                     |        | \*           |         |
-| is_cluster             | bool      | (Obsolete) `True` if the target is part of a cluster.                                            |        |              | False   |
 | created_at             | datetime  | The date and time in UTC when the record was created.                                            |        |              |         |
 | updated_at             | datetime  | The date and time in UTC when the record was last updated.                                       |        |              |         |
 

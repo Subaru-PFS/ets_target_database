@@ -47,8 +47,6 @@ from .sky import sky  # noqa E402
 from .fluxstd import fluxstd  # noqa E402
 from .target import target  # noqa E402
 
-from .cluster import cluster  # noqa E402
-
 
 __all__ = [
     "Base",
@@ -64,7 +62,6 @@ __all__ = [
     "sky",
     "fluxstd",
     "target",
-    "cluster",
     "input_catalog_id_start",
     "input_catalog_id_max",
     "input_catalog_id_absolute_max",

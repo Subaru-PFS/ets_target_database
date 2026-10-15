@@ -267,12 +267,6 @@ class target(Base):
         comment="Reference arm to evaluate effective exposure time ('b', 'r', 'n', 'm')",
     )
 
-    is_cluster = Column(
-        Boolean,
-        default=False,
-        comment="True if it is a cluster of multiple targets.",
-    )
-
     # timestamp
     created_at = Column(
         DateTime,
@@ -405,8 +399,6 @@ class target(Base):
         qa_reference_lambda,
         qa_reference_arm,
         #
-        is_cluster,
-        #
         created_at,
         updated_at,
     ):
@@ -508,8 +500,6 @@ class target(Base):
         self.qa_relative_noise = qa_relative_noise
         self.qa_reference_lambda = qa_reference_lambda
         self.qa_reference_arm = qa_reference_arm
-        #
-        self.is_cluster = is_cluster
         #
         self.created_at = created_at
         self.updated_at = updated_at

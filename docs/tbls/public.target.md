@@ -4,7 +4,7 @@
 
 | Name | Type | Default | Nullable | Children | Parents | Comment |
 | ---- | ---- | ------- | -------- | -------- | ------- | ------- |
-| target_id | bigint | nextval('target_target_id_seq'::regclass) | false | [public.cluster](public.cluster.md) |  | Unique identifier for each target |
+| target_id | bigint | nextval('target_target_id_seq'::regclass) | false |  |  | Unique identifier for each target |
 | proposal_id | varchar |  | true |  | [public.proposal](public.proposal.md) |  |
 | ob_code | varchar |  | false |  |  | Identifer for a combination of a target, observing mode, and exposure time in a program. |
 | obj_id | bigint |  | false |  |  | Object ID as specified by the observer at Phase 2 (can be same as the input_catalog_object_id) |
@@ -90,7 +90,6 @@
 | qa_relative_noise | double precision |  | true |  |  | Relative noise to the reference value requested by the observer (default: 1.0) |
 | qa_reference_lambda | double precision |  | true |  |  | Reference wavelength to evaluate effective exposure time (angstrom or nm?) |
 | qa_reference_arm | varchar |  | true |  | [public.pfs_arm](public.pfs_arm.md) | Reference arm to evaluate effective exposure time ('b', 'r', 'n', 'm') |
-| is_cluster | boolean |  | true |  |  | True if it is a cluster of multiple targets. |
 | created_at | timestamp without time zone | timezone('utc'::text, CURRENT_TIMESTAMP) | true |  |  | The date and time in UTC when the record was created |
 | updated_at | timestamp without time zone |  | true |  |  | The date and time in UTC when the record was last updated |
 
@@ -132,7 +131,6 @@
 ```mermaid
 erDiagram
 
-"public.cluster" }o--|| "public.target" : "FOREIGN KEY (target_id) REFERENCES target(target_id)"
 "public.target" }o--o| "public.proposal" : "FOREIGN KEY (proposal_id) REFERENCES proposal(proposal_id)"
 "public.target" }o--o| "public.target_type" : "FOREIGN KEY (target_type_id) REFERENCES target_type(target_type_id)"
 "public.target" }o--|| "public.input_catalog" : "FOREIGN KEY (input_catalog_id) REFERENCES input_catalog(input_catalog_id)"
@@ -233,19 +231,6 @@ erDiagram
   double_precision qa_relative_noise
   double_precision qa_reference_lambda
   varchar qa_reference_arm FK
-  boolean is_cluster
-  timestamp_without_time_zone created_at
-  timestamp_without_time_zone updated_at
-}
-"public.cluster" {
-  bigint cluster_id
-  bigint target_id FK
-  integer n_targets
-  double_precision ra_cluster
-  double_precision dec_cluster
-  double_precision d_ra
-  double_precision d_dec
-  integer input_catalog_id FK
   timestamp_without_time_zone created_at
   timestamp_without_time_zone updated_at
 }
