@@ -17,10 +17,10 @@ Here are the columns in the `proposal` table:
 | pi_middle_name       | str      | PI's middle name                                                    |      |              | ""      |
 | rank                 | float    | TAC score (0 to 10, higher is better)                               |      | \*           |         |
 | grade                | str      | TAC grade (A, B, C, D, F)                                           |      | \*           |         |
-| allocated_time       | float    | Total allocated fiberhours                                          | h    |              |         |
+| allocated_time_total | float    | Total allocated fiberhours                                          | h    |              | 0       |
 | allocated_time_lr    | float    | Allocated fiberhours for low-resolution mode                        | h    |              | 0       |
 | allocated_time_mr    | float    | Allocated fiberhours for medium-resolution mode                     | h    |              | 0       |
-| proposal_category_id | int      | `proposal_category_id` in the `proposal_category` table             |      |              | 0       |
+| proposal_category_id | int      | `proposal_category_id` in the `proposal_category` table             |      |              |         |
 | partner_id           | int      | `partner_id` in the `partner` table                                 |      |              |         |
 | is_too               | bool     | A flag to indicate if the proposal is a Target of Opportunity (ToO) |      |              | False   |
 | created_at           | datetime | The date and time in UTC when the record was created.               |      |              |         |

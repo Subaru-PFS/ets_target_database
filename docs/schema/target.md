@@ -22,7 +22,7 @@ Here are the columns in the `target` table:
 | pmdec                  | float     | Proper motion in declination direction                                                           | mas/yr |              | 0       |
 | tract                  | int       | Tract defined by, e.g., the HSC pipeline                                                         |        |              |         |
 | patch                  | int       | Patch defined by, e.g., the HSC pipeline                                                         |        |              |         |
-| target_type_id         | int       | `target_type_id` in the `target_type` table                                                      |        |              |         |
+| target_type_id         | int       | `target_type_id` in the `target_type` table                                                      |        |              | 1       |
 | input_catalog_id       | int       | `input_catalog_id` in the `input_catalog` table                                                  |        |              |         |
 | fiber_mag_u            | float     | (Obsolete) Fiber magnitude in _u_-band                                                           | AB mag |              |         |
 | fiber_mag_v            | float     | (Obsolete) Fiber magnitude in _v_-band                                                           | AB mag |              |         |
