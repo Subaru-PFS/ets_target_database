@@ -14,8 +14,7 @@
 | [public.proposal](public.proposal.md) | 15 |  | BASE TABLE |
 | [public.sky](public.sky.md) | 14 |  | BASE TABLE |
 | [public.fluxstd](public.fluxstd.md) | 73 |  | BASE TABLE |
-| [public.target](public.target.md) | 89 |  | BASE TABLE |
-| [public.cluster](public.cluster.md) | 10 |  | BASE TABLE |
+| [public.target](public.target.md) | 88 |  | BASE TABLE |
 
 ## Stored procedures and functions
 
@@ -94,8 +93,6 @@ erDiagram
 "public.target" }o--|| "public.input_catalog" : "FOREIGN KEY (input_catalog_id) REFERENCES input_catalog(input_catalog_id)"
 "public.target" }o--o| "public.target_type" : "FOREIGN KEY (target_type_id) REFERENCES target_type(target_type_id)"
 "public.target" }o--o| "public.proposal" : "FOREIGN KEY (proposal_id) REFERENCES proposal(proposal_id)"
-"public.cluster" }o--o| "public.input_catalog" : "FOREIGN KEY (input_catalog_id) REFERENCES input_catalog(input_catalog_id)"
-"public.cluster" }o--|| "public.target" : "FOREIGN KEY (target_id) REFERENCES target(target_id)"
 
 "public.filter_name" {
   varchar filter_name
@@ -348,19 +345,6 @@ erDiagram
   double_precision qa_relative_noise
   double_precision qa_reference_lambda
   varchar qa_reference_arm FK
-  boolean is_cluster
-  timestamp_without_time_zone created_at
-  timestamp_without_time_zone updated_at
-}
-"public.cluster" {
-  bigint cluster_id
-  bigint target_id FK
-  integer n_targets
-  double_precision ra_cluster
-  double_precision dec_cluster
-  double_precision d_ra
-  double_precision d_dec
-  integer input_catalog_id FK
   timestamp_without_time_zone created_at
   timestamp_without_time_zone updated_at
 }
