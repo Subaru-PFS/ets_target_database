@@ -11,26 +11,23 @@ Each directory has its own `alembic.ini` and its own independent revision
 history. **Run alembic from inside the directory whose history the database
 follows** — the histories are not interchangeable.
 
-| Directory           | Database                                                                           |
-| ------------------- | ---------------------------------------------------------------------------------- |
-| `local_test/`       | A local database used for trying migrations out                                    |
-| `pfsa-db01-gb/`     | Production (`pfsa-db:5433/targetdb`) and development (`pfsa-db:5437/targetdb_dev`) |
-| `pfsa-db01-gb-dev/` | Stale; kept for history only                                                       |
+| Directory       | Database                                                                           |
+| --------------- | ---------------------------------------------------------------------------------- |
+| `local_test/`   | A local database used for trying migrations out                                    |
+| `pfsa-db01-gb/` | Production (`pfsa-db:5433/targetdb`) and development (`pfsa-db:5437/targetdb_dev`) |
 
-Development and production share one revision history. Since the
-`filter_u`/`filter_v` revisions (2026-05), both have been migrated from
+Development and production share one revision history. Both are migrated from
 `pfsa-db01-gb/`, switching databases with `TARGETDB_CONF`: dev first, then
-production. `pfsa-db01-gb-dev/` stops at `a251bdccb11f`, and running it
-against dev fails because dev's current revision is not in that directory.
-Put new revisions under `pfsa-db01-gb/` only.
+production. A separate `pfsa-db01-gb-dev/` directory used to exist; it stopped
+being updated in 2026-05 and was removed, and its revisions are all in
+`pfsa-db01-gb/`.
 
 Directory names are historical and no longer match the current hostnames:
 `pfsa-db01-gb` and `pfsa-db` resolve to different machines (`.102` and
 `.110` respectively), and as of 2026-08 the production `targetdb` — the one
 `TargetDB`'s own `DEFAULT_HOST`/`DEFAULT_PORT` point at — is reachable at
 `pfsa-db:5433`, not `pfsa-db01-gb:5433`. Confirm which host actually holds
-the database you intend to migrate before running `alembic upgrade` from
-either directory.
+the database you intend to migrate before running `alembic upgrade`.
 
 The revision scripts under `*/alembic/versions/` are historical records. They
 are deliberately excluded from `ruff` and `black` (see `pyproject.toml`) and
