@@ -21,14 +21,14 @@ def test_scalar_column_defaults_lists_model_defaults():
     defaults = scalar_column_defaults("target")
     assert defaults["epoch"] == "J2000.0"
     assert defaults["single_exptime"] == 900
-    assert defaults["is_cluster"] is False
+    assert defaults["is_medium_resolution"] is False
     assert "ra" not in defaults
     # server_default is applied by the database, not a client-side default.
     assert "created_at" not in defaults
 
 
 def test_scalar_column_defaults_is_empty_without_defaults():
-    assert scalar_column_defaults("cluster") == {}
+    assert scalar_column_defaults("user_pointing") == {}
 
 
 def test_fill_absent_columns_adds_missing_defaults():
@@ -46,8 +46,8 @@ def test_fill_absent_columns_adds_missing_defaults():
 
 
 def test_fill_absent_columns_returns_input_when_nothing_is_absent():
-    df = pd.DataFrame({"cluster_id": [1]})
-    assert TargetDB._fill_absent_columns_with_defaults("cluster", df) is df
+    df = pd.DataFrame({"user_pointing_id": [1]})
+    assert TargetDB._fill_absent_columns_with_defaults("user_pointing", df) is df
 
 
 def test_insert_hands_defaults_to_insert_dataframe(monkeypatch):
@@ -88,7 +88,7 @@ def test_fill_null_replaces_nan_none_na_and_empty_string():
             "pmra": [1.5, np.nan, np.nan],
             # A CSV column with blanks, read with keep_default_na=False.
             "priority": ["2", "", "3"],
-            "is_cluster": pd.array([True, pd.NA, False], dtype="boolean"),
+            "is_medium_resolution": pd.array([True, pd.NA, False], dtype="boolean"),
             "single_exptime": pd.array([1800, pd.NA, 900], dtype="Int64"),
         }
     )
@@ -98,7 +98,7 @@ def test_fill_null_replaces_nan_none_na_and_empty_string():
     assert out["epoch"].tolist() == ["J2016.0", "J2000.0", "J2000.0"]
     assert out["pmra"].tolist() == [1.5, 0.0, 0.0]
     assert out["priority"].tolist() == ["2", 1.0, "3"]
-    assert out["is_cluster"].tolist() == [True, False, False]
+    assert out["is_medium_resolution"].tolist() == [True, False, False]
     assert out["single_exptime"].tolist() == [1800, 900, 900]
 
 
@@ -210,7 +210,7 @@ def test_add_database_rows_leaves_nulls_on_update(captured_writes):
     [
         # An all-null input column comes back as float64 from parquet/feather.
         ("epoch", [np.nan, np.nan], ["J2000.0", "J2000.0"]),
-        ("is_cluster", [1.0, np.nan], [1.0, False]),
+        ("is_medium_resolution", [1.0, np.nan], [1.0, False]),
         ("parallax", pd.array([1, pd.NA], dtype="Int64"), [1, 1e-7]),
     ],
 )
