@@ -101,9 +101,9 @@ Here, we show a few examples of how to use the `targetdb` package.
 If a postgres database server to create `targetdb` is not running, you can easily make one as a Docker container.
 
 ```console
-cd example/docker/
+cd examples/docker/
 docker compose build
-docker compose -up -d
+docker compose up -d
 ```
 
 In this example, the local port 15432 is mapped to the port 5432 inside the container.
@@ -121,7 +121,7 @@ pfs-targetdb-cli create-db -c dbconf.toml
 pfs-targetdb-cli install-q3c -c dbconf.toml
 
 # create tables in the database
-pfs-targetdb-cli create_schema -c dbconf.toml
+pfs-targetdb-cli create-schema -c dbconf.toml
 ```
 
 

@@ -20,6 +20,7 @@ from . import (
     proposal_category,
     # proposal_grade,
     utcnow,
+    with_default,
 )
 
 
@@ -57,16 +58,16 @@ class proposal(Base):
         comment="TAC grade (A/B/C/F and N/A)",
     )
     allocated_time_total = Column(
-        Float, default=0.0, comment="Total fiberhours allocated by TAC (hour)"
+        Float, **with_default(0.0), comment="Total fiberhours allocated by TAC (hour)"
     )
     allocated_time_lr = Column(
         Float,
-        default=0.0,
+        **with_default(0.0),
         comment="Total fiberhours for the low-resolution mode allocated by TAC (hour)",
     )
     allocated_time_mr = Column(
         Float,
-        default=0.0,
+        **with_default(0.0),
         comment="Total fiberhours for the medium-resolution mode allocated by TAC (hour)",
     )
     proposal_category_id = Column(
@@ -78,7 +79,9 @@ class proposal(Base):
         ForeignKey("partner.partner_id"),
     )
 
-    is_too = Column(Boolean, default=False, comment="True when the proposal is ToO")
+    is_too = Column(
+        Boolean, **with_default(False), comment="True when the proposal is ToO"
+    )
 
     created_at = Column(DateTime, comment=comment_created_at, server_default=utcnow())
     updated_at = Column(DateTime, comment=comment_updated_at, onupdate=utcnow())

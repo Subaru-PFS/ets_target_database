@@ -21,6 +21,7 @@ from . import (
     input_catalog,
     target_type,
     utcnow,
+    with_default,
 )
 
 
@@ -69,7 +70,9 @@ class sky(Base):
     ra = Column(Float, nullable=False, comment="RA (ICRS, degree)")
     dec = Column(Float, nullable=False, comment="Dec (ICRS, degree)")
     epoch = Column(
-        String, default="J2000.0", comment="Epoch (e.g., J2000.0, J2015.5, etc.)"
+        String,
+        **with_default("J2000.0"),
+        comment="Epoch (e.g., J2000.0, J2015.5, etc.)",
     )
 
     tract = Column(
@@ -84,7 +87,7 @@ class sky(Base):
     target_type_id = Column(
         Integer,
         ForeignKey("target_type.target_type_id"),
-        default=2,
+        **with_default(2),
         comment="target_type_id from the target_type table (must be 2 for SKY)",
     )
 

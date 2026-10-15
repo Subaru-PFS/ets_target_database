@@ -7,15 +7,22 @@ how each deployed database was brought to match them.
 
 ## Layout
 
-Each deployment target has its own directory, with its own `alembic.ini` and its
-own independent revision history. **Run alembic from inside the directory for
-the database you are migrating** — the histories are not interchangeable.
+Each directory has its own `alembic.ini` and its own independent revision
+history. **Run alembic from inside the directory whose history the database
+follows** — the histories are not interchangeable.
 
-| Directory           | Database                                        |
-| ------------------- | ----------------------------------------------- |
-| `local_test/`       | A local database used for trying migrations out |
-| `pfsa-db01-gb/`     | Production                                      |
-| `pfsa-db01-gb-dev/` | Development                                     |
+| Directory           | Database                                                                           |
+| ------------------- | ---------------------------------------------------------------------------------- |
+| `local_test/`       | A local database used for trying migrations out                                    |
+| `pfsa-db01-gb/`     | Production (`pfsa-db:5433/targetdb`) and development (`pfsa-db:5437/targetdb_dev`) |
+| `pfsa-db01-gb-dev/` | Stale; kept for history only                                                       |
+
+Development and production share one revision history. Since the
+`filter_u`/`filter_v` revisions (2026-05), both have been migrated from
+`pfsa-db01-gb/`, switching databases with `TARGETDB_CONF`: dev first, then
+production. `pfsa-db01-gb-dev/` stops at `a251bdccb11f`, and running it
+against dev fails because dev's current revision is not in that directory.
+Put new revisions under `pfsa-db01-gb/` only.
 
 Directory names are historical and no longer match the current hostnames:
 `pfsa-db01-gb` and `pfsa-db` resolve to different machines (`.102` and
@@ -128,6 +135,31 @@ notice a change to those indexes. Write that DDL by hand.
 Identity/serial sequences are likewise reported as skipped
 (`Detected sequence named 'fluxstd_fluxstd_id_seq' ... assuming SERIAL and
 omitting`); this is normal and needs nothing.
+
+### Autogenerate does not compare server defaults
+
+`compare_server_default` is left off in `env.py`, so autogenerate does not
+notice a column whose `server_default` was added or changed. Columns with a
+scalar default declare it through `models.with_default()`, which sets both
+`default=` and `server_default=`. Adding or changing one of those needs a
+hand-written `op.alter_column(..., server_default=...)`. See `03091e870c70`.
+
+### `ALTER TABLE` on the large tables waits for locks
+
+`target`, `fluxstd` and `sky` hold billions of rows, but a metadata-only
+`ALTER` (`SET DEFAULT`, `DROP DEFAULT`, a comment, a nullable `ADD COLUMN`) is
+still instant on them. It does take an `ACCESS EXCLUSIVE` lock, though. Behind
+a long-running transaction, it waits, and every new query on that table queues
+behind it. Start such a revision with
+
+```python
+op.execute("SET LOCAL lock_timeout = '10s'")
+```
+
+so it fails and rolls back instead; rerun it later. Before upgrading
+production, check `pg_stat_activity` for anything `idle in transaction` or
+long `active`. A non-superuser sees other roles' sessions there with `state`
+and `xact_start` blanked.
 
 ### `%` in a password
 

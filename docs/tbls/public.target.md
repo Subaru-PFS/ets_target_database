@@ -10,13 +10,13 @@
 | obj_id | bigint |  | false |  |  | Object ID as specified by the observer at Phase 2 (can be same as the input_catalog_object_id) |
 | ra | double precision |  | false |  |  | RA (ICRS, degree) |
 | dec | double precision |  | false |  |  | Dec (ICRS, degree) |
-| epoch | varchar |  | true |  |  | Epoch (default: J2000.0) |
-| parallax | double precision |  | true |  |  | Parallax (mas) |
-| pmra | double precision |  | true |  |  | Proper motion in right ascension direction (mas/yr) |
-| pmdec | double precision |  | true |  |  | Proper motion in declination direction (mas/yr) |
+| epoch | varchar | 'J2000.0'::character varying | true |  |  | Epoch (default: J2000.0) |
+| parallax | double precision | 0.0000001 | true |  |  | Parallax (mas) |
+| pmra | double precision | 0.0 | true |  |  | Proper motion in right ascension direction (mas/yr) |
+| pmdec | double precision | 0.0 | true |  |  | Proper motion in declination direction (mas/yr) |
 | tract | integer |  | true |  |  | same definition as HSC-SSP?; can be derived from the coordinate |
 | patch | integer |  | true |  |  | same definition as HSC-SSP?; can be derived from the coordinate; Note that it's defined as an integer |
-| target_type_id | integer |  | true |  | [public.target_type](public.target_type.md) | target type ID (default: 1 = SCIENCE) |
+| target_type_id | integer | 1 | true |  | [public.target_type](public.target_type.md) | target type ID (default: 1 = SCIENCE) |
 | input_catalog_id | integer |  | false |  | [public.input_catalog](public.input_catalog.md) | Input catalog ID from the input_catalog table |
 | fiber_mag_u | double precision |  | true |  |  | u-band magnitude within a fiber (AB mag) |
 | fiber_mag_v | double precision |  | true |  |  | v-band magnitude within a fiber (AB mag) |
@@ -82,12 +82,12 @@
 | filter_z | varchar |  | true |  | [public.filter_name](public.filter_name.md) | z-band filter (z_hsc, z_ps1, z_sdss, etc.) |
 | filter_y | varchar |  | true |  | [public.filter_name](public.filter_name.md) | y-band filter (y_hsc, y_ps1, y_sdss, etc.) |
 | filter_j | varchar |  | true |  | [public.filter_name](public.filter_name.md) | j-band filter (j_mko, etc.) |
-| priority | double precision |  | true |  |  | Priority of the target specified by the observer within the proposal |
+| priority | double precision | 1.0 | true |  |  | Priority of the target specified by the observer within the proposal |
 | effective_exptime | double precision |  | false |  |  | Requested effective exposure time (s) |
-| single_exptime | double precision |  | false |  |  | Individual exposure time (s) |
-| is_medium_resolution | boolean |  | true |  |  | True if the medium resolution mode is requested |
-| qa_relative_throughput | double precision |  | true |  |  | Relative throughput to the reference value requested by the observer (default: 1.0) |
-| qa_relative_noise | double precision |  | true |  |  | Relative noise to the reference value requested by the observer (default: 1.0) |
+| single_exptime | double precision | 900 | false |  |  | Individual exposure time (s) |
+| is_medium_resolution | boolean | false | true |  |  | True if the medium resolution mode is requested |
+| qa_relative_throughput | double precision | 1.0 | true |  |  | Relative throughput to the reference value requested by the observer (default: 1.0) |
+| qa_relative_noise | double precision | 1.0 | true |  |  | Relative noise to the reference value requested by the observer (default: 1.0) |
 | qa_reference_lambda | double precision |  | true |  |  | Reference wavelength to evaluate effective exposure time (angstrom or nm?) |
 | qa_reference_arm | varchar |  | true |  | [public.pfs_arm](public.pfs_arm.md) | Reference arm to evaluate effective exposure time ('b', 'r', 'n', 'm') |
 | created_at | timestamp without time zone | timezone('utc'::text, CURRENT_TIMESTAMP) | true |  |  | The date and time in UTC when the record was created |
@@ -120,11 +120,11 @@
 | target_pkey | CREATE UNIQUE INDEX target_pkey ON public.target USING btree (target_id) |
 | target_propid_obcode_catid_objid_resolution_key | CREATE UNIQUE INDEX target_propid_obcode_catid_objid_resolution_key ON public.target USING btree (proposal_id, ob_code, input_catalog_id, obj_id, is_medium_resolution) |
 | target_propid_obcode_key | CREATE UNIQUE INDEX target_propid_obcode_key ON public.target USING btree (proposal_id, ob_code) |
-| target_input_catalog_id_idx | CREATE INDEX target_input_catalog_id_idx ON public.target USING btree (input_catalog_id) |
-| target_proposal_id_obj_id_idx | CREATE INDEX target_proposal_id_obj_id_idx ON public.target USING btree (proposal_id, obj_id) |
 | target_q3c_ang2ipix_idx | CREATE INDEX target_q3c_ang2ipix_idx ON public.target USING btree (q3c_ang2ipix(ra, "dec")) |
 | target_proposal_id_idx | CREATE INDEX target_proposal_id_idx ON public.target USING btree (proposal_id) |
 | target_obj_id_input_catalog_id_idx | CREATE INDEX target_obj_id_input_catalog_id_idx ON public.target USING btree (obj_id, input_catalog_id) |
+| target_input_catalog_id_idx | CREATE INDEX target_input_catalog_id_idx ON public.target USING btree (input_catalog_id) |
+| target_proposal_id_obj_id_idx | CREATE INDEX target_proposal_id_obj_id_idx ON public.target USING btree (proposal_id, obj_id) |
 
 ## Relations
 

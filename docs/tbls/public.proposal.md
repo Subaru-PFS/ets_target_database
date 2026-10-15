@@ -11,12 +11,12 @@
 | pi_middle_name | varchar |  | true |  |  | PI's middle name |
 | rank | double precision |  | false |  |  | TAC score |
 | grade | varchar |  | false |  |  | TAC grade (A/B/C/F and N/A) |
-| allocated_time_total | double precision |  | true |  |  | Total fiberhours allocated by TAC (hour) |
-| allocated_time_lr | double precision |  | true |  |  | Total fiberhours for the low-resolution mode allocated by TAC (hour) |
-| allocated_time_mr | double precision |  | true |  |  | Total fiberhours for the medium-resolution mode allocated by TAC (hour) |
+| allocated_time_total | double precision | 0.0 | true |  |  | Total fiberhours allocated by TAC (hour) |
+| allocated_time_lr | double precision | 0.0 | true |  |  | Total fiberhours for the low-resolution mode allocated by TAC (hour) |
+| allocated_time_mr | double precision | 0.0 | true |  |  | Total fiberhours for the medium-resolution mode allocated by TAC (hour) |
 | proposal_category_id | integer |  | true |  | [public.proposal_category](public.proposal_category.md) |  |
 | partner_id | integer |  | true |  | [public.partner](public.partner.md) |  |
-| is_too | boolean |  | true |  |  | True when the proposal is ToO |
+| is_too | boolean | false | true |  |  | True when the proposal is ToO |
 | created_at | timestamp without time zone | timezone('utc'::text, CURRENT_TIMESTAMP) | true |  |  | The date and time in UTC when the record was created |
 | updated_at | timestamp without time zone |  | true |  |  | The date and time in UTC when the record was last updated |
 

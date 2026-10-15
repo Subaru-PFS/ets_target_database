@@ -23,6 +23,7 @@ from . import (
     input_catalog,
     target_type,
     utcnow,
+    with_default,
 )
 
 
@@ -57,19 +58,23 @@ class fluxstd(Base):
     ra = Column(Float, nullable=False, comment="RA (ICRS, degree)")
     dec = Column(Float, nullable=False, comment="Dec (ICRS, degree)")
     epoch = Column(
-        String, default="J2000.0", comment="Epoch (e.g., J2000.0, J2015.5, etc.)"
+        String,
+        **with_default("J2000.0"),
+        comment="Epoch (e.g., J2000.0, J2015.5, etc.)",
     )
 
-    parallax = Column(Float, default=1.0e-7, comment="Parallax (mas)")
+    parallax = Column(Float, **with_default(1.0e-7), comment="Parallax (mas)")
     parallax_error = Column(Float, comment="Standard error of parallax (mas)")
     pmra = Column(
         Float,
-        default=0.0,
+        **with_default(0.0),
         comment="Proper motion in right ascension direction (mas/yr)",
     )
     pmra_error = Column(Float, comment="Standard error of pmra (mas/yr)")
     pmdec = Column(
-        Float, default=0.0, comment="Proper motion in declination direction (mas/yr)"
+        Float,
+        **with_default(0.0),
+        comment="Proper motion in declination direction (mas/yr)",
     )
     pmdec_error = Column(Float, comment="Standard error of pmdec (mas/yr)")
 
@@ -85,7 +90,7 @@ class fluxstd(Base):
     target_type_id = Column(
         Integer,
         ForeignKey("target_type.target_type_id"),
-        default=3,
+        **with_default(3),
         comment="target_type_id from the target_type table (must be 3 for FLUXSTD)",
     )
 
@@ -217,17 +222,17 @@ class fluxstd(Base):
     )
     is_fstar_gaia = Column(
         Boolean,
-        default=False,
+        **with_default(False),
         comment="Flag for F-star from Gaia (Teff=6000-7500K if True)",
     )
     is_gc_neighbor = Column(
         Boolean,
-        default=False,
+        **with_default(False),
         comment="Flag for globular cluster neighbor",
     )
     is_dense_region = Column(
         Boolean,
-        default=False,
+        **with_default(False),
         comment="Flag for dense stellar region",
     )
 

@@ -77,7 +77,7 @@ Here are the columns in the `fluxstd` table:
 | teff_gspphot       | float     | Effective temperature from GSP-Phot Aeneas best library using BP/RP spectra                                 | K      | \*           |         |
 | teff_gspphot_lower | float     | Lower confidence level (16%) of effective temperature from GSP-Phot Aeneas best library using BP/RP spectra | K      | \*           |         |
 | teff_gspphot_upper | float     | Upper confidence level (84%) of effective temperature from GSP-Phot Aeneas best library using BP/RP spectra | K      | \*           |         |
-| is_fstar_gaia      | bool      | `True` if teff_gspphot is between 6000K and 7500K                                                           |        | \*           |         |
+| is_fstar_gaia      | bool      | `True` if teff_gspphot is between 6000K and 7500K                                                           |        | \*           | False   |
 | is_gc_neighbor     | bool      | Flag for globular cluster neighbor                                                                          |        |              | False   |
 | is_dense_region    | bool      | Flag for dense stellar region                                                                               |        |              | False   |
 | version            | str       | The version of the F-star candidate catalog                                                                 |        | \*           |         |

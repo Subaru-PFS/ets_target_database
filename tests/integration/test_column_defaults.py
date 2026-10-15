@@ -6,7 +6,8 @@ Since TargetDB moved onto pfs.utils.database.db.DB, inserts go through
 PostgreSQL's COPY, which knows nothing about the SQLAlchemy models'
 client-side `default=` values. These tests insert through the CLI with the
 defaulted columns left out entirely and with blank cells, then read back what
-was stored.
+was stored. The same values are also the columns' server defaults, which a
+raw INSERT that bypasses targetdb is checked against at the end.
 
 Every row created here, including the probe input catalog, is deleted again:
 the fixtures in conftest.py are session-scoped and other modules assert exact
@@ -17,6 +18,8 @@ only, not target_data, which would load the example targets early.
 import pandas as pd
 import pytest
 from sqlalchemy import text
+
+from targetdb.targetdb import scalar_column_defaults
 
 from .conftest import run_cli
 
@@ -190,3 +193,52 @@ def test_target_given_values_are_kept(engine, inserted_with_defaults):
         "priority": 5.0,
         "is_medium_resolution": True,
     }
+
+
+# Raw INSERTs naming only the required columns, so every value checked below
+# comes from the DDL's DEFAULT clause rather than from targetdb's Python code.
+SERVER_DEFAULT_INSERTS = {
+    "input_catalog": (
+        "INSERT INTO input_catalog (input_catalog_id, input_catalog_name) "
+        f"VALUES ({PROBE_CATALOG_ID + 1}, 'zzz_server_defaults')"
+    ),
+    "proposal": (
+        "INSERT INTO proposal (proposal_id, group_id, pi_last_name, rank, grade) "
+        "VALUES ('ZZZ-SERVER-DEFAULTS-1', 'o99998', 'Probe', 5.0, 'A')"
+    ),
+    "target": (
+        "INSERT INTO target "
+        "(ob_code, obj_id, ra, dec, input_catalog_id, effective_exptime) "
+        f"VALUES ('zzz_server_defaults', 1, 150.0, 2.0, {PROBE_CATALOG_ID + 1}, 3600.0)"
+    ),
+    "fluxstd": (
+        "INSERT INTO fluxstd (obj_id, ra, dec, input_catalog_id, version) "
+        f"VALUES (1, 150.0, 2.0, {PROBE_CATALOG_ID + 1}, 'zzz')"
+    ),
+    "sky": (
+        "INSERT INTO sky (obj_id, ra, dec, input_catalog_id, version) "
+        f"VALUES (1, 150.0, 2.0, {PROBE_CATALOG_ID + 1}, 'zzz')"
+    ),
+}
+
+
+def test_server_defaults_fill_omitted_columns(engine, master_data):
+    # Inserted in this order for the foreign keys, then rolled back, so nothing
+    # is left behind for the session-scoped fixtures.
+    stored = {}
+    with engine.connect() as conn:
+        try:
+            for table, insert in SERVER_DEFAULT_INSERTS.items():
+                columns = ", ".join(scalar_column_defaults(table))
+                stored[table] = dict(
+                    conn.execute(text(f"{insert} RETURNING {columns}")).mappings().one()
+                )
+        finally:
+            conn.rollback()
+
+    for table, row in stored.items():
+        expected = {
+            name: None if value == "" else value
+            for name, value in scalar_column_defaults(table).items()
+        }
+        assert row == expected, table

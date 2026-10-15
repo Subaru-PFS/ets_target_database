@@ -8,16 +8,16 @@
 | obj_id | bigint |  | false |  |  | source_id (e.g., Gaia EDR3, DR3, etc.) |
 | ra | double precision |  | false |  |  | RA (ICRS, degree) |
 | dec | double precision |  | false |  |  | Dec (ICRS, degree) |
-| epoch | varchar |  | true |  |  | Epoch (e.g., J2000.0, J2015.5, etc.) |
-| parallax | double precision |  | true |  |  | Parallax (mas) |
+| epoch | varchar | 'J2000.0'::character varying | true |  |  | Epoch (e.g., J2000.0, J2015.5, etc.) |
+| parallax | double precision | 0.0000001 | true |  |  | Parallax (mas) |
 | parallax_error | double precision |  | true |  |  | Standard error of parallax (mas) |
-| pmra | double precision |  | true |  |  | Proper motion in right ascension direction (mas/yr) |
+| pmra | double precision | 0.0 | true |  |  | Proper motion in right ascension direction (mas/yr) |
 | pmra_error | double precision |  | true |  |  | Standard error of pmra (mas/yr) |
-| pmdec | double precision |  | true |  |  | Proper motion in declination direction (mas/yr) |
+| pmdec | double precision | 0.0 | true |  |  | Proper motion in declination direction (mas/yr) |
 | pmdec_error | double precision |  | true |  |  | Standard error of pmdec (mas/yr) |
 | tract | integer |  | true |  |  | same definition as HSC-SSP?; can be derived from the coordinate |
 | patch | integer |  | true |  |  | same definition as HSC-SSP?; can be derived from the coordinate; Note that it's defined as an integer |
-| target_type_id | integer |  | true |  | [public.target_type](public.target_type.md) | target_type_id from the target_type table (must be 3 for FLUXSTD) |
+| target_type_id | integer | 3 | true |  | [public.target_type](public.target_type.md) | target_type_id from the target_type table (must be 3 for FLUXSTD) |
 | input_catalog_id | integer |  | false |  | [public.input_catalog](public.input_catalog.md) | input_catalog_id from the input_catalog table |
 | psf_mag_u | double precision |  | true |  |  | u-band PSF magnitude (AB mag) |
 | psf_mag_v | double precision |  | true |  |  | v-band PSF magnitude (AB mag) |
@@ -71,9 +71,9 @@
 | teff_gspphot | double precision |  | true |  |  | Effective temperature inferred by GSP-phot Aeneas [K] |
 | teff_gspphot_lower | double precision |  | true |  |  | Lower confidence level (16%) of effective temperature inferred by GSP-phot Aeneas [K] |
 | teff_gspphot_upper | double precision |  | true |  |  | Upper confidence level (84%) of effective temperature inferred by GSP-phot Aeneas [K] |
-| is_fstar_gaia | boolean |  | true |  |  | Flag for F-star from Gaia (Teff=6000-7500K if True) |
-| is_gc_neighbor | boolean |  | true |  |  | Flag for globular cluster neighbor |
-| is_dense_region | boolean |  | true |  |  | Flag for dense stellar region |
+| is_fstar_gaia | boolean | false | true |  |  | Flag for F-star from Gaia (Teff=6000-7500K if True) |
+| is_gc_neighbor | boolean | false | true |  |  | Flag for globular cluster neighbor |
+| is_dense_region | boolean | false | true |  |  | Flag for dense stellar region |
 | version | varchar |  | false |  |  | Version string of the F-star selection |
 | created_at | timestamp without time zone | timezone('utc'::text, CURRENT_TIMESTAMP) | true |  |  | The date and time in UTC when the record was created |
 | updated_at | timestamp without time zone |  | true |  |  | The date and time in UTC when the record was last updated |

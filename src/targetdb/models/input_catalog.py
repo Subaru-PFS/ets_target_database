@@ -10,6 +10,7 @@ from . import (
     input_catalog_id_max,
     input_catalog_id_start,
     utcnow,
+    with_default,
 )
 
 
@@ -41,15 +42,19 @@ class input_catalog(Base):
     )
     active = Column(
         Boolean,
-        default=True,
+        **with_default(True),
         comment="Flag to indicate if the input catalog is active (default: True)",
     )
     is_classical = Column(
-        Boolean, default=False, comment="True if the classical mode is requested"
+        Boolean,
+        **with_default(False),
+        comment="True if the classical mode is requested",
     )
 
     is_user_pointing = Column(
-        Boolean, default=False, comment="True if user-defined pointings are provided"
+        Boolean,
+        **with_default(False),
+        comment="True if user-defined pointings are provided",
     )
 
     created_at = Column(

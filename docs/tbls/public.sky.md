@@ -9,10 +9,10 @@
 | obj_id_orig | varchar |  | true |  |  | Original object ID in the sky catalog |
 | ra | double precision |  | false |  |  | RA (ICRS, degree) |
 | dec | double precision |  | false |  |  | Dec (ICRS, degree) |
-| epoch | varchar |  | true |  |  | Epoch (e.g., J2000.0, J2015.5, etc.) |
+| epoch | varchar | 'J2000.0'::character varying | true |  |  | Epoch (e.g., J2000.0, J2015.5, etc.) |
 | tract | integer |  | true |  |  | Tract from HSC-SSP |
 | patch | integer |  | true |  |  | Patch from HSC-SSP |
-| target_type_id | integer |  | true |  | [public.target_type](public.target_type.md) | target_type_id from the target_type table (must be 2 for SKY) |
+| target_type_id | integer | 2 | true |  | [public.target_type](public.target_type.md) | target_type_id from the target_type table (must be 2 for SKY) |
 | input_catalog_id | integer |  | false |  | [public.input_catalog](public.input_catalog.md) | input_catalog_id from the input_catalog table |
 | mag_thresh | double precision |  | true |  |  | Sky intensity threshold in mag/arcsec^2 (only for HSC-SSP). |
 | version | varchar |  | false |  |  | Version string of the sky position |
@@ -34,9 +34,9 @@
 | ---- | ---------- |
 | sky_pkey | CREATE UNIQUE INDEX sky_pkey ON public.sky USING btree (sky_id) |
 | sky_obj_id_input_catalog_id_version_key | CREATE UNIQUE INDEX sky_obj_id_input_catalog_id_version_key ON public.sky USING btree (obj_id, input_catalog_id, version) |
-| ix_sky_input_catalog_id | CREATE INDEX ix_sky_input_catalog_id ON public.sky USING btree (input_catalog_id) |
 | ix_sky_version | CREATE INDEX ix_sky_version ON public.sky USING btree (version) |
 | sky_q3c_ang2ipix_idx | CREATE INDEX sky_q3c_ang2ipix_idx ON public.sky USING btree (q3c_ang2ipix(ra, "dec")) |
+| ix_sky_input_catalog_id | CREATE INDEX ix_sky_input_catalog_id ON public.sky USING btree (input_catalog_id) |
 
 ## Relations
 

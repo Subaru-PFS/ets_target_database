@@ -25,6 +25,7 @@ from . import (
     proposal,
     target_type,
     utcnow,
+    with_default,
 )
 
 
@@ -81,16 +82,20 @@ class target(Base):
         nullable=False,
         comment="Dec (ICRS, degree)",
     )
-    epoch = Column(String, default="J2000.0", comment="Epoch (default: J2000.0)")
+    epoch = Column(
+        String, **with_default("J2000.0"), comment="Epoch (default: J2000.0)"
+    )
 
-    parallax = Column(Float, default=1.0e-7, comment="Parallax (mas)")
+    parallax = Column(Float, **with_default(1.0e-7), comment="Parallax (mas)")
     pmra = Column(
         Float,
-        default=0.0,
+        **with_default(0.0),
         comment="Proper motion in right ascension direction (mas/yr)",
     )
     pmdec = Column(
-        Float, default=0.0, comment="Proper motion in declination direction (mas/yr)"
+        Float,
+        **with_default(0.0),
+        comment="Proper motion in declination direction (mas/yr)",
     )
 
     tract = Column(
@@ -105,7 +110,7 @@ class target(Base):
     target_type_id = Column(
         Integer,
         ForeignKey("target_type.target_type_id"),
-        default=1,
+        **with_default(1),
         comment="target type ID (default: 1 = SCIENCE)",
     )
 
@@ -222,7 +227,7 @@ class target(Base):
 
     priority = Column(
         Float,
-        default=1.0,
+        **with_default(1.0),
         comment="Priority of the target specified by the observer within the proposal",
     )
     effective_exptime = Column(
@@ -232,13 +237,13 @@ class target(Base):
     single_exptime = Column(
         Float,
         nullable=False,
-        default=900,
+        **with_default(900),
         comment="Individual exposure time (s)",
     )
 
     is_medium_resolution = Column(
         Boolean,
-        default=False,
+        **with_default(False),
         comment="True if the medium resolution mode is requested",
     )
 
@@ -249,12 +254,12 @@ class target(Base):
     # QA information
     qa_relative_throughput = Column(
         Float,
-        default=1.0,
+        **with_default(1.0),
         comment="Relative throughput to the reference value requested by the observer (default: 1.0)",
     )
     qa_relative_noise = Column(
         Float,
-        default=1.0,
+        **with_default(1.0),
         comment="Relative noise to the reference value requested by the observer (default: 1.0)",
     )
     qa_reference_lambda = Column(
