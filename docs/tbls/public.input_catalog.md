@@ -8,9 +8,9 @@
 | input_catalog_name | varchar |  | false |  |  | Name of the input catalog (e.g., Gaia DR2, HSC-SSP PDR3, etc.) |
 | input_catalog_description | varchar |  | true |  |  | Description of the input catalog |
 | upload_id | varchar(16) |  | true |  |  | A 8-bit hex string (16 characters) assigned at the submission of the target list (default: empty string) |
-| active | boolean |  | true |  |  | Flag to indicate if the input catalog is active (default: True) |
-| is_classical | boolean |  | true |  |  | True if the classical mode is requested |
-| is_user_pointing | boolean |  | true |  |  | True if user-defined pointings are provided |
+| active | boolean | true | true |  |  | Flag to indicate if the input catalog is active (default: True) |
+| is_classical | boolean | false | true |  |  | True if the classical mode is requested |
+| is_user_pointing | boolean | false | true |  |  | True if user-defined pointings are provided |
 | created_at | timestamp without time zone | timezone('utc'::text, CURRENT_TIMESTAMP) | true |  |  | The date and time in UTC when the record was created |
 | updated_at | timestamp without time zone |  | true |  |  | The date and time in UTC when the record was last updated |
 
