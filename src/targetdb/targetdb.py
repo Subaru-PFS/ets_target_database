@@ -14,9 +14,12 @@ def scalar_column_defaults(tablename):
     """Return ``{column: value}`` for the columns of a table with a scalar default.
 
     These are the models' client-side ``default=`` values: SQLAlchemy applies
-    them when it builds an INSERT from the model, but they are not part of the
-    table DDL. The ``COPY`` path behind ``DB.insert_dataframe()`` never sees
-    the model, so they have to be applied to the DataFrame explicitly.
+    them when it builds an INSERT from the model. The ``COPY`` path behind
+    ``DB.insert_dataframe()`` never sees the model, so they have to be applied
+    to the DataFrame explicitly. All but the ``""`` ones are also server
+    defaults (``models.with_default()``), but those only fill a column that
+    the INSERT leaves out, never one it sends as NULL, and a database that has
+    not been migrated yet lacks them.
     Callable and SQL-expression defaults are skipped; no model defines one.
     """
     table = getattr(models, tablename).__table__
