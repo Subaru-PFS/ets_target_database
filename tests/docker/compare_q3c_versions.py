@@ -7,7 +7,8 @@ sky. If a q3c upgrade changed its value for any input, those indexes would
 silently disagree with the function and have to be rebuilt. This script
 loads one seeded point set into two servers, compares the ipix of every row
 and the result of q3c_radial_query() for a set of PFS-sized cones, and exits
-non-zero on any difference.
+non-zero on any difference between the servers or on any radial-query
+result that disagrees with the exact angular distance.
 
 The point set mixes uniform points on the sphere with the inputs most likely
 to expose a numerical change: ra next to 0/360, dec at and next to the
@@ -108,12 +109,17 @@ def cross(ra_values, dec_values):
 def offset_points(ra0, dec0, dist, pa):
     """Points at angular distance `dist` and position angle `pa` (deg) from a centre."""
     ra0, dec0, dist, pa = (np.radians(v) for v in (ra0, dec0, dist, pa))
-    sin_dec = np.sin(dec0) * np.cos(dist) + np.cos(dec0) * np.sin(dist) * np.cos(pa)
-    dec = np.arcsin(np.clip(sin_dec, -1.0, 1.0))
-    dra = np.arctan2(
-        np.sin(pa) * np.sin(dist) * np.cos(dec0),
-        np.cos(dist) - np.sin(dec0) * sin_dec,
-    )
+    # Rotate the offset into the centre's frame: east/north/up components of
+    # the point give ra and dec through atan2 alone. The textbook arcsin form
+    # loses precision next to the poles, and its atan2 for ra divides out a
+    # cos(dec0) that collapses every position angle at an exact pole.
+    east = np.sin(pa) * np.sin(dist)
+    north = np.cos(pa) * np.sin(dist)
+    up = np.cos(dist)
+    along_meridian = np.cos(dec0) * up - np.sin(dec0) * north
+    sin_dec = np.sin(dec0) * up + np.cos(dec0) * north
+    dec = np.arctan2(sin_dec, np.hypot(east, along_meridian))
+    dra = np.arctan2(east, along_meridian)
     return np.degrees(ra0 + dra) % 360.0, np.degrees(dec)
 
 
@@ -367,6 +373,7 @@ def compare(dsn_a, dsn_b, seed, n_uniform):
             returned[ids] = True
             missed = int((inside & ~returned).sum())
             extra = int((outside & returned).sum())
+            failed |= bool(missed or extra)
             line += f" {label}={ids.size:6d} (missed {missed:5d}, extra {extra:3d})"
         print(f"{line} {'same' if same else 'DIFFERENT'}")
         if not same:
