@@ -4,10 +4,12 @@
 #
 # q3c is built from an upstream tag rather than installed from the PGDG apt
 # repository: the apt package is unpinned and tracks the latest release, so
-# it silently drifts away from the version production runs. Keep the default
-# equal to production; override with `--build-arg Q3C_VERSION=...` (or the
-# Q3C_VERSION environment variable when going through docker compose).
-ARG Q3C_VERSION=2.0.1
+# the tested version changed without anyone deciding it. The default is the
+# version production is moving to; production still runs 2.0.1 until it is
+# upgraded. Override with `--build-arg Q3C_VERSION=...` (or the Q3C_VERSION
+# environment variable when going through docker compose), e.g. 2.0.1 to
+# match production exactly.
+ARG Q3C_VERSION=2.0.6
 
 FROM postgres:16 AS q3c-build
 ARG Q3C_VERSION
