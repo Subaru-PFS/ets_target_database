@@ -9,6 +9,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      # Passed through from the environment only when set, so the
+      # Dockerfile's default q3c version applies otherwise.
+      args:
+        - Q3C_VERSION
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres

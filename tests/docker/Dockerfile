@@ -1,9 +1,29 @@
-# PostgreSQL image with the Q3C extension pre-installed, mirroring the
-# packages installed on-the-fly in .github/workflows/test_database.yml.
-# Building this once and reusing the image is much faster than the CI
-# approach of installing q3c into a freshly-started container every run.
-FROM postgres:16
+# PostgreSQL image with the Q3C extension pre-installed. Building this once
+# and reusing the image is much faster than the CI approach of installing
+# q3c into a freshly-started container every run.
+#
+# q3c is built from an upstream tag rather than installed from the PGDG apt
+# repository: the apt package is unpinned and tracks the latest release, so
+# the tested version changed without anyone deciding it. The default is the
+# version production is moving to; production still runs 2.0.1 until it is
+# upgraded. Override with `--build-arg Q3C_VERSION=...` (or the Q3C_VERSION
+# environment variable when going through docker compose), e.g. 2.0.1 to
+# match production exactly.
+ARG Q3C_VERSION=2.0.6
 
+FROM postgres:16 AS q3c-build
+ARG Q3C_VERSION
+# q3c 2.0.1's Makefile links its `prepare` helper against PostgreSQL's full
+# $(LIBS), hence the -dev libraries (2.0.6 no longer needs them).
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends postgresql-16-q3c \
+    && apt-get install -y --no-install-recommends \
+        build-essential ca-certificates curl postgresql-server-dev-16 \
+        liblz4-dev libreadline-dev libzstd-dev zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
+RUN curl -fsSL "https://github.com/segasai/q3c/archive/refs/tags/v${Q3C_VERSION}.tar.gz" \
+        | tar xz -C /tmp \
+    && make -C "/tmp/q3c-${Q3C_VERSION}" \
+    && make -C "/tmp/q3c-${Q3C_VERSION}" install DESTDIR=/q3c-install
+
+FROM postgres:16
+COPY --from=q3c-build /q3c-install/ /
